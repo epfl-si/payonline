@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<title>PayOnLine</title>
+
+<!-- web2010 EPFL -->
+<link rel="stylesheet" href="https://www.epfl.ch/css/epfl.css">
+<link rel="stylesheet" href="/payonline.css">
+
+<script type="text/javascript" src="https://www.epfl.ch/js/jquery-epfl.min.js"></script>
+<script type="text/javascript">jQuery.noConflict();</script>
+<script type="text/javascript" src="https://www.epfl.ch/js/globalnav.js"></script>
+
+<script src="/CalendarPopup.js"></script>
+<script src="/payonline.js" type="text/javascript"></script>
+
+</head>
+
+<body <TMPL_VAR NAME="sOnLoad">>
+
+<TMPL_INCLUDE NAME="header.fr.html">
+
+<div id="main-content"> 
+
+<!-- breadcrumbs -->
+<ul id="breadcrumbs" title="Navigation dans l'arborescence de l'EPFL">
+  <li><a href="https://www.epfl.ch/" title="EPFL Page d'accueil">EPFL</a></li>
+  <li ><a href="http://dit.epfl.ch/" title="DIT">DIT</a></li>
+  <li class="last">payonline</li>
+</ul>
+
+<ul id="languages" title="Language">
+  <li><a href="<TMPL_VAR NAME="sPathMe">/priv?lang=en&id=<TMPL_VAR NAME="sId">">English</a></li>
+  <li class="current">Français</a></li>
+</ul>
+
+<h1>Paiement en ligne</h1>
+
+<div id="main-navigation" class="navigation-bar">
+	<ul class="topnav">
+
+      <TMPL_IF NAME=sAuthstr>
+          <TMPL_IF NAME=sRespAdmin>
+			<li><a href="http://sf.epfl.ch/files/content/sites/sf/files/shared/Doc-Xls/Ouverture_fds.docx">Demande de fonds</a></li>      
+        </TMPL_IF>
+		<li><a href="<TMPL_VAR NAME=sPathMe>/newinst?lang=fr">Nouvelle instance</a></li>  
+	  	<li><a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=fr&etat=prod">Mes instances</a></li>
+	  	<li><a href="<TMPL_VAR NAME=sPathMe>/search?lang=fr">Recherche</a></li>  
+    </TMPL_IF>
+    <li><a href="http://wiki.epfl.ch/payonline-aide" target="_blank">Aide</a></li>
+
+	</ul>
+	<div style="clear:both"></div>
+</div>
+
+<div  id="content" class="content">

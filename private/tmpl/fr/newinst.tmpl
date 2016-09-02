@@ -1,0 +1,93 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+	<div  class="editbox">
+	<h3>Nouvelle instance</h3>
+	
+	Une instance de paiement correspond à une manifestation pour laquelle vous désirez
+	pouvoir effectuer des encaissements en ligne. L'instance peut être créée seulement 
+	si vous disposez d'un fonds dédié. Autrement, vous devez effectuer la 
+	<a href=http://payonline.epfl.ch/cgi-bin/payonline/demfnd?lang=fr>demande de fonds</a>.
+	<p>Les champs en <b>gras</b> sont obligatoires.</p>
+	
+	<form id="form1" name="form1" method="post" action="<TMPL_VAR NAME=sFormaction>">
+	  <input type="hidden" name="add" >
+	  <table width="98%" border="0">
+		<tr height="30" valign="top">
+		  <td align="right"><B>Fonds</B></td>
+		  <td><TMPL_VAR NAME=sFonds></td>
+		</tr>
+		<tr>
+		  <td valign="top" align="right">OIS<br>(Ordre Interne Statistique)
+		  </td>
+		  <td><input name="ois"" size="48"></td>
+		</tr>
+		<tr>
+		  <td valign="top" align="right"><B>Description</B>
+		  <br><i>(Vous êtes priés de préciser les dates de la manifestation)</i>
+		  </td>
+		  <td><textarea name="descr" cols="48" rows="2" id="descr"></textarea></td>
+		</tr>
+		<tr>
+		  <td align="right"><b>Compte budgétaire </b></td>
+		  <td><TMPL_VAR NAME=sNCTxt></td>
+		</tr>
+		<tr>
+		  <td align="right"><B>D&eacute;but validité instance</B></td>
+		  <td>
+			<input name="datedeb"  size="12" value="<TMPL_VAR NAME=sdatedeb>">
+			<A HREF="#" onClick="cal.select(document.forms['form1'].datedeb,'anchor1','dd-MM-yyyy'); return false;"
+				NAME="anchor1" ID="anchor1"><img src="/images/cal.gif" border="0"></A>
+		  </td>
+		</tr>
+		<tr>
+		  <td align="right"><B>Fin validité instance</B></td>
+		  <td><input name="datefin"  size="12">
+			<A HREF="#" onClick="cal.select(document.forms['form1'].datefin,'anchor2','dd-MM-yyyy'); return false;"
+				NAME="anchor2" ID="anchor2"><img src="/images/cal.gif" border="0"></A>
+		  </td>
+		</tr>
+		<tr>
+		  <td align="right"><B>Monnaie</B> </td>
+		  <td><TMPL_VAR NAME=sMonnaie></td>
+		</tr>
+		<tr>
+		  <td align="right" valign="top">Contact mail </td>
+		  <td><input name="contact" value="<TMPL_VAR NAME=contact>" size="48">
+		  <br><i>(si autre contact que l'adresse du responsable)</i>      
+		  </td>
+		</tr>
+		<tr>
+		  <td align="right">URL Manifestation </td>
+		  <td><input name="urlconf"  size="48"></td>
+		</tr>
+		<tr>
+		  <td align="right">URL Retour </td>
+		  <td><input name="url" type="text" size="48" />
+		  <br><i>(veuillez consulter l'aide en ligne pour plus de détails à ce sujet)</i>
+		  </td>
+		</tr>
+		<tr>
+		  <td align="right">Mail de confirmation des transactions </td>
+		  <td><input name="mailinst" type="text" size="48" />
+		  <br><i>(si présent, déclanche un message de confirmation pour les transactions réussies)</i>
+		  </td>
+		</tr>
+	  </table>
+	
+	<hr>
+	<br><b>Actions :</b>
+	 [ <a href="#" OnClick="document.form1.add.value=1;form1.submit();">enregistrer</a> ]
+	</form>
+	
+	</div>
+
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">
