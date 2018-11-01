@@ -1,0 +1,19 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+
+   <h3>Demande de validation</h3>
+   Le message ci-dessous a été envoyé au Service financier de l'EPFL.<br>
+   Dès validation, vous recevrez un message et l'instance passera en mode <b>production</b>.
+   <hr>
+   <TMPL_VAR NAME=sMsg>
+
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">

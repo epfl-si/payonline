@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Troubleshooting payonline</title>
+<link href="https://www.epfl.ch/css/epfl.css" media="all" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="/payonline.css">
+
+<style>
+ol li {margin-left:20px;}
+</style>
+
+</head>
+
+<body>
+
+<h2>Probl&egrave;mes avec  payonline</h2>
+<p>  Les &eacute;tapes de la proc&eacute;dure de EPFL payonline  :</p>
+<ol>
+  <li> Saisir les donn&eacute;es personnelles sur la page <strong>d'enregistrement</strong> et soumettre
+    le formulaire </li>
+  <li>Suit la page de  <strong>payonline.epfl.ch</strong>    qui confirme l'enregistrement
+    des donn&eacute;es; cliquer <strong>Continuer</strong> pour faire apparaitre  </li>
+  <li> la fen&ecirc;tre pop-up de <strong>PostFinance</strong> : choisir la mani&egrave;re
+    de paiement et donner ensuite les param&egrave;tres de la carte<br>
+    (si votre navigateur bloque les fen&ecirc;tres pop-up le message pour &quot;Payer&quot; ou &quot;Annuler&quot; est
+  affich&eacute;)</li>
+  <li>PostFinance valide la transaction et retourne un code &agrave; payonline.epfl.ch
+    :
+    <ul>
+      <li>la carte est solvable,   
+        code=1 (Transaction accept&eacute;e), </li>
+      <li>la carte n'est pas solvable ou la proc&eacute;dure est interrompue par &quot;Annuler&quot;,
+        code=0 (Transaction &eacute;chou&eacute;e);</li>
+      <li>vous interrompez la proc&eacute;dure en fermant la fen&ecirc;tre de PostFinance,
+        code vide (Transaction &eacute;chou&eacute;e).</li>
+    </ul>
+  </li>
+</ol>
+<img src="/images/transactions.gif">
+<div class="editbox">
+<p>En cas d'&eacute;chec de paiement, veuillez contacter les responsables ci-dessous,
+  selon l'&eacute;tape o&ugrave; le probl&egrave;me est arriv&eacute;  :	  </p>
+<ul style="margin-left:20px;">
+  <li>sur le site de la conf&eacute;rence  : le responsable de l'instance de
+    paiement </li>
+  <li>sur payonline.epfl.ch (EPFL logo) :  <a href="mailto:1234@epfl.ch">1234@epfl.ch</a> </li>
+  <li>lors du choix du mode de paiement et/ou la saisie des d&eacute;tails de la carte
+    de cr&eacute;dit  (sur
+    le site de PostFinance) :  <a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>  </li>
+</ul>
+Veuillez fournir des d&eacute;tails de la transaction (num&eacute;ro, date, etc.), le 
+navigateur et  syst&egrave;me informatique utilis&eacute;s, une description du probl&egrave;me
+et la copie du message d'erreur. Une copie d'&eacute;cran attach&eacute;e &agrave; votre
+message remplace les quelques 1000 mots de trop. </div>
+
+<h2>Notes</h2>
+<ul>
+<li>JavaScript est exig&eacute; par PostFinance pour son service de paiement (&eacute;tape 3)</li>
+<li>Le blocage des fen&ecirc;tres popup par le navigateur peut poser un probl&egrave;me : veuillez le d&eacute;sactiver, svp.</li>
+<li>Veuillez prendre note que certaines cartes de cr&eacute;dit, selon l'organisme &eacute;metteur,
+  peuvent &ecirc;tre refus&eacute;es pour les transactions &eacute;lectroniques lors de l'&eacute;tape 4
+  (codes d'erreur entre 200 et 299). Dans ce cas il faut contacter l'organisme &eacute;metteur de la carte pour plus de
+  d&eacute;tails.</li>
+<li>En cas d'&eacute;checs r&eacute;p&eacute;t&eacute;s, utiliser un moyen alternatif de paiement pour ne
+  pas rater l'&eacute;v&eacute;nement. <br />
+  Ces d&eacute;tails devraient se trouver sur la page d'enregistrement. </li>
+</ul>
+<hr />
+<p>contact : <a href="mailto:1234@epfl.ch">1234@epfl.ch</a></p>
+</body>
+</html>

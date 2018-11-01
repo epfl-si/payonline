@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<title>PayOnLine</title>
+
+<!-- web2010 EPFL -->
+<link rel="stylesheet" href="https://www.epfl.ch/css/epfl.css">
+<script type="text/javascript" src="https://www.epfl.ch/js/jquery-epfl.min.js"></script>
+<script type="text/javascript">jQuery.noConflict();</script>
+<script type="text/javascript" src="https://www.epfl.ch/js/globalnav.js"></script>
+
+<link rel="stylesheet" href="/payonline.css">
+<script src="/CalendarPopup.js"></script>
+<script src="/payonline.js" type="text/javascript"></script>
+
+</head>
+
+<body <TMPL_VAR NAME="sOnLoad">>
+
+<TMPL_INCLUDE NAME="header.fr.html">
+
+<div id="main-content"> 
+
+<!-- breadcrumbs -->
+<ul id="breadcrumbs" title="Navigation dans l'arborescence de l'EPFL">
+  <li><a href="https://www.epfl.ch/" title="EPFL Page d'accueil">EPFL</a></li>
+  <li><a href="http://it.epfl.ch/" title="IT">IT</a></li>
+  <li class="last">Payonline</li>
+</ul>
+
+<h1>Paiement en ligne</h1>
+
+<TMPL_IF NAME=sTestInst>
+<div style="width: 95%; padding: 20px; border: solid 2px #ff0000;">
+<b>Attention</b> cette procédure est en mode test : les transactions financières seront seulement simulées.<br>
+Contacter <a href="mailto:1234@epfl.ch">1234@epfl.ch</a> pour plus de détails.
+</div>
+</TMPL_IF>

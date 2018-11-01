@@ -1,0 +1,50 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+
+    <h3>Instances</h3>
+    Click the instance to edit parameters or to list transactions. You may sort the
+    list by "Description", "Status" or "Start Date".
+
+    <p style="text-align:justify;">
+    Instances : 
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=en&id=<TMPL_VAR NAME=id>&etat=prod">running</a> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=en&id=<TMPL_VAR NAME=id>&etat=test">testing</a> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=en&id=<TMPL_VAR NAME=id>&etat=inact">inactives</a> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=en&id=<TMPL_VAR NAME=id>&etat=archive">archives</a> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=en&id=<TMPL_VAR NAME=id>">all</a> ]
+    </p>
+    <table width="100%" border="0" cellspacing="0" cellpadding="2">
+    <th><a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=en&id=<TMPL_VAR NAME=id>&orderby=descr">Description</a></th>
+    <TMPL_IF NAME=sIsSuperUSer>
+    <th>Responsable</th>
+    </TMPL_IF>
+    <th><a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=en&id=<TMPL_VAR NAME=id>&orderby=etat">Status</a></th>
+    <th>Fonds</th>
+    <th><a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=en&id=<TMPL_VAR NAME=id>&orderby=datedeb">Start Date</a></th>
+    <th>End Date</th>
+    <TMPL_LOOP NAME=sLoop>
+   	 <tr>
+	   <td class="<TMPL_VAR NAME=style>">
+	   <a href="<TMPL_VAR NAME=sEdit>"><TMPL_VAR NAME="descr"></a>
+	   </td>
+	   <TMPL_IF NAME=sIsSuperUSer>
+	   <td class="<TMPL_VAR NAME=style>"><TMPL_VAR NAME=respPrenom> <TMPL_VAR NAME=respNom></td>
+	   </TMPL_IF>
+	   <td class="<TMPL_VAR NAME=style>"><TMPL_VAR NAME="etat"></td>
+	   <td class="<TMPL_VAR NAME=style>"><TMPL_VAR NAME="fonds"></td>
+	   <td class="<TMPL_VAR NAME=style>"><TMPL_VAR NAME="datedeb"></td>
+	   <td class="<TMPL_VAR NAME=style>"><TMPL_VAR NAME="datefin"></td>
+	 </tr>
+    </TMPL_LOOP>
+    </table>
+
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">

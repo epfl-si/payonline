@@ -1,0 +1,294 @@
+#!/usr/bin/perl
+#
+##############################################################################
+#
+# File Name:    ress.pl
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2005
+#
+#########################################################################
+#####
+#
+#
+
+
+use strict;
+use HTML::Template;
+
+use payonline_tools;
+
+use vars qw(%args $tmpldir $lang $errmsg $crtdate);
+
+my $me 			= $ENV {SCRIPT_NAME};
+my $us 			= $ENV {SERVER_NAME};
+my $qs 			= $ENV {QUERY_STRING};
+my $pi 			= $ENV {PATH_INFO};
+my $lang 		= 'en';
+my $tmpldir 	= '/var/www/vhosts/payonline.epfl.ch/private/tmpl/XX/';
+my $logfile		= '/var/log/httpd/payonline.log';
+my $lockfile	= '/tmp/payonline.lock';
+my @languages 	= ('fr','en');
+my $mailresp	= 'ion.cionca@epfl.ch';
+my $masterIP	= '128.178.1.146';
+
+#	- inst id qui contournent les Conditions Générales de payonline
+my $bypassCondGen = 'y8xou4juffbh586ua1astocwsnmuh1y4,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
+my $noHeaderPage  = 'maintrans-noheader.tmpl';
+my $noHeaderInsts = 'cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
+
+my %errmsgs	= (
+	fr => [
+		'Erreur(s) de saisie',
+		'<li>indentificateur d\'instance absent</li>',
+		'<li>indentificateur de monnaie absent</li>',
+		'<li>total transaction absent</li>',
+		'<li>nom absent</li>',
+		'<li>prénom absent</li>',
+		'<li>adresse absente</li>',
+		'<li>code postal absent</li>',
+		'<li>ville absente</li>',
+		'<li>code pays absent</li>',
+		'Veuillez retourner sur la page précédente pour effectuer les corrections nécessaires.',
+		'<li>total transaction incorrect</li>',
+		'Instance de paiement pas trouvée ou pas active',
+		'Veuillez retourner sur la page précédente et suivre le lien de contact pour plus de détails.',
+		'<li>les seules monnaies acceptées : CHF, EUR, USD</li>',
+		' *** Attention : version de test. Ne pas utiliser, svp ! ***',			# 15
+		'Le service <b>payonline@epfl</b> est momentanément indisponible : veuillez rester sur cette page et l\'actualiser dans quelques minutes',			# 16
+		'transaction pas trouvée',	#	- 17
+		'Veuillez contacter le support payonline', 	#	- 18
+		'Erreur de paramètre de lang, fr ou en', 	#	- 19
+	      ],
+	en => [
+		'Input error(s)',				# 0
+		'<li>instance identificator missing</li>',	# 1
+		'<li>currency missing</li>',			# 2
+		'<li>transaction total missing</li>',		# 3
+		'<li>last name missing</li>',			# 4
+		'<li>first name missing</li>',			# 5
+		'<li>address missing</li>',			# 6
+		'<li>zip code missing</li>',			# 7
+		'<li>city missing</li>',			# 8
+		'<li>country code missing</li>',		# 9
+		'Please return on the previous page and correct the input',	# 10
+		'<li>wrong total format</li>',					# 11
+		'Payment instance not found or not active',		# 12
+		'Please return on the previous page and follow the contact link for details',		# 13
+		'<li>valid currencies : CHF, EUR, USD</li>',			# 14
+		' *** Warning : test version. Not for public usage ! ***',	# 15
+		'<b>payonline@epfl</b> is currently unavailable : please stay on this page end do a page reload in a couple of minutes.',	# 16
+		'transaction not found',		#	- 17
+		'Please contact payonline support', 	#	- 18
+		'Wrong value for parameter lang : fr or en are accepted', 	#	- 19
+	      ],
+	);
+
+
+my $header = qq{
+	<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<title>SDSC | A complex journey made simple</title>
+
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+<link href="//fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700,800,900,300italic,400italic" rel="stylesheet" type="text/css">
+
+<link rel="stylesheet" id="wp-blog-designer-fontawesome-stylesheets-css" href="https://datascience.ch/wp-content/plugins/blog-designer/css/font-awesome.min.css?ver=4.8.1" type="text/css" media="all">
+<!--
+
+<link rel="stylesheet" id="wp-blog-designer-stylesheets-css" href="https://datascience.ch/wp-content/plugins/blog-designer/css/designer_css.php?ver=4.8.1" type="text/css" media="all">
+-->
+<link rel="stylesheet" id="layerslider-css" href="https://datascience.ch/wp-content/plugins/LayerSlider/static/layerslider/css/layerslider.css?ver=6.0.5" type="text/css" media="all">
+<link rel="stylesheet" id="ls-google-fonts-css" href="https://fonts.googleapis.com/css?family=Lato:100,300,regular,700,900%7COpen+Sans:300%7CIndie+Flower:regular%7COswald:300,regular,700&amp;subset=latin%2Clatin-ext" type="text/css" media="all">
+<link rel="stylesheet" id="wpos-slick-style-css" href="https://datascience.ch/wp-content/plugins/blog-designer-for-post-and-widget/assets/css/slick.css?ver=1.1.2" type="text/css" media="all">
+<link rel="stylesheet" id="bdpw-public-css-css" href="https://datascience.ch/wp-content/plugins/blog-designer-for-post-and-widget/assets/css/bdpw-public.css?ver=1.1.2" type="text/css" media="all">
+<link rel="stylesheet" id="rs-plugin-settings-css" href="https://datascience.ch/wp-content/plugins/revslider/public/assets/css/settings.css?ver=5.2.6" type="text/css" media="all">
+<link rel="stylesheet" id="cssnews-css" href="https://datascience.ch/wp-content/plugins/sp-news-and-widget/css/stylenews.css?ver=3.3.4" type="text/css" media="all">
+<link rel="stylesheet" id="wspsc-style-css" href="https://datascience.ch/wp-content/plugins/wordpress-simple-paypal-shopping-cart/wp_shopping_cart_style.css?ver=4.3.6" type="text/css" media="all">
+<link rel="stylesheet" id="default_style-css" href="https://datascience.ch/wp-content/themes/bridge/style.css?ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="qode_font_awesome-css" href="https://datascience.ch/wp-content/themes/bridge/css/font-awesome/css/font-awesome.min.css?ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="qode_font_elegant-css" href="https://datascience.ch/wp-content/themes/bridge/css/elegant-icons/style.min.css?ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="qode_linea_icons-css" href="https://datascience.ch/wp-content/themes/bridge/css/linea-icons/style.css?ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="stylesheet-css" href="https://datascience.ch/wp-content/themes/bridge/css/stylesheet.min.css?ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="qode_print-css" href="https://datascience.ch/wp-content/themes/bridge/css/print.css?ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="mac_stylesheet-css" href="https://datascience.ch/wp-content/themes/bridge/css/mac_stylesheet.css?ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="webkit-css" href="https://datascience.ch/wp-content/themes/bridge/css/webkit_stylesheet.css?ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="style_dynamic-css" href="https://datascience.ch/wp-content/themes/bridge/css/style_dynamic.css?ver=1495093928" type="text/css" media="all">
+<link rel="stylesheet" id="responsive-css" href="https://datascience.ch/wp-content/themes/bridge/css/responsive.min.css?ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="style_dynamic_responsive-css" href="https://datascience.ch/wp-content/themes/bridge/css/style_dynamic_responsive.css?ver=1495093928" type="text/css" media="all">
+<link rel="stylesheet" id="js_composer_front-css" href="https://datascience.ch/wp-content/plugins/js_composer/assets/css/js_composer.min.css?ver=5.2.1" type="text/css" media="all">
+<link rel="stylesheet" id="custom_css-css" href="https://datascience.ch/wp-content/themes/bridge/css/custom_css.css?ver=1495093928" type="text/css" media="all">
+</head>
+};
+
+  payonline_tools::setLog($logfile);
+  %args		= payonline_tools::loadargs ();
+  $crtdate 	= payonline_tools::getcrtdate();
+  $lang    	= lc($args{lang}) if $args{lang};
+  $lang 	= 'en' unless $lang;
+  
+  unless ($lang =~ /(fr|en)/) {
+	 $tmpldir 	=~ s/XX/en/;
+  	 my $template = initTempl('maintrans.tmpl');
+     $errmsg .= qq{<p>$errmsgs{en}->[19]</p>} ;
+     $template->param(sErrMsg => $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+
+  $tmpldir 	=~ s/XX/$lang/;
+
+  payonline_tools::init ();
+
+#warn "payonline :: init : tmpldir=$tmpldir\n";
+  
+  maintrans ();
+
+  exit;
+
+#------
+sub maintrans {
+
+  my $tmpl_file = $noHeaderInsts =~ /$args{id_inst}/ ? 'maintrans-noheader.tmpl' : 'maintrans.tmpl';
+
+warn "-_> maintrans : tmpl_file=$tmpl_file\n";
+
+  my $template  = initTempl($tmpl_file);
+
+  if (-f $lockfile && $ENV{REMOTE_ADDR} ne $masterIP) {
+     my $msg = qq{Service payonline en maintenance !};
+     payonline_tools::send_mail ($mailresp, 'EPFL payonline :: maintenance', $msg);
+
+     $errmsg .= qq{<p>$errmsgs{$lang}->[16]</p>} ;
+     $template->param(sErrMsg => $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+
+  my $sql = qq{select * from instances where id=? and (etat='test' or etat='prod') };
+  my $sth = payonline_tools::dbquery ($sql, ($args{id_inst}));
+
+  my $inst = $sth->fetchrow_hashref;
+  unless ($inst) {
+     $errmsg .= qq{<p>1 $errmsgs{$lang}->[12]</p>} 
+  } else {
+     $errmsg .= qq{<p>2 $errmsgs{$lang}->[12] : $inst->{id}</p>}  if (($inst->{datedeb} gt $crtdate) or (($inst->{datefin} lt $crtdate) and ($inst->{datefin} ne '0000-00-00')))
+  }
+
+  if ($errmsg) {
+warn "maintrans : ERR from $ENV{HTTP_REFERER} :: $errmsg\n";
+     $errmsg = qq{<h3>$errmsgs{$lang}->[12]</h3>$errmsgs{$lang}->[13]     };
+	#	- dump args
+	 foreach my $item (sort keys %args) {
+		warn "maintrans : ERR from : $item=$args{$item}=\n";
+	 }
+
+     $template->param(sErrMsg => $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+  
+	my $id_trans;
+	my $query;
+	my $Addr;
+
+	# - check params
+	$errmsg  = $errmsgs{$lang}->[1]	unless $args{id_inst};
+	$errmsg .= $errmsgs{$lang}->[2] 	unless $args{Currency};
+	$errmsg .= $errmsgs{$lang}->[14] 	unless $args{Currency} =~ /(CHF|EUR|USD)/i;
+	$errmsg .= $errmsgs{$lang}->[3] 	unless $args{Total};
+	$errmsg .= $errmsgs{$lang}->[4] 	unless $args{LastName};
+	$errmsg .= $errmsgs{$lang}->[5] 	unless $args{FirstName};
+	$errmsg .= qq{<li>email absent</li>} unless $args{Email};
+	$errmsg .= qq{<li>phone absent</li>} unless $args{Phone};
+	$errmsg .= $errmsgs{$lang}->[6] 	unless $args{Addr};
+	$Addr    = $args{Addr};
+	$Addr	   =~ s/\r/ /g;
+	$Addr	   =~ s/\n/ /g;
+	$errmsg .= $errmsgs{$lang}->[7] 	unless $args{ZipCode};
+	$errmsg .= $errmsgs{$lang}->[8] 	unless $args{City};
+	$errmsg .= $errmsgs{$lang}->[9]	unless $args{Country};
+
+	if ($errmsg) {
+		 $errmsg = qq{<h3>$errmsgs{$lang}->[0]</h3><ul>$errmsg</ul>$errmsgs{$lang}->[10]
+		 };
+		 $template->param(sErrMsg => $errmsg);
+		 print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+		 exit;
+	}
+
+	my $dest  = 'contact@datascience.ch';
+	my $dest  = 'floriane.jacquemet@epfl.ch,contact@datascience.ch';
+	
+#	   $dest .= qq{,$args{Email}};
+	   
+	my $subj = 'SDSC-Connect 2017, ETH Free Registration';
+	my $msg  = "
+SDSC-Connect : ETH staff free registration
+
+$args{Prefix} $args{FirstName} $args{LastName}
+
+Title: $args{Title}
+Email: $args{Email}
+Phone: $args{Phone}
+Company: $args{Company}
+
+Address
+$args{Addr}
+ZipCode: $args{ZipCode}
+City: $args{City}
+Country: $args{Country}
+
+	";
+
+	payonline_tools::send_mail ($dest, $subj, $msg);
+
+	print qq{Content-Type: text/html; charset=iso-8859-1\n\n
+$header  
+<body style="padding: 50px;">
+<h2>SDSC-Connect, Bern Nov. 29th 2017</h2>
+<h3>ETH staff free registration</h3>
+<br>
+
+<ul style="margin-left: 20px;">
+	<h3>$args{Prefix} $args{FirstName} $args{LastName}</h3>
+
+	Title: $args{Title}<br>
+	Email: $args{Email}<br>
+	Phone: $args{Phone}<br>
+	Company: $args{Company}<br>
+<br>
+	<b>Address</b><br>
+	$args{Addr}<br>
+	ZipCode: $args{ZipCode}<br>
+	City: $args{City}<br>
+	Country: $args{Country}<br>
+</ul>
+<br>
+Your registration has been sent to $dest<br>
+Best Regards
+</body>
+</html>
+	};
+
+	exit;
+
+}
+
+#------
+sub initTempl {
+   my ($tmplpath) = @_;
+
+#warn "initTempl: $tmpldir$tmplpath\n";
+   my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
+	   strict => 0,
+	   cache => 1,
+	   die_on_bad_params => 0) or die "err : $!";
+
+   my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+   $year += 1900;
+   $template->param(sCrtYear 	=> $year);
+   $template->param(sPathMe 	=> $me);
+   $template->param(sDebug 		=> $payonline_tools::DEBUG);
+   return $template;
+}

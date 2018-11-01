@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Troubleshooting payonline</title>
+<link href="https://www.epfl.ch/css/epfl.css" media="all" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="/payonline.css">
+
+<style>
+ol li {margin-left:20px;}
+</style>
+
+</head>
+
+<body>
+
+<h2>Troubleshooting payonline</h2>
+<p>  The EPFL payonline procedure works the following way :</p>
+<ol>
+  <li> Enter your personal data on the <strong>registration</strong> web page and submit the form </li>
+  <li>You get to <strong>payonline.epfl.ch</strong>    which confirms that your data has been registered; click <strong>Continue</strong> to    </li>
+  <li> pop <strong>PostFinance</strong>'s  window : choose the credit card, then
+    give the card's parameters <br>(if your browser blocks the popups, you'll get
+  a message which asks if you want to &quot;Pay&quot; or &quot;Cancel&quot;)</li>
+  <li>PostFinance validates the transaction and returns a result code to payonline.epfl.ch
+    :
+    <ul>
+      <li>the card is valid,   result
+        code=1 (Transaction accepted), </li>
+      <li>the card is rejected or you  cancel the operation, result code=0 (Transaction
+      failed);</li>
+      <li>you close the window during the process, result code is empty (Transaction
+      failed).</li>
+    </ul>
+  </li>
+</ol>
+<img src="/images/transactions.gif">
+<div class="editbox">
+<p>In case of payment troubles, contact the following, according to the failure
+  point :
+</p>
+<ul style="margin-left:20px;">
+  <li>at the conference's site :  the person in charge of the instance </li>
+  <li>at payonline.epfl.ch (EPFL logo) :  <a href="mailto:1234@epfl.ch">1234@epfl.ch</a> </li>
+  <li>payment choice and credit card details (on PostFinances's site) :  <a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>  </li>
+</ul>
+Please provide  transaction details (number, date, etc.), browser and operating
+system, a description of the problem and the error messages. A screen copy  might
+be useful : an image is better than 1000 words.</div>
+
+<h2>Notes</h2>
+<ul>
+<li>JavaScript is required in order to use PostFinance's services (step 3)</li>
+<li>Popup blocking might cause problems : please disable it</li>
+<li>Please note that a credit card electronic transaction may be refused by the
+  card issuer at step 4 (error codes between 200 and 299). In this case, you need to contact your card issuer for details.</li>
+<li>In case of several transaction failures, please use one alternative payment
+  method so you shouldn't miss the conference.<br />
+  Refer to the registration page
+  for details. </li>
+</ul>
+<hr />
+<p>contact : <a href="mailto:1234@epfl.ch">1234@epfl.ch</a></p>
+</body>
+</html>

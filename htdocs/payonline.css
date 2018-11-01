@@ -1,0 +1,105 @@
+
+.redborder {
+	border: 1px solid #FF0000;
+	padding:4px
+}
+.greenborder {
+	border: 1px solid #00FF00;
+	padding:4px
+}
+.litegray {
+	border: 1px solid #666666;
+	background-color : #EEEEEE;
+}
+.prod {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999999;
+	background-color : #AAF0AF;
+}
+.archive {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999999;
+	background-color : #CCE6FF;
+}
+.inactive {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999999;
+	background-color : #ABABBA;
+}
+.test {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999999;
+	background-color : #FFFFCC;
+}
+.validation {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999999;
+	background-color : #FF3399;
+}
+.greyborder {
+	border: 1px solid #999999;
+	padding:4px
+}
+.underlined {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #0066CC;
+	padding: 2px;
+}
+.error {
+	border: 1px solid #999999;
+	background-color : yellow;
+	color:red;
+	padding:4px
+}
+.editbox {
+	border: 1px solid #2e8b57;
+	background-color : #E2F5EC;
+	padding:4px
+}
+.paybox {
+	border: 1px solid #2e8b57;
+	padding:4px
+}
+.red {
+	color:red;
+}
+.green {
+	color:green;
+}
+.layer1 {
+	position:absolute;
+	width:400px;
+	height:50px;
+	z-index:1;
+}
+.layer2 {
+	position:absolute;
+	width:400px;
+	height:50px;
+	z-index:2;
+	visibility: hidden;
+}
+th	{ 
+	text-align: left; 
+	background-color : #A2B5AC;
+	color : #FFFFFF;	
+}
+blockquote {
+	margin-left : 20px;
+}
+
+.ul_local {
+	margin-left: 20px;
+}
+.ol_local {
+	margin-left: 20px;
+}
+.li_local {
+	margin-left: 10px;
+}

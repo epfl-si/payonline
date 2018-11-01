@@ -1,0 +1,1344 @@
+#!/usr/bin/perl
+#
+##############################################################################
+#
+# File Name:    ress.pl
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2005
+#
+#########################################################################
+#####
+#
+#
+
+use strict;
+use HTML::Template;
+
+use payonline_tools;
+
+use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits $tmpldir $lang $errmsg %CFs $crtdate	);
+
+my $me 			= $ENV {SCRIPT_NAME};
+my $us 			= $ENV {SERVER_NAME};
+my $qs 			= $ENV {QUERY_STRING};
+my $pi 			= $ENV {PATH_INFO};
+my $lang 		= 'fr';
+my $tmpldir 	= '/var/www/vhosts/payonline.epfl.ch/private/tmpl/XX/';
+my $logfile		= '/var/log/httpd/payonline.log';
+my @languages 	= ('fr','en');
+my $mailresp	= 'ion.cionca@epfl.ch';
+my @statlist	= ('test','prod');
+my %errmsgs	= (
+	fr => [
+		'Erreur(s) de saisie',
+		'Veuillez retourner sur la page précédente pour effectuer les corrections nécessaires.',
+		'pas trouvée ou inactive',
+		'<li>Date début absent ou erronée</li>',
+		'<li>Description absente</li>',
+		'<li>Fonds absent</li>',
+		'<li>Centre financier absent</li>',
+		'<li>Date fin absente ou erronée</li>',
+		'<li>La date de fin doit être après la date début</li>',
+		'<li>Compte budgétaire absent</li>',
+		'<li>Date fin obligatoire</li>',
+		'<li>Opération inconnue</li>',
+		'Transactions payées',
+		'Transactions non payées',
+	      ],
+	en => [
+		'Input error(s)',												# 0
+		'Please return on the previous page and correct the input',		# 1
+		'pas trouvée ou inactive',										# 2
+		'<li>Start date missing or wrong format</li>',					# 3
+		'<li>Description missing</li>',									# 4
+		'<li>Fund missing</li>',										# 5
+		'<li>Financial center missing</li>',							# 6
+		'<li>End date missing or wrong format</li>',					# 7
+		'<li>End date must be after Start date</li>',					# 8
+		'<li>Compte budgétaire missing</li>',							# 9
+		'<li>End date is compulsory</li>',								# 10
+		'<li>Unknown operation</li>',									# 11
+		'Transactions payed',									# 12
+		'Transactions not payed',								# 13
+	      ],
+	);
+my %nat_comptable = (
+		fr => {
+			'', '---choisir---',
+			'700010', '700010 : Ventes de biens et fournitures diverses',
+			'700020', '700020 : Ventes de fournitures fournitures diverses',
+			'700060', '700060 : Ventes de reprographie',
+			'710100', '710100 : Candidatures bachelor et master',
+			'710120', '710120 : Taxe de cours doctorants',
+			'710130', '710130 : Amendes bachelor et master',
+			'710140', '710140 : Taxes certifications conformes',
+			'740050', '740050 : Vente, Formation tiers',
+			'740055', '740055 : Vente, Formation continue',
+			'740060', '740060 : Congrès, Séminaires, Conférences',
+			'741070', '741070 : Produits de manifestations',
+			'746020', '746020 : Dons, donations, legs reçus',
+			'747040', '747040 : Cotisations et abonnements divers',
+			'783120', '783120 : Contrat de service suisse',
+			},
+		en => {
+			'', '---select---',
+			'700010', '700010 : Ventes de biens et fournitures diverses',
+			'700020', '700020 : Ventes de fournitures fournitures diverses',
+			'700060', '700060 : Ventes de reprographie',
+			'710100', '710100 : Candidatures bachelor et master',
+			'710120', '710120 : Taxe de cours doctorants',
+			'710130', '710130 : Amendes bachelor et master',
+			'710140', '710140 : Taxes certifications conformes',
+			'740050', '740050 : Sales, Training Others',
+			'740055', '740055 : Sales, Continuing Education',
+			'740060', '740060 : Congres, Seminaires, Conferences',
+			'741070', '741070 : Produits de manifestations',
+			'746020', '746020 : Dons, donations, legs reçus',
+			'747040', '747040 : Cotisations et abonnements divers',
+			'783120', '783120 : Contrat de service suisse',
+			},
+);
+			
+my $mailSF		= 'marc.fromentin@epfl.ch,barbara.scheuner@epfl.ch,pascal.schweingruber@epfl.ch,pierre.fournier@epfl.ch';
+my $MyPrintID = 'xwmc1evtcdibo6b3cq1si1ozu2tb8uff';
+
+  payonline_tools::setLog($logfile);
+  %args		= payonline_tools::loadargs ();
+  $crtdate 	= payonline_tools::getcrtdate();
+
+  payonline_tools::init ();
+  $mailSF			= '' if $payonline_tools::DEBUG;
+
+  $lang    	= $args{lang} if $args{lang};
+  $tmpldir 	=~ s/XX/$lang/;
+  
+  authenticate () unless $pi eq '' or ($pi =~ /^\/(|quit|main)$/);
+  
+  dispatch ();
+
+  exit;
+
+
+#------
+sub dispatch {
+
+   if      ($pi =~  /^\/priv/) {
+   	priv ();
+   } elsif ($pi =~  /^\/newinst/) {
+   	newinst ();
+   } elsif ($pi =~  /^\/doneinst/) {
+   	doneinst ();
+   } elsif ($pi =~  /^\/demvalid/) {
+   	demvalid ();
+   } elsif ($pi =~  /^\/demfnd/) {
+   	demfnd ();
+   } elsif ($pi =~  /^\/donefnd/) {
+   	donefnd ();
+   } elsif ($pi =~  /^\/listinst/) {
+   	listinst ();
+   } elsif ($pi =~  /^\/detinst/) {
+   	detinst ();
+   } elsif ($pi =~  /^\/listtrans/) {
+   	listtrans ();
+   } elsif ($pi =~  /^\/extrans/) {
+   	extrans ();
+   } elsif ($pi =~  /^\/search/) {
+   	search ();
+   } elsif ($pi =~  /^\/dettrans/) {
+   	dettrans ();
+   } elsif ($pi =~  /^\/quit/) {
+   	quit ();
+   }
+
+   main ();
+
+}
+
+#------
+sub main {
+
+  my $template = initTempl('default.tmpl');
+  $template->param(sErrMsg => $errmsg);
+
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub priv {
+
+  my $template = initTempl('priv.tmpl');
+
+  $template->param(sErrMsg => $errmsg);
+  $template->param(sAuthstr	=> 1 );
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub search {
+
+  my $template = initTempl('search.tmpl');
+
+  $template->param(sErrMsg 	=> $errmsg);
+  $template->param(sAuthstr	=> 1 );
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub listinst {
+
+  my $template = initTempl('listinst.tmpl');
+
+  my $cfs;
+  foreach my $cfline (payonline_tools::getCFs($respunits)) {
+    next unless $cfline;
+    my ($sigle,$cf) = split(/:/, $cfline);
+    $cfs .= qq{,'$cf'};
+  }
+  $cfs =~ s/^,//;
+
+  my $sql = qq{select * from instances };
+  my @params;
+  unless (payonline_tools::IsSuperUser($sciper)) {
+  	$sql .= qq{where cf in ($cfs)} ;
+  }
+  if ($args{no_inst}) {
+    if ($sql =~/where/) {
+      $sql .= qq{ and id=?} ;
+      push @params, $args{no_inst};
+    } else {
+      $sql .= qq{ where id=?} ;
+      push @params, $args{no_inst};
+    }
+  }
+  
+  if ($sql =~/where/) {
+    	$sql .= " and ";
+  } else {
+    	$sql .= " where ";
+  }
+
+  if ($args{resp_sciper}) {
+      $sql .= qq{ sciper=?  and} ;
+      push @params,$args{resp_sciper};
+  }
+
+  if ($args{etat}) {
+    if ($args{etat} =~ /^inact/) {
+      $sql .= qq{ etat like '$args{etat}%'};
+    } else {
+      $sql .= qq{ etat=?};
+      push @params, $args{etat};
+    }
+    $sql .= " and ";
+  }
+
+  if ($args{op} eq 'byinstanceid') {
+      $sql .= qq{ id=? and} ;
+      push @params, $args{id_inst};
+  }
+  
+  my $datedeb = payonline_tools::datevalide($args{datedeb});
+  my $datefin = payonline_tools::datevalide($args{datefin});
+  if ($datedeb) {
+      $sql .= qq{ datedeb >= ?} ;
+      push @params, $datedeb;
+  }
+
+  $sql =~ s/and $//;
+  $sql =~ s/and$//;
+  $sql =~ s/where $//;
+
+  $sql .= $args{orderby} ? qq{ order by $args{orderby} }  : qq{ order by descr } ;
+#warn "--> $sql\nparams=@params\n";
+  my @inst;
+  my $sth = payonline_tools::dbquery ($sql, @params);
+  while (my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$mailinst,$contact) = $sth->fetchrow_array ()) {
+#warn "--> $id, $fonds, $etat, $cf, $descr\n";
+    next unless $descr;
+    my $sEditTxt;
+   	$sEditTxt  = qq{$me/detinst?id=$id&lang=$lang}	;
+   	my $style  = $etat =~ /^inactive/ ? 'inactive' : $etat;
+
+    my $resp = payonline_tools::getPersonInfos ($tsciper);
+
+    my %item = (
+	  'id', $id,
+	  'respNom', $resp->{nom},
+	  'respPrenom', $resp->{prenom},
+	  'respMail', $resp->{mail},
+	  'sPathMe', $me,
+	  'sEdit',$sEditTxt,
+	  'fonds', $fonds,
+	  'sIsSuperUSer', payonline_tools::IsSuperUser($sciper),
+	  'sresp', $tsciper,
+	  'etat',$etat,
+	  'style', $style,
+	  'cf',$cf,
+	  'descr',$descr,
+	  'datedeb',payonline_tools::prdate($datedeb,'date'),
+	  'datefin',payonline_tools::prdate($datefin,'date'),
+	  'url',$url,
+	  'mailinst',$mailinst,
+	  'contact',$contact,
+    );
+    push(@inst, \%item);
+  }
+
+  $template->param(sErrMsg 	=> $errmsg);
+  $template->param(sAuthstr	=> 1 );
+  $template->param(sEtat	=> $args{etat});
+  $template->param(sIsSuperUSer	=> payonline_tools::IsSuperUser($sciper) );
+  $template->param(sLoop	=> \@inst );
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub dettrans {
+
+  my $template = initTempl('dettrans.tmpl');
+
+  unless ($args{id_trans} or $args{id_pay}) {
+     my $errmsg = qq{clé de recherche de la transaction absente};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+  
+  my @params;
+  my $sql = qq{select * from transact };
+
+  if ($args{id_trans}) {
+	  $sql .= qq{where id=?} ;
+	  push @params, $args{id_trans};
+  }
+
+  if ($args{id_pay}) {
+	  $sql .= qq{where PaymentID=?} ;
+	  push @params, $args{id_pay};
+  }
+  my $sth = payonline_tools::dbquery ($sql, @params);
+  my $result = $sth->fetchrow_hashref ();
+  unless ($result) {
+     my $errmsg = qq{transaction pas trouvée};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+
+  my $id_inst = $result->{id_inst};
+  my $sql = qq{select * from instances where id = ?};
+  my $sth = payonline_tools::dbquery ($sql, ($id_inst));
+  my $resultinst = $sth->fetchrow_hashref ();
+  unless ($resultinst) {
+     my $errmsg = qq{instance no: $id_inst pas trouvée};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+  my $descr 		= $resultinst->{descr};
+  my $fonds 		= $resultinst->{fonds};
+  my $resp_sciper 	= $resultinst->{sciper};
+  my $naturecomptable=$resultinst->{naturecomptable};
+  my $urlconf		= $resultinst->{urlconf};
+  my $etatinst		= $resultinst->{etat};
+  my $queryArgs 	= payonline_tools::getArgs($result->{query});
+  my $resp 			= payonline_tools::getPersonInfos ($resp_sciper);
+  $template->param(respNom 		=> $resp->{nom});
+  $template->param(respPrenom 	=> $resp->{prenom});
+  $template->param(fonds 		=> $fonds);
+  $template->param(naturecomptable => $naturecomptable);
+  $template->param(urlconf 		=> $urlconf);
+  $template->param(etatinst		=> $etatinst);
+  $template->param(sErrMsg 		=> $errmsg);
+  $template->param(sAuthstr		=> 1 );
+  $template->param(sIDInst		=> $id_inst );
+  $template->param(sDescrInst	=> $descr );
+  $template->param(sRespInst	=> $resp_sciper );
+  $template->param(
+	 'idtrans',	$result->{id},
+	 'Total', 		$queryArgs->{Total},
+	 'Currency',	$queryArgs->{Currency},
+	 'datecr',		payonline_tools::prdate($result->{datecr}),
+	 'etat',        $result->{etat} ,    
+     'paymode', 	$result->{paymode},
+	 'PaymentID',	$result->{PaymentID},
+	 'LastName', 	payonline_tools::utf8tolatin1($queryArgs->{LastName}),
+	 'FirstName',	payonline_tools::utf8tolatin1($queryArgs->{FirstName}),
+	 'Addr', 		payonline_tools::utf8tolatin1($queryArgs->{Addr}),
+	 'ZipCode', 	$queryArgs->{ZipCode},
+	 'City', 		payonline_tools::utf8tolatin1($queryArgs->{City}),
+	 'Country', 	$queryArgs->{Country},
+	 'Email', 		$queryArgs->{Email} ,
+	 'Phone', 		$queryArgs->{Phone} ,
+	 'Fax', 		$queryArgs->{Fax}   ,
+  );
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub listtrans {
+
+  my $template = initTempl('listtrans.tmpl');
+  my $id_inst  = $args{id};
+
+  unless ($id_inst) {
+     my $errmsg = qq{identificateur d'instance absent};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+
+  my $sql = qq{select * from instances where id = ?};
+  my $sth = payonline_tools::dbquery ($sql, ($id_inst));
+  my $result = $sth->fetchrow_hashref ();
+  unless ($result) {
+     my $errmsg = qq{instance no: $id_inst pas trouvée};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+  my $descr 		= $result->{descr};
+  my $fonds 		= $result->{fonds};
+  my $resp_sciper 	= $result->{sciper};
+  my $naturecomptable=$result->{naturecomptable};
+  my $urlconf		= $result->{urlconf};
+  my $etatinst		= $result->{etat};
+
+  my @inst; my $limit = 'LIMIT 50' unless $args{listall};
+  my @params;
+  my $sql = qq{select * from transact where id_inst = ?};
+  push @params, $id_inst;
+  $sql   .= qq{ and etat='payé'} unless $args{op};
+  $sql 	 .= qq{ and etat=''} 	 if $args{op} eq 'notpayed';
+  $sql   .= qq{ order by datecr desc $limit};
+
+#warn "payonline :: listtrans : $sql";
+  my $sth = payonline_tools::dbquery ($sql, @params);
+  while (my $result = $sth->fetchrow_hashref ()) {
+    next unless $result;
+    my $queryArgs = payonline_tools::getArgs($result->{query});
+    my %item = (
+    	'id', 		$result->{id},
+    	'Total', 	$queryArgs->{Total},
+    	'Currency', 	$queryArgs->{Currency},
+    	'datecr',	payonline_tools::prdate($result->{datecr}),
+    	'etat', 	$result->{etat},
+    	'paymode', 	$result->{paymode},
+    	'PaymentID', 	$result->{PaymentID},
+    	'LastName', 	payonline_tools::utf8tolatin1($queryArgs->{LastName}),
+    	'FirstName', 	payonline_tools::utf8tolatin1($queryArgs->{FirstName}),
+    	'Addr', 	payonline_tools::utf8tolatin1($queryArgs->{Addr}),
+    	'ZipCode', 	$queryArgs->{ZipCode},
+    	'City', 	payonline_tools::utf8tolatin1($queryArgs->{City}),
+    	'Country', 	$queryArgs->{Country},
+    	'Email', 	$queryArgs->{Email} ? $queryArgs->{Email} : '&nbsp;',
+    	'Phone', 	$queryArgs->{Phone} ? $queryArgs->{Phone} : '&nbsp;',
+    	'Fax', 		$queryArgs->{Fax}   ? $queryArgs->{Fax}   : '&nbsp;',
+    );
+    push(@inst, \%item);
+  }
+#warn "listtrans : ";
+  my $resp = payonline_tools::getPersonInfos ($resp_sciper);
+  my $sOtherTitle = qq{<a href="$me/listtrans?lang=$lang&id=$id_inst};
+  $sOtherTitle   .=	$args{op} ? qq{">$errmsgs{$lang}->[12]  <img src=/images/ok.gif border=0 align=middle></a>} : qq{&op=notpayed">$errmsgs{$lang}->[13] <img src=/images/ko.gif border=0 align=middle></a>};
+  my $sOp = qq{&op=notpayed} if $args{op} eq 'notpayed';
+
+  $template->param(
+	 'sTitle' 		, $args{op} ? "$errmsgs{$lang}->[13] <img src=/images/ko.gif align=middle>" : "$errmsgs{$lang}->[12] <img src=/images/ok.gif align=middle>",
+	 'sOtherTitle'	, $sOtherTitle,
+	 'sOp'			, $sOp,
+	 'respNom' 		, $resp->{nom},
+	 'respPrenom' 	, $resp->{prenom},
+	 'fonds' 		, $fonds,
+	 'naturecomptable' , $naturecomptable,
+	 'urlconf' 		, $urlconf,
+	 'etatinst'		, $etatinst,
+	 'sErrMsg' 		, $errmsg,
+	 'sAuthstr'		, 1 ,
+	 'sIDInst'		, $id_inst ,
+	 'sDescrInst'	, $descr ,
+	 'sRespInst'	, $resp_sciper ,
+	 'sTitleDate'	, $args{op} ? 'Date' : 'Date payment' ,
+	 'sLoop'		, \@inst 
+  );
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub extrans {
+
+  my $template = initTempl('extrans.tmpl');
+  my $id_inst  = $args{id};
+  my $separator= "\t";
+
+  unless ($id_inst) {
+     my $errmsg = qq{identificateur d'instance absent};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+
+  my $sql = qq{select * from instances where id = ?};
+  my $sth = payonline_tools::dbquery ($sql, ($id_inst));
+  my $result = $sth->fetchrow_hashref ();
+  unless ($result) {
+     my $errmsg = qq{instance no: $id_inst pas trouvée};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+  my $descr 		= $result->{descr};
+  my $fonds 		= $result->{fonds};
+  my $resp_sciper 	= $result->{sciper};
+  my $naturecomptable=$result->{naturecomptable};
+  my $urlconf	 	= $result->{urlconf};
+
+  my $sql = qq{select * from transact where id_inst = ?};
+  $sql   .= qq{ and etat='payé'} unless $args{op};
+  $sql 	 .= qq{ and etat=''} 	 if $args{op} eq 'notpayed';
+  $sql   .= qq{ order by datecr};
+
+  my $sth 	 = payonline_tools::dbquery ($sql, ($id_inst));
+  my $result = $sth->fetchrow_hashref ();
+  
+  unless ($result) {
+     my $errmsg = qq{aucune transaction};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+
+  my @inst;
+  my $query  		= payonline_tools::getArgs ($result->{query});
+  my $skeys 		= qq{date${separator}PaymentID${separator}methode${separator}}.join($separator, keys %$query);
+
+  print "Content-Type: application/vnd.ms-excel; charset=iso-8859-1\n\n";
+  my @params;
+  do {
+    my $queryArgs = payonline_tools::getArgs($result->{query});
+    push(@params, keys %$queryArgs);
+    my %item = (
+    	'id', 		$result->{id},
+    	'datecr',	payonline_tools::prdate($result->{datecr}),
+    	'etat', 	$result->{etat},
+    	'paymode', 	$result->{paymode},
+    	'PaymentID',$result->{PaymentID},
+    );
+    foreach my $param (keys %$queryArgs) {
+    	$item{$param} = payonline_tools::utf8tolatin1($queryArgs->{$param});
+	push (@params, $param);
+    }
+    push(@inst, \%item);
+    $result = $sth->fetchrow_hashref ();
+  } while ($result);
+
+  my %count;
+  push (@params, ('id','datecr','etat','paymode','PaymentID'));
+  @params = grep { ++$count{$_} < 2} @params;
+  @params = sort @params;
+  
+  print join($separator, @params)."$separator\n";
+  foreach my $instance (@inst) {
+    foreach my $param (@params) {
+      my $txt = $instance->{$param};
+      $txt    =~ s/\n/,/g;
+      $txt    =~ s/\r/,/g;
+      print "$txt$separator";
+    }
+    print "\n";
+  }
+
+  exit;
+}
+
+#------
+sub detinst {
+
+  my $template = initTempl('detinst.tmpl');
+  my $id = $args{id};
+  unless ($id) {
+     my $errmsg = qq{identificateur d'instance absent};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+  
+  my ($sql, $cfs, @params);
+  if (payonline_tools::IsSuperUser($sciper)) {
+  	$sql = qq{select * from instances where id = ?};
+  	push @params, $id;
+  } else {
+	foreach my $cfline (payonline_tools::getCFs($respunits)) {
+	   next unless $cfline;
+	   my ($sigle,$cf) = split(/:/, $cfline);
+	   $cfs .= qq{,'$cf'};
+	}
+	$cfs =~ s/^,//;
+	$sql = qq{select * from instances where id = ? and cf in ($cfs)};
+  	push @params, $id;
+
+  }
+  my $sth 	 = payonline_tools::dbquery ($sql, @params);
+  my $result = $sth->fetchrow_hashref ();
+  
+  unless ($result->{descr}) {
+     my $errmsg = qq{instance pas trouvée ou en dehors de votre responsabilité};
+     $template->param(sErrMsg 	=> $errmsg);
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+  my $selfonds = $result->{fonds};
+
+  if (payonline_tools::IsSuperUser($sciper)) {
+		my $ref_units = $payonline_tools::Accreds->getAllUnitsWhereHasRight ($result->{sciper}, 38);	#	- 'payonline'
+		$respunits = join ",", keys %$ref_units;
+		foreach my $cfline (payonline_tools::getCFs($respunits)) {
+			 next unless $cfline;
+			 my ($sigle,$cf) = split(/:/, $cfline);
+			 $cfs .= qq{,'$cf'};
+		}
+		$cfs =~ s/^,//;
+  }
+
+  my $fonds = payonline_tools::getFonds ($respunits);
+  my $seltxt2 = qq{<select name="fonds">\n}; my $seltxt21;
+  foreach my $cf (sort keys %$fonds) {
+    my $flistref   = $fonds->{$cf};
+    next unless @$flistref;
+
+    foreach my $fond (@$flistref) {
+      my ($no,$lib) = split(/:/, $fond);
+      my $selected = $no eq $selfonds ? 'selected' : '';
+      $seltxt21 = qq{<input type="hidden" name="fonds" value="$cf:$no"> $no : $lib} if $selected;
+      $seltxt2 .= qq{<option value="$cf:$no" $selected>$no : $lib</option>\n};
+    }
+  }
+
+# - patch myprint -----
+  if ($id eq $MyPrintID) {
+      $seltxt2 .= qq{<option value="0042:0042-24" selected>0042-24 : Myprint</option>\n};
+  }
+
+  $seltxt2 .= qq{</select>\n};
+
+  my $nat_comptable_txt = qq{<select name="naturecomptable">  };
+  my $ncref = $nat_comptable{$lang};
+  my $codeTVAtxt;
+  foreach my $item (sort keys %$ncref) {
+		my $selected = $result->{naturecomptable} eq $item ? 'selected' : '';
+		$nat_comptable_txt .= qq{<option value="$item" $selected>$ncref->{$item}</option>};
+		if ($result->{naturecomptable} eq '740060' || $result->{naturecomptable} eq '741070') {
+			my $q0selected = $result->{codetva} =~ /^q0$/i ? 'selected' : '';
+			my $c5selected = $result->{codetva} =~ /^c5$/i ? 'selected' : '';
+			my $a7selected = $result->{codetva} =~ /^[ac]7$/i ? 'selected' : '';
+			$codeTVAtxt = qq{<select name="codetva">
+				<option value="Q0" $q0selected>Q0</option>
+				<option value="C5" $c5selected>C5</option>
+				<option value="C7" $a7selected>C7</option>
+				</select>
+			};
+		}
+  }
+  $nat_comptable_txt .= qq{</select>};
+
+  if ( ($result->{etat} eq 'prod') && ! payonline_tools::IsSuperUser($sciper) ) {
+  	$nat_comptable_txt = qq{<input type="hidden" name="naturecomptable" value="$result->{naturecomptable}"> $ncref->{$result->{naturecomptable}}};
+  }
+
+  my $resp 		= payonline_tools::getPersonInfos ($result->{sciper});
+  my $selCHF	= 'selected' if $result->{monnaie} eq 'CHF';
+  my $selEUR	= 'selected' if $result->{monnaie} eq 'EUR';
+  my $selUSD	= 'selected' if $result->{monnaie} eq 'USD';
+  my $monnaietxt	  = qq{<select name="monnaie">
+	   <option value="CHF" $selCHF>CHF</option>
+	   <option value="EUR" $selEUR>EUR</option>
+	   <option value="USD" $selUSD>USD</option>
+  </select>};
+
+  if ( ($result->{etat} eq 'prod') && ! payonline_tools::IsSuperUser($sciper) ) {
+  	$monnaietxt = qq{<input type="hidden" name="monnaie" value="$result->{monnaie}"> $result->{monnaie}};
+  }
+  
+  $template->param(sMonnaie		=> $monnaietxt );
+  
+  $template->param(id 				=> $result->{id});
+  $template->param(sDelValid	=> ($result->{etat} eq 'test'));
+  $template->param(sValid			=> ($result->{etat} eq 'validation') && payonline_tools::IsSuperUser($sciper));
+
+  $template->param(sActivate	=> $result->{etat} =~ /^inactive/);
+  $template->param(sInactivate=> $result->{etat} =~ /^test|^prod/);
+  $template->param(respNom 		=> $resp->{nom});
+  $template->param(respPrenom => $resp->{prenom});
+  $template->param(respMail 	=> $resp->{mail});
+  $template->param(sCodeTVA		=> $codeTVAtxt );
+  $template->param(sNCTxt			=> $nat_comptable_txt );
+#  $template->param(sMonnaie		=> $result->{monnaie} ?  $result->{monnaie} : 'CHF' );
+  $template->param(urlconf		=> $result->{urlconf});
+  $template->param(etat 			=> $result->{etat});
+
+  if ( ($result->{etat} eq 'prod') && ! payonline_tools::IsSuperUser($sciper) ) {
+	  $template->param(sNoEdit	=> 1);
+	  $template->param(sFonds		=> $seltxt21 );
+  } else {
+  	$template->param(sFonds			=> $seltxt2 );
+  }
+  
+  $template->param(OIS 				=> $result->{ois});
+  $template->param(descr 			=> $result->{descr});
+  $template->param(datedeb 		=> payonline_tools::prdate($result->{datedeb},'date'));
+  $template->param(datefin 		=> payonline_tools::prdate($result->{datefin},'date'));
+  $template->param(url 				=> $result->{url});
+  $template->param(mailinst		=> $result->{mailinst});
+  $template->param(contact		=> $result->{contact});
+  $template->param(sErrMsg 		=> $errmsg);
+  $template->param(sFormaction=> "$me/doneinst?lang=$lang" );
+  $template->param(sAuthstr		=> 1 );
+  $template->param(sDelPath		=> "javascript:confirmDelete(\'$lang\', \'$me/doneinst?lang=$lang&id=$result->{id}&del=1\')");
+
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub newinst {
+
+  my $template = initTempl('newinst.tmpl');
+
+  my $fonds 	= payonline_tools::getFonds ($respunits);
+	my $nbfonds = 0;
+
+  my $seltxt2 = qq{<select name="fonds">\n};
+  foreach my $cf (sort keys %$fonds) {
+    my $flistref   = $fonds->{$cf};
+    next unless @$flistref;
+    foreach my $fond (@$flistref) {
+      my ($no,$lib) = split(/:/, $fond);
+      $seltxt2 .= qq{<option value="$cf:$no">$cf : $no - $lib</option>\n};
+      $nbfonds++;
+    }
+  }
+  $seltxt2 .= qq{</select>\n};
+
+  unless( $nbfonds ) {
+	my $errmsg = qq{Aucun fonds ouvert disponible , veuillez contacter vos accréditeurs};
+	$template->param(sErrMsg 	=> $errmsg);
+	print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+	exit;
+  }
+
+  
+  my $nat_comptable_txt = qq{<select name="naturecomptable">
+  };
+  my $ncref = $nat_comptable{$lang};
+  foreach my $item (sort keys %$ncref) {
+	my $selected = 'selected' unless $item;
+	$nat_comptable_txt .= qq{<option value="$item" $selected>$ncref->{$item}</option>};
+  }
+  $nat_comptable_txt .= qq{</select>};
+  my $monnaietxt	  = qq{<select name="monnaie">
+	   <option value="CHF" selected>CHF</option>
+	   <option value="EUR" >EUR</option>
+	   <option value="USD" >USD</option>
+  </select>};
+  $template->param(sAuthstr		=> 1 );
+  $template->param(sFonds		=> $seltxt2 );
+  $template->param(sEtat		=> 'inactive' );
+  $template->param(sNCTxt		=> $nat_comptable_txt );
+  $template->param(sMonnaie		=> $monnaietxt );
+  $template->param(sdatedeb		=> payonline_tools::prdate($crtdate,'date') );
+  $template->param(sFormaction	=> "$me/doneinst?lang=$lang"		);
+ 
+  $template->param(sErrMsg => $errmsg);
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+#------
+sub demvalid {
+
+  my $template = initTempl('demvalid.tmpl');
+
+  my $id = $args{id};
+  my $etat_precedent;
+  
+  $template->param(sAuthstr		=> 1 );
+  unless($id) {
+	my $errmsg = qq{identificateur d'instance absent};
+	$template->param(sErrMsg 	=> $errmsg);
+	print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+	exit;
+  }
+
+  my $sql = qq{select * from instances where id = ?};
+  my $sth = payonline_tools::dbquery ($sql, ($id));
+  my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$d1,$d2,$d3,$ois) = $sth->fetchrow_array ();
+
+  unless ($descr) {
+   my $errmsg = qq{instance $id pas trouvée ou en dehors de votre contrôle};
+	$template->param(sErrMsg 	=> $errmsg);
+	$template->param(sAuthstr	=> 1 );
+	print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+	exit;
+  }
+  
+  $sql = qq{update instances set etat='validation' where id=?};
+  payonline_tools::dbquery ($sql, ($id));
+  payonline_tools::write_log_db ($sciper, qq{demvalid::$id});
+
+  # - send mail to SF
+
+   my $resp = payonline_tools::getPersonInfos ($sciper);
+   my $txt = qq{
+*Demande de validation d'instance de paiement*
+
+Instance no: $id
+OIS : $ois
+Description : $descr
+Responsable : $resp->{prenom} $resp->{nom} [sciper: $sciper, mail:$resp->{mail}]
+Centre financier : $cf
+Fonds : $fonds
+Date début: $datedeb
+Date fin : $datefin
+
+};
+
+  my $txt1 = qq{
+Veuillez cliquer sur ce lien pour valider les données financières de l'instance ci-dessus :
+http://payonline.epfl.ch/cgi-bin/};
+  $txt1 .= "dev/" if $payonline_tools::DEBUG;
+  $txt1 .= qq{payonline/detinst?id=$id&lang=$lang
+
+Votre service de paiement en ligne
+};
+  payonline_tools::send_mail ($mailSF, 'payonline : validation instance de paiement', $txt.$txt1) ;
+
+  $txt .= s/\r/<br>/g;
+  $template->param(sMsg 	=> $txt);
+  $template->param(sErrMsg 	=> $errmsg);
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub doneinst {
+
+  my $template = initTempl('doneinst.tmpl');
+
+#payonline_tools::debug_params (\%args);
+
+  unless ($args{del} or $args{mod} or $args{add} or $args{valid} or $args{activate} or $args{inactivate}) {
+     $template->param(sErrMsg 	=> $errmsgs{$lang}->[11]);
+     $template->param(sAuthstr	=> 1 );
+     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     exit;
+  }
+  
+  my $cfFonds 		= $args{"fonds"};
+  my $ois	 				= $args{ois};
+  my $descr 			= $args{descr};
+  my $naturecomptable 	= $args{naturecomptable};
+  my $codetva		 	= $args{codetva} 
+  									? $args{codetva} 
+  									: payonline_tools::getTVAcode($naturecomptable);
+  my $urlconf 		= $args{urlconf};
+  my $datedeb			= $args{datedeb};
+  my $datefin			= $args{datefin};
+  my $etat				= $args{etat};
+  my $monnaie			= $args{monnaie};
+  my $url				= $args{url};
+  my $mailinst			= $args{mailinst};
+  my $contact			= $args{contact};
+  $naturecomptable 		=~s/\s//g;
+
+  my $id = $args{id};
+  my $etat_precedent;
+  
+# - patch myprint -----
+  $cfFonds='0042:0042-24' if ($id eq $MyPrintID);
+  
+  my ($CF, $Fonds)		= split (/:/, $cfFonds);
+
+  unless ($args{add}) {
+     unless($id) {
+       my $errmsg = qq{identificateur d'instance absent};
+       $template->param(sErrMsg 	=> $errmsg);
+       $template->param(sAuthstr	=> 1 );
+       print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+       exit;
+     }
+
+     my $cfs;
+     foreach my $cfline (payonline_tools::getCFs($respunits)) {
+       next unless $cfline;
+       my ($sigle,$cf) = split(/:/, $cfline);
+       $cfs .= qq{,'$cf'};
+     }
+     $cfs =~ s/^,//;
+
+     my $sql = qq{select * from instances where id = ?}; 
+     $sql   .= qq{ and cf in ($cfs)} unless (payonline_tools::IsSuperUser($sciper)) ;
+     my $sth = payonline_tools::dbquery ($sql, ($id));
+     my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$monnaie,$mailinst,$contact,$ois) = $sth->fetchrow_array ();
+
+     unless ($descr) {
+      my $errmsg = qq{instance $id pas trouvée ou en dehors de votre contrôle};
+       $template->param(sErrMsg 	=> $errmsg);
+       $template->param(sAuthstr	=> 1 );
+       print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+       exit;
+     }
+     $etat_precedent = $etat;
+
+     # - del instance
+     if ($args{del}) {
+       $sql = qq{delete from instances where id = ?};
+       payonline_tools::dbquery ($sql, ($id));
+       my $msg = qq{
+     	  <h3>Instance effacée</h3>
+		  <li>id instance=$id 
+		  <li>cf=$CF 
+		  <li>fonds=$Fonds
+		  <li>OIS=$ois 
+		  <li>descr=$descr 
+		  <li>compte budgétaire=$naturecomptable
+		  <li>date début=$datedeb
+		  <li>date fin=$datefin
+		  <li>état=$etat	
+		  <li>monnaie=$monnaie
+		  <li>url manifestation=$urlconf
+		  <li>url=$url
+		  <li>mailinst=$mailinst
+		  <li>contact=$contact
+       };
+       payonline_tools::write_log_db ($sciper, qq{delinst::$id;$cf;$fonds;$naturecomptable;$urlconf;$descr;$datedeb;$datefin;$monnaie;$url});
+       $template->param(sMsg 	=> $msg);
+       $template->param(sAuthstr	=> 1 );
+       print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+       exit;
+
+     }
+  }
+
+  # - mod instance
+  my $errtxt;
+  my $datedebvalide = payonline_tools::datevalide($datedeb);
+  my $datefinvalide = payonline_tools::datevalide($datefin);
+  
+  $errtxt .= $errmsgs{$lang}->[6] 	unless $CF;
+  $errtxt .= $errmsgs{$lang}->[5] 	unless $Fonds;
+  $errtxt .= $errmsgs{$lang}->[9] 	unless $naturecomptable;
+  $errtxt .= $errmsgs{$lang}->[4] 	unless $descr;
+  $errtxt .= $errmsgs{$lang}->[3] 	unless $datedebvalide;
+  $errtxt .= $errmsgs{$lang}->[7] 	unless $datefinvalide;
+  if ($datefinvalide and $datedebvalide) {
+    $errtxt .= $errmsgs{$lang}->[8] 	unless ($datefinvalide gt $datedebvalide) ;
+  }
+  if ($errtxt) {
+    $errmsg .= "<h3>$errmsgs{$lang}->[0]</h3><ul>$errtxt</ul>$errmsgs{$lang}->[1]";
+    $template->param(sErrMsg    => $errmsg);
+    print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+    exit;
+  }
+  $descr			=~ s/;/,/g;
+
+  
+  my ($msg, $sql);
+  if ($id) {
+	if ($args{valid} and payonline_tools::IsSuperUser($sciper) and $etat_precedent eq 'validation') {
+	# - validation
+		$sql = qq{update instances set
+		  cf=?,
+		  fonds=?,
+		  ois=?,
+		  descr=?,
+		  datedeb=?,
+		  datefin=?,
+		  url=?,
+		  mailinst=?,
+		  contact=?,
+		  etat='prod',
+		  naturecomptable=?,
+		  codetva=?,
+		  urlconf=?
+		  where id=?};
+
+		  payonline_tools::dbquery($sql, ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$codetva,$urlconf,$id));
+
+		$msg = qq{
+		   <h3>Validation de l'instance</h3>
+		   <li>id instance=$id 
+		   <li>cf=$CF 
+		   <li>fonds=$Fonds
+		   <li>OIS=$ois 
+		   <li>descr=$descr 
+		   <li>compte budgétaire=$naturecomptable
+		   <li>code TVA=$codetva
+		   <li>date début=$datedeb
+		   <li>date fin=$datefin
+		   <li>état=$etat	
+		   <li>monnaie=$monnaie
+		   <li>url manifestation=$urlconf
+		   <li>url=$url
+		   <li>mail confirmation=$mailinst
+		   <li>contact mail=$contact
+		   <hr>
+		   L'instance passe en mode <b>production</b> : toutes les transaction de test ont
+		   été effacées.<br>
+		   Le responsable de l'instance est averti par mail de cette opération.
+		};
+
+	  # - delete test transactions
+	  my $sql = qq{delete from transact where id_inst=?};
+#warn "payonline :: doneinst : $sql1";
+	  payonline_tools::dbquery($sql, ($id));
+
+     # - send mail to SF
+	  my $resp = payonline_tools::getPersonInfos ($sciper);
+	  my $txt = qq{
+*Validation d'instance de paiement*
+
+Instance no: $id
+OIS : $ois
+Description : $descr
+Responsable : $resp->{prenom} $resp->{nom} [sciper: $sciper, mail:$resp->{mail}]
+Centre financier : $CF
+Fonds : $Fonds
+Compte budgétaire : $naturecomptable
+URL Manifestation : $urlconf
+Mail confirmation : $mailinst
+Contact mail : $contact
+Date début: $datedeb
+Date fin : $datefin
+Monnaie : $monnaie
+
+L'instance a été validée par le Service Financier de l'EPFL et est passée en mode *production*.
+Toutes les transactions de test ont été effacées.
+
+Votre service de paiement en ligne
+};
+	  payonline_tools::send_mail ($resp->{mail}, 'payonline : validation instance de paiement', $txt) ;
+
+	  payonline_tools::write_log_db ($sciper, qq{del_test_trasact::$id});
+	  payonline_tools::write_log_db ($sciper, qq{validinst::$id;$CF;$Fonds;$naturecomptable;$codetva;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$url;$mailinst;$contact});
+
+	   } elsif ($args{mod}) {
+	# - mise a jour
+		$sql = qq{update instances set
+		  cf=?,
+		  fonds=?,
+		  ois=?,
+		  descr=?,
+		  datedeb=?,
+		  datefin=?,
+		  url=?,
+		  mailinst=?,
+		  contact=?,
+		  naturecomptable=?,
+		  monnaie=?
+		};
+		my @params = ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$monnaie);
+
+		if ($urlconf) {
+			$sql .= qq{,urlconf=?};
+			push @params, $urlconf;
+		}
+		$sql .= qq{	   where id=?};
+		push @params, $id;	
+		payonline_tools::dbquery($sql, @params);
+		
+		$msg = qq{
+ 		<h3>Mise à jour de l'instance</h3>
+		<li>id instance=$id 
+		<li>cf=$CF 
+		<li>fonds=$Fonds
+		<li>OIS=$ois 
+		<li>descr=$descr 
+		<li>compte budgétaire=$naturecomptable
+		<li>date début=$datedeb
+		<li>date fin=$datefin
+		<li>état=$etat	
+		<li>monnaie=$monnaie
+		<li>url manifestation=$urlconf
+		<li>url=$url
+		<li>mail confirmation=$mailinst
+		<li>contact mail=$contact
+		};
+
+		payonline_tools::write_log_db ($sciper, qq{modinst::$id;$etat;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
+
+	   } elsif ($args{activate}) {
+	# - activer instance
+	    $etat =~s /inactive-//;
+		$sql = qq{update instances set etat=? where id=?};
+		payonline_tools::dbquery($sql, ($etat,$id));
+
+		$msg = qq{
+ 		<h3>Instance active</h3>
+		<li>id instance=$id 
+		<li>cf=$CF 
+		<li>fonds=$Fonds
+		<li>OIS=$ois 
+		<li>descr=$descr 
+		<li>compte budgétaire=$naturecomptable
+		<li>date début=$datedeb
+		<li>date fin=$datefin
+		<li>état=$etat	
+		<li>monnaie=$monnaie
+		<li>url manifestation=$urlconf
+		<li>url=$url
+		<li>mail confirmation=$mailinst
+		<li>contact mail=$contact
+		};
+
+		payonline_tools::write_log_db ($sciper, qq{modinst:active=$etat:$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
+
+	   } elsif ($args{inactivate}) {
+	# - inactiver instance
+		my $etat = qq{inactive-$etat};
+		$sql = qq{update instances set etat=? where id=?};
+		payonline_tools::dbquery($sql, ($etat, $id));
+
+		$msg = qq{
+ 		<h3>Instance inactive</h3>
+		<li>id instance=$id 
+		<li>cf=$CF 
+		<li>fonds=$Fonds
+		<li>OIS=$ois 
+		<li>descr=$descr 
+		<li>compte budgétaire=$naturecomptable
+		<li>date début=$datedeb
+		<li>date fin=$datefin
+		<li>état=inactive-$etat	
+		<li>monnaie=$monnaie
+		<li>url manifestation=$urlconf
+		<li>url=$url
+		<li>mailinst=$mailinst
+		<li>contact mail=$contact
+		};
+
+		payonline_tools::write_log_db ($sciper, qq{modinst:inactive:$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
+
+	}
+	
+  } else {
+  # - new instance ----------------------------------------
+  	 my $id = payonline_tools::gentablekey('instances',32);
+
+     $sql = qq{update instances set
+		  cf=?,
+		  fonds=?,
+		  ois=?,
+		  etat='test',
+		  descr=?,
+		  datedeb=?,
+		  datefin=?,
+		  url=?,
+		  mailinst=?,
+		  contact=?,
+		  naturecomptable=?,
+		  sciper=?,
+		  monnaie=?,
+		  urlconf=?
+  	   where   	   id=?
+     };
+     
+     payonline_tools::dbquery($sql, ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$sciper,$monnaie,$urlconf,$id));
+     
+     payonline_tools::write_log_db ($sciper, qq{newinst::$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
+     $msg = qq{
+      <h3>L'instance no "$id" a été créée</h3>
+      l'instance est en mode de <b>test</b>
+      <pre>$descr</pre>
+
+      <h3>Prochaines étapes:</h3>
+      <ol>
+      <li>préparer le <b>formulaire de saisie</b> soit avec le nouveau module de paiement en ligne d'InForm soit avec les compétences informatiques de votre unité ; le numéro de l'instance <b>$id</b> doit faire partie de ce formulaire pour identifier les transactions</li>
+      <li>effectuer les essais du formulaire de paiement en ligne et consulter les transactions correspondantes avec cette interface</li>
+      <li>à la fin des tests, ouvrir la fiche de l'instance et demander sa validation par le <b>Service financier</b> de l'EPFL</li>
+      <li>dès validation par le SF, l'instance passe automatiquement en mode <b>production</b> ; vous recevrez un message de confirmation ; toutes les transctions des essais seront automatiquement effacées</li>
+      <li>à l'échéance de la date de fin, l'instance passe automatiquement en mode <b>archive</b> : aucune transaction ne sera plus acceptée</li>
+      </ol>
+     };
+  }
+  
+#  my $inst_id = $sth->{insertid};
+  
+  $template->param(sMsg 	=> $msg);
+  $template->param(sAuthstr	=> 1 );
+  $template->param(sDescr	=> $args{descr} );
+  $template->param(sErrMsg 	=> $errmsg);
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub demfnd {
+
+  my $template = initTempl('demfnd.tmpl');
+
+  my $seltxt1 = qq{<select name="cf">};
+  foreach my $cfline (payonline_tools::getCFs($respunits)) {
+    next unless $cfline;
+    my ($sigle,$cf) = split(/:/, $cfline);
+    $seltxt1 .= qq{<option value="$cf" >$sigle : $cf</option>};
+  }
+
+  $seltxt1 .= qq{</select>};
+  $template->param(sAuthstr	=> 1 );
+  $template->param(sCF		=> $seltxt1 );
+  $template->param(sdatedeb	=> payonline_tools::prdate($crtdate,'date') );
+  $template->param(sFormaction	=> "$me/donefnd?lang=$lang"		);
+ 
+  $template->param(sErrMsg => $errmsg);
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub donefnd {
+
+  my $template = initTempl('donefnd.tmpl');
+
+  my $CF 	= $args{cf};
+  my $descr 	= $args{descr};
+  my $datedeb 	= $args{datedeb};
+  my $datefin 	= $args{datefin};
+  
+  my ($errtxt, $datefinvalide);
+  my $datedebvalide = payonline_tools::datevalide($datedeb);
+
+  $errtxt .= qq{<li>centre financier absent</li>} 	unless $CF;
+  $errtxt .= qq{<li>description absente</li>} 		unless $descr;
+  $errtxt .= qq{<li>date début absente ou erronée</li>} unless $datedeb or $datedebvalide;
+  $errtxt .= qq{<li>date début dans le passée</li>} 	unless $datedebvalide ge $crtdate ;
+
+  if ($datefin) {
+    $datefinvalide = payonline_tools::datevalide($datefin);
+    $errtxt .= qq{<li>date fin erronée</li>} 		unless $datefinvalide;
+    $errtxt .= qq{<li>date fin dans le passé</li>} 	unless $datefinvalide gt $crtdate;
+  }
+ 
+  if ($errtxt) {
+    $errmsg .= "<br><b>Erreurs de saisie</b><ul>$errtxt</ul>";
+    $template->param(sErrMsg => $errmsg);
+    print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+    exit;
+  }
+  
+  my $txt = qq{
+  Demande de fonds pour le paiement en ligne
+  
+  Sciper responsable: $sciper
+  Centre Financier:   $CF
+  Raison de la demande:
+  $descr
+  Date début :        $datedeb
+  Date fin:           $datefin
+  };
+  my $subj = qq{Paiement en ligne: demande de fonds};
+
+  payonline_tools::send_mail ($payonline_tools::demfond, $subj, $txt);
+  payonline_tools::write_log_db ($sciper, "demfonds cf:$CF, descr:$descr");
+
+  $template->param(sAuthstr		=> 1 );
+  $template->param(sTxt			=> $txt );
+  $template->param(sdatedeb		=> payonline_tools::prdate($crtdate,'date') );
+  $template->param(sFormaction	=> "$me/fnddone?lang=$lang"		);
+ 
+  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  exit;
+}
+
+#------
+sub initTempl {
+   my ($tmplpath) = @_;
+
+#warn "initTempl: $tmpldir$tmplpath";
+   my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
+	   strict => 0,
+	   cache  => 1,
+	   global_vars => 1,
+	   die_on_bad_params => 0) or die "err : $!";
+
+   my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+   $year += 1900;
+   $template->param(sCrtYear 	=> $year);
+   $template->param(sPathMe 	=> $me);
+   $template->param(sID 			=> $sciper);
+   $template->param(sPrenom 	=> $prenom);
+   $template->param(sNom 			=> $nom);
+   $template->param(sSuperUser=> payonline_tools::IsSuperUser($sciper));
+   $template->param(sRespAdmin=> $respunits);
+   $template->param(sDebug 		=> $payonline_tools::DEBUG ? ' *** Attention : version de test. Ne pas utiliser, svp ! ***' : '');
+   return $template;
+}
+
+#------
+sub authenticate {
+
+  unless ($tequila) {
+	$tequila = new Tequila::Client (
+	  service    => 'paiement en ligne',
+	  request    => [ 'name','firstname','uniqueid','email' ],
+	  identities => 'any',
+	  urlaccess  => "https://$ENV{SERVER_NAME}/cgi-bin/payonline/priv?$ENV{QUERY_STRING}",
+	);
+    $tequila->init ();
+  } 
+
+  $tequila->setclientsesskey ($key) if $key;
+
+  $tequila->authenticate ();
+
+  $key 		= $args {key};
+  $sciper 	= $tequila->{attrs}->{uniqueid};
+  $args{sciper} = $sciper;
+  $nom 		= $tequila->{attrs}->{name};
+  $prenom 	= $tequila->{attrs}->{firstname};
+  $email 	= $tequila->{attrs}->{email};
+  
+# impersonate
+#  $sciper 	 = '145744' if $sciper eq '104782';
+
+#  $respunits = join(",", Droits::getAllUnitsWhereHasRight($sciper,'payonline'));
+#  $respunits = join(",", $payonline_tools::Rights->getAllUnitsWhereHasRight ($sciper, 'payonline'));
+
+  my $ref_units = $payonline_tools::Accreds->getAllUnitsWhereHasRight ($sciper, 38);	#	- 'payonline'
+  $respunits = join ",", keys %$ref_units;
+  
+  unless (payonline_tools::IsSuperUser($sciper) or $respunits) {
+    my $template = initTempl('default.tmpl');
+    $template->param(sErrMsg => qq{Pas de droits pour ce service : le droit <b>payonline</b> est requis.
+    	<br>Plus de détails auprès de votre responsable accréditation.});
+    print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+    exit;
+  }
+
+#warn "payonline :: respunits=$respunits";
+  my ($n1, $n2) = split(/,/, $nom)    if ($nom =~ /,/);
+  $nom = utf8tolatin1($n1) if $n2;
+  my ($n1, $n2) = split(/,/, $prenom) if ($prenom =~ /,/);
+  $prenom = utf8tolatin1($n1) if $n2;
+
+}
+
+#--------
+sub utf8tolatin1 {
+    my $string = shift;
+    $string =~ s/([\xC0-\xDF])([\x80-\xBF])/chr(ord($1)<<6&0xC0|ord($2)&0x3F)/eg;
+    return $string;
+}
+
+#------
+sub quit {
+  if ($tequila) {
+    $tequila->killsession ();
+    $tequila->{authenticated} = undef;
+  }
+  main ();
+}
+
