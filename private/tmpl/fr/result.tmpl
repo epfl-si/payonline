@@ -15,42 +15,33 @@
 	</TMPL_IF>
 </TMPL_IF>
 	  
-<table border="0" cellpadding="0" cellspacing="2" width="100%">
-  <tr >
-   <td width="155" valign="top">
-	  <TMPL_IF NAME=URL>
-	  <hr width="25%" align="left">
-	  <div style="float:left; width:80%; padding:10px; border:1px solid red; font-weight: bold; ">
-	  	<a href="<TMPL_VAR NAME=URL>">Retour</a> sur le site principal
-	  </div>
-	  </TMPL_IF>
-   </td>
-   <td >
-	  <TMPL_IF NAME=Descr>
-		 <h3><TMPL_VAR NAME=Descr></h3>
-		 <b>Responsable :</b> <a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a><br>
-		 <b>No. transaction : </b><TMPL_VAR NAME=OrderIDShop><br>
-		 <b>Identificateur PostFinance : </b><TMPL_VAR NAME=TransactionID><br>
-		 <b>Date de paiement: </b><TMPL_VAR NAME=Date><br>
-		 <b>Mode de paiement : </b><TMPL_VAR NAME=PayMode><br>
-		 <b>Client</b>
-		 <blockquote>
-		 <TMPL_VAR NAME=LastName> <TMPL_VAR NAME=FirstName><br>
-		 <TMPL_VAR NAME=Addr><br>
-		 <TMPL_VAR NAME=Country>, <TMPL_VAR NAME=ZipCode>, <TMPL_VAR NAME=City><br>
-		 <TMPL_VAR NAME=Email><br>
-		 </blockquote>
-		 <b>Montant : </b><TMPL_VAR NAME=Total> <TMPL_VAR NAME=Currency>
-		 <hr>
-	 </TMPL_IF>
+<TMPL_IF NAME=URL>
+		<a href="<TMPL_VAR NAME=URL>">Retour</a> sur le site principal<br>
+</TMPL_IF>
 
-	  <p>En cas de problème récurent, veuillez consulter <b><a href=http://payonline.epfl.ch/docs/troubleshooting-fr.html>l'aide en ligne</a></b> et transmettre ces informations ainsi que le message
-	  d'erreur au support technique de Postfinance [<a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>], au responsable de l'instance [<a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a>]
-	  ou à <a href="mailto:payonline@epfl.ch">payonline@epfl.ch</a> selon l'étape où le problème est arrivé.
-	  </p>
+<hr>
 
-  </td>
- </tr>
-</table>
+<TMPL_IF NAME=Descr>
+	 <h3><TMPL_VAR NAME=Descr></h3>
+	 <b>Responsable :</b> <a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a><br>
+	 <b>No. transaction : </b><TMPL_VAR NAME=OrderIDShop><br>
+	 <b>Identificateur PostFinance : </b><TMPL_VAR NAME=TransactionID><br>
+	 <b>Date de paiement: </b><TMPL_VAR NAME=Date><br>
+	 <b>Mode de paiement : </b><TMPL_VAR NAME=PayMode><br>
+	 <b>Client</b>
+	 <blockquote>
+	 <TMPL_VAR NAME=LastName> <TMPL_VAR NAME=FirstName><br>
+	 <TMPL_VAR NAME=Addr><br>
+	 <TMPL_VAR NAME=Country>, <TMPL_VAR NAME=ZipCode>, <TMPL_VAR NAME=City><br>
+	 <TMPL_VAR NAME=Email><br>
+	 </blockquote>
+	 <b>Montant : </b><TMPL_VAR NAME=Total> <TMPL_VAR NAME=Currency>
+	 <hr>
+</TMPL_IF>
+
+<p>En cas de problème récurent, veuillez consulter <b><a href=http://payonline.epfl.ch/fr/troubleshooting.html>l'aide en ligne</a></b> et transmettre ces informations ainsi que le message
+d'erreur au support technique de Postfinance [<a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>], au responsable de l'instance [<a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a>]
+ou à <a href="mailto:payonline@epfl.ch">payonline@epfl.ch</a> selon l'étape où le problème est arrivé.
+</p>
 
 <TMPL_INCLUDE NAME="footer.tmpl">

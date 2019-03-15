@@ -119,7 +119,7 @@ my @YP_IP_range = (
 $rejectIP = ('128.178.109.243','157.55.39.166');	#	crawlers 
 
 $demfond 	= 'bertold.walther@epfl.ch,ion.cionca@epfl.ch';
-$su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490,254724,229454';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
+$su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
 $codeTVA	= 'Q7';
 
 #--------
@@ -204,15 +204,6 @@ sub prdate {
     }
 }
 
-#--------
-sub makeHash_old {
-  my ($Currency, $Total) = @_;
-
-  my $hash = md5_hex($HashID{$Currency} . $Currency . $Total . $YPHashSeed{$Currency});
-warn "makeHash : str=$HashID{$Currency}$Currency$Total$YPHashSeed{$Currency}; hash=$hash\n";
-  return $hash;
-}
-
 #-------------
 sub makeHash {
   my ($data, $flag) = @_;
@@ -225,10 +216,10 @@ sub makeHash {
   	$txt = $data->{orderID}.$data->{currency}.$data->{amount}.$data->{PM}.$data->{ACCEPTANCE}.$data->{STATUS}.$data->{CARDNO}.$data->{PAYID}.$data->{NCERROR}.$data->{BRAND}
   }
   $txt .= $SHAsalt;
-warn "makeHash : txt=$txt\n";
+#warn "makeHash : txt=$txt\n";
   $ctx->add($txt);
   my $hexdigest = uc($ctx->hexdigest);
-warn "makeHash : digest=$hexdigest\n";
+#warn "makeHash : digest=$hexdigest\n";
   return ($hexdigest);
 }
 
@@ -265,7 +256,8 @@ sub send_mail_bc {
 warn "payonline :: send_mail_bc : $dest, $bcc, $subj\n";
   return unless $dest or $bcc;
   
-  $dest='ion.cionca@epfl.ch' if $DEBUG;
+  $dest 	= 'payonline@epfl.ch' if $DEBUG;
+  $dest ||= 'payonline@epfl.ch';
   my %mail;
   $mail{From} = 'noreply@epfl.ch'; 
   $mail{Bcc}  = $resp;
@@ -528,7 +520,7 @@ sub dbconnect {
 	die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
 	my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306}; 
 
-#warn "dbconnect : $dsndb\n";
+warn "dbconnect : $dsndb\n";
 
 	my $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd);
 	$dbh->{'mysql_enable_utf8'} = 1;
@@ -599,7 +591,7 @@ sub getTrans {
 #--------
 sub getQuery {
   my ($id_trans) = @_;
-warn "getQuery : $id_trans\n";
+#warn "getQuery : $id_trans\n";
   return unless $id_trans;
   return if  $id_trans =~ /select/i;
   return if  $id_trans =~ /insert/i;
@@ -614,7 +606,7 @@ warn "getQuery : $id_trans\n";
     my ($param, $val) = split (/=/, $item);
     $val =~ s/%26/&/g;
     $query{$param} = $val;
-warn "getQuery : $param=$val;";
+#warn "getQuery : $param=$val;";
   }
   return \%query;
 }

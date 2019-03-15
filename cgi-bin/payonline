@@ -1257,7 +1257,7 @@ sub donefnd {
 sub initTempl {
    my ($tmplpath) = @_;
 
-#warn "initTempl: $tmpldir$tmplpath";
+warn "initTempl: $tmpldir$tmplpath";
    my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
 	   strict => 0,
 	   cache  => 1,
@@ -1318,7 +1318,7 @@ sub authenticate {
     exit;
   }
 
-#warn "payonline :: respunits=$respunits";
+warn "authenticate $sciper :: respunits=$respunits";
   my ($n1, $n2) = split(/,/, $nom)    if ($nom =~ /,/);
   $nom = utf8tolatin1($n1) if $n2;
   my ($n1, $n2) = split(/,/, $prenom) if ($prenom =~ /,/);

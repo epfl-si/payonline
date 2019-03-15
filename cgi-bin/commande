@@ -31,9 +31,9 @@ my $mailresp	= 'ion.cionca@epfl.ch';
 my $masterIP	= '128.178.1.146';
 
 #	- inst id qui contournent les Conditions Générales de payonline
-my $bypassCondGen = 'y8xou4juffbh586ua1astocwsnmuh1y4,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
+my $bypassCondGen = 'y8xou4juffbh586ua1astocwsnmuh1y4,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8,6yz8pygfkg0ldordglzygll8qwf56t3a';
 my $noHeaderPage  = 'maintrans-noheader.tmpl';
-my $noHeaderInsts = 'cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
+my $noHeaderInsts = 'cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8';
 
 my %errmsgs	= (
 	fr => [
@@ -114,7 +114,7 @@ sub maintrans {
 
   my $tmpl_file = $noHeaderInsts =~ /$args{id_inst}/ ? 'maintrans-noheader.tmpl' : 'maintrans.tmpl';
 
-warn "-_> maintrans : tmpl_file=$tmpl_file\n";
+#warn "-_> maintrans : tmpl_file=$tmpl_file\n";
 
   my $template  = initTempl($tmpl_file);
 
