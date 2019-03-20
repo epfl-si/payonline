@@ -147,7 +147,6 @@ sub init {
 	die "FATAL dinfo DB ACCESS" unless $db_dinfo;
 	$Accreds = new Cadi::Accreds (caller => '104782', utf8 => 1);
 	$SHAsalt = $SHAsaltTest if $DEBUG;
-
 }
 
 #--------
@@ -493,7 +492,6 @@ sub getFonds {
     $sql = qq{select no_fond,libelle from dinfo.fonds where cf = ? and etat='O'};
     my $sth = $db_dinfo->query ( $sql, ("F$cf"));
     while (my ($no_fond,$libelle) = $sth->fetchrow_array ()) {
-#warn "cf=$cf,no_fond=$no_fond,libelle=$libelle";
       push (@fonds, "$no_fond:$libelle");
     }
     $fondsperCF->{$cf} = \@fonds;

@@ -127,7 +127,7 @@ payonline offline status change
 	
 	";
 
-	payonline_tools::send_mail ('payonline\@epfl.ch', 'payonline OFFLINE STATUS CHANGE ', $msg);
+	payonline_tools::send_mail ('payonline\@epfl.ch', "payonline OFFLINE STATUS CHANGE : status=$args{STATUS}", $msg);
 
 	return;
   }
@@ -152,11 +152,11 @@ warn "payonline cert: ... 3 query OK\n";
   # - get transaction data
   my $trans= payonline_tools::getTrans ($id_trans,'');
   if ($trans->{etat} eq 'payé') {
-  	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction payée\n";
-	my $msg = qq{
-	error :: id_trans=$id_trans :: transaction already payed
-	};
-	payonline_tools::send_mail ('payonline\@epfl.ch', 'payonline WARNING :: transaction payée', $msg);
+  	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction payed: status=$args{STATUS}\n";
+		my $msg = qq{
+		error :: id_trans=$id_trans :: transaction already payed, status=$args{STATUS}
+		};
+		payonline_tools::send_mail ('payonline\@epfl.ch', "payonline WARNING :: transaction payed: status=$args{STATUS}", $msg);
   	return;
   }
   
@@ -193,17 +193,17 @@ warn " ==>> payonline cert: OK : $id_trans\n";
 	  $lang 	= $query->{lang} ? $query->{lang} : 'en';
 
 	  my $msg = qq{
-	$errmsgs{$lang}->[1]
+		$errmsgs{$lang}->[1]
 
 			$inst->{descr}
-	
-	$errmsgs{$lang}->[2] $id_trans
-	$errmsgs{$lang}->[3] $args{PAYID}
-	$errmsgs{$lang}->[4] $args{PM} $args{BRAND}
-	Date : $trans->{datecr}
-	$errmsgs{$lang}->[5] $query->{Total} $query->{Currency}
-	
-	$errmsgs{$lang}->[6]
+
+		$errmsgs{$lang}->[2] $id_trans
+		$errmsgs{$lang}->[3] $args{PAYID}
+		$errmsgs{$lang}->[4] $args{PM} $args{BRAND}
+		Date : $trans->{datecr}
+		$errmsgs{$lang}->[5] $query->{Total} $query->{Currency}
+
+		$errmsgs{$lang}->[6]
 		$query->{FirstName} $query->{LastName}
 		$query->{Addr}
 		$query->{Country}, $query->{ZipCode} $query->{City}

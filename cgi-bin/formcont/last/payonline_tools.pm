@@ -22,7 +22,7 @@ use Digest::SHA1 ;
 use strict;
 use vars qw( $dbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfond $codeTVA
             $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
-            $su_list $ges_list $SHAsalt $mode $formContent $postURL $redirectURL $URLcgi
+            $su_list $ges_list $SHAsalt $mode
             );
 
 my $me 		= $ENV {SCRIPT_NAME};
@@ -47,25 +47,10 @@ my $resp 	= 'ion.cionca@epfl.ch';
 $YellowPayTstSrv= 'yellowpaytest.postfinance.ch';
 $YellowPayPrdSrv= 'yellowpay.postfinance.ch';
 
-$YPServersIP	= '185.8.54.254,185.8.52.254,194.41.152.138,194.41.152.139,194.41.216.138,194.41.216.139,212.23.45.96,212.23.45.97,212.23.45.98,212.23.45.99,212.23.45.100,212.23.45.101,212.23.45.102,212.23.45.103,212.23.45.104,212.23.45.105,212.23.45.106,212.23.45.107,212.23.45.108,212.23.45.109,212.23.45.110,212.23.45.111 ,213.254.248.96,213.254.248.97,213.254.248.98,213.254.248.99,213.254.248.100,213.254.248.101,213.254.248.102,213.254.248.103,213.254.248.104,213.254.248.105,213.254.248.106,213.254.248.107,213.254.248.108,213.254.248.109,213.254.248.110,213.254.248.111 ,212.35.124.160,212.35.124.161,212.35.124.162,212.35.124.163,212.35.124.164,212.35.124.165,212.35.124.166,212.35.124.167,212.35.124.168,212.35.124.169,212.35.124.170,212.35.124.171,212.35.124.172,212.35.124.173,212.35.124.174,212.35.124.175';
+$YPServersIP	= '194.41.152.138,194.41.152.139,194.41.216.138,194.41.216.139,212.23.45.96,212.23.45.97,212.23.45.98,212.23.45.99,212.23.45.100,212.23.45.101,212.23.45.102,212.23.45.103,212.23.45.104,212.23.45.105,212.23.45.106,212.23.45.107,212.23.45.108,212.23.45.109,212.23.45.110,212.23.45.111 ,213.254.248.96,213.254.248.97,213.254.248.98,213.254.248.99,213.254.248.100,213.254.248.101,213.254.248.102,213.254.248.103,213.254.248.104,213.254.248.105,213.254.248.106,213.254.248.107,213.254.248.108,213.254.248.109,213.254.248.110,213.254.248.111 ,212.35.124.160,212.35.124.161,212.35.124.162,212.35.124.163,212.35.124.164,212.35.124.165,212.35.124.166,212.35.124.167,212.35.124.168,212.35.124.169,212.35.124.170,212.35.124.171,212.35.124.172,212.35.124.173,212.35.124.174,212.35.124.175';
+
 
 $su_list	= '104782';	# - ic,
-
-$DEBUG 		= '0';
-if ( $DEBUG ) {
-	$mode   	= 'test' ;	# - test | prod
-	$ShopID 	= 'unilepflTEST';	# - test | prod
-	$URLcgi		= '/cgi-bin/formcont/test/payment' ;
-	$postURL	= 'https://isatest.epfl.ch/imoniteur_ISAT/!itf.formulaires.payonlineFCUE';
-	$redirectURL= 'https://isatest.epfl.ch/imoniteur_ISAT/!itf.formulaires.redirectFCUE';
-warn "formcont :: DEBUG=$DEBUG\n";
-} else {
-	$mode   	= 'prod';	# - test | prod
-	$ShopID 	= 'unilepfl';	# - test | prod
-	$URLcgi		= '/cgi-bin/formcont/payment';
-	$postURL	= 'https://isa.epfl.ch/imoniteur_ISAP/!itf.formulaires.payonlineFCUE';
-	$redirectURL= 'https://isa.epfl.ch/imoniteur_ISAP/!itf.formulaires.redirectFCUE';
-}
 
 #--------
 sub utf8tolatin1 {
@@ -189,8 +174,7 @@ sub gentablekey {
       	amount='$userdata->{amount}',
       	raison='$userdata->{raison}',
       	email='$userdata->{email}',
-      	id_transact='$userdata->{id_transact}',
-      	origin='$userdata->{origin}'
+      	id_transact='$userdata->{id_transact}'
       };
 warn "formcont :: gentablekey : key=$key\n";
       my $sth = dbquery ($sql);
@@ -357,7 +341,7 @@ sub dbconnect {
   my $dbname  = 'formcont';
   my $dbuser  = 'formcont';
   my $dbpwd   = $dbuser.'59';
-  my $dbhost  = $DEBUG ? 'test-cadidb.epfl.ch' : 'cadidb.epfl.ch';
+  my $dbhost  = 'cadidb.epfl.ch';
 
   die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
   my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306}; 
@@ -411,7 +395,6 @@ sub getTrans {
   
 }
 
-#--------
 sub header {
 	print qq{Content-Type: text/html; charset=iso-8859-1
 
@@ -444,11 +427,11 @@ a:hover {
 
 <body>
 
-<div class="logobox"><a href="http://www.formation-continue-unil-epfl.ch/"><img src="https://payonline.epfl.ch/images/formcont-logo.png" alt="Formation continue UNIL/EPFL" border="0"></a></div>
+<div class="logobox"><a href="http://www.formation-continue-unil-epfl.ch/"><img src="/images/formcont-logo.png" alt="Formation continue UNIL/EPFL" border="0"></a></div>
+
 };
 }
 
-#--------
 sub footer {
 	print qq{
 		<hr>

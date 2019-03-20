@@ -585,7 +585,7 @@ sub detinst {
   }
   my $sth 	 = payonline_tools::dbquery ($sql, @params);
   my $result = $sth->fetchrow_hashref ();
-  
+
   unless ($result->{descr}) {
      my $errmsg = qq{instance pas trouvée ou en dehors de votre responsabilité};
      $template->param(sErrMsg 	=> $errmsg);
@@ -604,7 +604,6 @@ sub detinst {
 		}
 		$cfs =~ s/^,//;
   }
-
   my $fonds = payonline_tools::getFonds ($respunits);
   my $seltxt2 = qq{<select name="fonds">\n}; my $seltxt21;
   foreach my $cf (sort keys %$fonds) {
