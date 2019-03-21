@@ -19,7 +19,12 @@ my $me 		= $ENV {SCRIPT_NAME};
 my $us 		= $ENV {SERVER_NAME};
 my $qs 		= $ENV {QUERY_STRING};
 my $pi 		= $ENV {PATH_INFO};
+
+my $DEBUG 	= '1';
 my $verbose = '1';
+
+$payonline_tools::mode 	 = $DEBUG ? 'test' : 'prod';	# - test | prod
+$payonline_tools::ShopID = $DEBUG ? 'unilepflTEST' : 'unilepfl';	# - test | prod
 
 %args		= payonline_tools::loadargs ();
 $crtdate 	= payonline_tools::getcrtdate();
@@ -34,7 +39,7 @@ my %msgs	= (
 		'Nom',
 		'Montant',
 		'Payé par',
-		'Veuillez contacter directement le support de Postfinance à l\'adresse : shopperhelp@postfinance.ch avec les détails de votre transaction',
+		'Veuillez contacter directement le support de Postfinance à l\'adresse : shopperhelp\@postfinance.ch avec les détails de votre transaction',
 	],
 	en => [
 		'On line payment failed',
@@ -44,7 +49,7 @@ my %msgs	= (
 		'Name',
 		'Amount',
 		'Payed by',
-		'Please contact Postfinance\'s support at : shopperhelp@postfinance.ch and provide all details of the transaction',
+		'Please contact Postfinance\'s support at : shopperhelp\@postfinance.ch and provide all details of the transaction',
 	],
 	);
 payonline_tools::header ();
@@ -76,6 +81,7 @@ sub main {
 		PAYID : $args{PAYID}<br>
 		$msgs{$lang}->[6] : $args{BRAND}<br>
 		Date : $args{TRXDATE}<br>
+
 	};
 	
 	unless ($args{result} eq '1') {
@@ -84,12 +90,6 @@ sub main {
 		</p>
 		};
 	}
-	
-	print qq{
-	<script language="javascript">
-		location.href='$payonline_tools::redirectURL';
-	</script>
-	};
 
 #foreach my $item (keys %args) {
 #	print "$item=$args{$item}<br>";

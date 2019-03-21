@@ -15,9 +15,7 @@ Please enable JavaScript and then "<b>Reload</b>" the current page.
 </TMPL_IF>
 
 <TMPL_IF NAME=sErrMsg>
-  <div class="error">
-  	<p><TMPL_VAR NAME=sErrMsg></p>
-  </div>
+	<p><TMPL_VAR NAME=sErrMsg></p>
 <TMPL_ELSE>
 	<p></p>
 
@@ -85,7 +83,7 @@ Please enable JavaScript and then "<b>Reload</b>" the current page.
 
 	<p>
 
-	<a href="http://www.postfinance.ch/index.html.en" target="_blank"><img src="/images/postfinance.gif" width="150" height="54" border="0" align=right></a>
+	<img src="/images/postfinance.gif" width="150" height="54" border="0" align=right>
 
 	<input type="checkbox" name="condgen" id="condgen"  <TMPL_VAR NAME=CGchecked>> I read and accept the  <a href="http://wiki.epfl.ch/payonline-aide/documents/CGpayonlineEN.pdf" target="_blank">General Terms and Conditions</a>
 	</p>
@@ -94,7 +92,6 @@ Please enable JavaScript and then "<b>Reload</b>" the current page.
 
 	</form>
   </div>
-
 </TMPL_IF>
 
 <TMPL_INCLUDE NAME="footer.tmpl">

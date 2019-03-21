@@ -28,7 +28,7 @@ my %errmsgs	= (
 		'Erreur(s) de saisie',
 		'<li>indentificateur d\'instance absent</li>',
 		'<li>indentificateur de monnaie absent</li>',
-		'<li>montant formation absente</li>',
+		'<li>total transaction absent</li>',
 		'<li>nom absent</li>',
 		'<li>prénom absent</li>',
 		'<li>adresse absente</li>',
@@ -50,16 +50,16 @@ my %errmsgs	= (
 		'<li>syntaxe email incorrecte</li>',
 	      ],
 	en => [
-		'Input error(s)',								# 0
-		'<li>instance identificator missing</li>',		# 1
-		'<li>currency missing</li>',					# 2
-		'<li>trainig fee missing</li>',					# 3
-		'<li>last name missing</li>',					# 4
-		'<li>first name missing</li>',					# 5
-		'<li>address missing</li>',						# 6
-		'<li>zip code missing</li>',					# 7
-		'<li>city missing</li>',						# 8
-		'<li>country code missing</li>',				# 9
+		'Input error(s)',				# 0
+		'<li>instance identificator missing</li>',	# 1
+		'<li>currency missing</li>',			# 2
+		'<li>transaction total missing</li>',		# 3
+		'<li>last name missing</li>',			# 4
+		'<li>first name missing</li>',			# 5
+		'<li>address missing</li>',			# 6
+		'<li>zip code missing</li>',			# 7
+		'<li>city missing</li>',			# 8
+		'<li>country code missing</li>',		# 9
 		'Please return on the previous page and correct the input',	# 10
 		'<li>wrong total format</li>',					# 11
 		'Payment instance not found or not operational',		# 12
@@ -68,12 +68,22 @@ my %errmsgs	= (
 		' *** Warning : test version. Not for public usage ! ***',	# 15
 		'<b>payonline@epfl</b> is currently unavailable : please stay on this page end do a page reload in a couple of minutes.',	# 16
 		'<li>pernum number missing</li>',
-		'<li>invoice number missing</li>',
+		'<li>bill number missing</li>',
 		'<li>training number missing</li>',
 		'<li>email missing</li>',
 		'<li>incorrect email syntax</li>',
 	      ],
 	);
+
+my $DEBUG 	= '1';
+
+$payonline_tools::mode   = $DEBUG ? 'test' : 'prod';	# - test | prod
+$payonline_tools::ShopID = $DEBUG ? 'unilepflTEST' : 'unilepfl';	# - test | prod
+
+init();
+
+#------
+sub init {
 
   %args		= payonline_tools::loadargs ();
   $crtdate 	= payonline_tools::getcrtdate();
@@ -82,13 +92,11 @@ my %errmsgs	= (
 warn "--> formcont payment : $payonline_tools::mode\n";
 
   payonline_tools::header ();
-
   main ();
-
   payonline_tools::footer ();
 
   exit;
-
+}
 
 #------
 sub main {
@@ -103,13 +111,11 @@ sub main {
 
   $errmsg .= "$errmsgs{$lang}->[17]<br>" 	unless $args{nopernum};
   $errmsg .= "$errmsgs{$lang}->[18]<br>" 	unless $args{nofacture};
-#  $errmsg .= "$errmsgs{$lang}->[19]<br>" 	unless $args{nocours};
+  $errmsg .= "$errmsgs{$lang}->[19]<br>" 	unless $args{nocours};
 
   $errmsg .= "$errmsgs{$lang}->[20]<br>" 	unless $args{Email};
-  if ($args{Email}) {
-	  # - validation email
-	  $errmsg .= "$errmsgs{$lang}->[21]<br>" unless ($args{Email} =~ /^(\w|\-|\_|\.)+\@((\w|\-|\_)+\.)+[a-zA-Z]{2,}$/);
-  }
+  # - validation email
+  $errmsg .= "$errmsgs{$lang}->[21]<br>" unless ($args{Email} =~ /^(\w|\-|\_|\.)+\@((\w|\-|\_)+\.)+[a-zA-Z]{2,}$/);
   # validation du total:  [0-9]{0,9}\.[0-9]{1,2}
   my ($raison, $UserTotal) = split (/:/, $args{Total});
   $errmsg .= "$errmsgs{$lang}->[3]<br>" 	unless $UserTotal;
@@ -119,21 +125,21 @@ sub main {
   payonline_tools::setYellowPaySrv();
 
   my $ParamTotal = $UserTotal * 100;	# 		- pas de décimales
-  my $currency   = 'CHF';
-  my $userdata   = {
-  	name 	  	=> $args{LastName},
-  	firstname 	=> $args{FirstName},
-  	addr 	  	=> $args{Addr},
-  	zip 	  	=> $args{Zip},
-  	city 	  	=> $args{City},
-  	country	  	=> $args{Country},
-	email 	  	=> $args{Email},
-	amount 	  	=> $UserTotal,
-	raison 	  	=> $raison,
-  	nopart    	=> $args{num_part},
-  	nofacture 	=> $args{num_facture},
-  	nocours	  	=> $args{nocours},
-	id_transact => $args{id_transact},
+  my $currency  = 'CHF';
+  my $userdata = {
+  	name 	  => $args{LastName},
+  	firstname => $args{FirstName},
+  	addr 	  => $args{Addr},
+  	zip 	  => $args{Zip},
+  	city 	  => $args{City},
+  	country	  => $args{Country},
+	email 	  => $args{Email},
+	amount 	  => $UserTotal,
+	raison 	  => $raison,
+  	nopernum  => $args{nopernum},
+  	nofacture => $args{nofacture},
+  	nocours	  => $args{nocours},
+	id_transact  => $args{id_transact},
   };
   
   my $id_trans 	= payonline_tools::gentablekey($userdata);
@@ -157,18 +163,18 @@ foreach my $item (keys %args) {
   print qq{
 	   <form action="$payonline_tools::YellowPaySrv" method="POST" name="cmd" >
 
-			<input type="hidden" name="PSPID" 		value="$payonline_tools::ShopID"> 
-			<input type="hidden" name="orderID" 	value="$id_trans"> 
-			<input type="hidden" name="amount" 		value="$ParamTotal"> 
-			<input type="hidden" name="currency" 	value="CHF"> 
-			<input type="hidden" name="language" 	value="$txtLang"> 
-			<input type="hidden" name="SHASign" 	value="$txtHash"> 
+			<input type="hidden" name="PSPID" value="$payonline_tools::ShopID"> 
+			<input type="hidden" name="orderID" value="$id_trans"> 
+			<input type="hidden" name="amount" value="$ParamTotal"> 
+			<input type="hidden" name="currency" value="CHF"> 
+			<input type="hidden" name="language" value="$txtLang"> 
+			<input type="hidden" name="SHASign" value="$txtHash"> 
 
-			<input type="hidden" name="CN" 			value="$args{FirstName} $args{LastName}"> 
-			<input type="hidden" name="EMAIL" 		value="$args{Email}"> 
-			<input type="hidden" name="ownertown" 	value="$args{City}"> 
-			<input type="hidden" name="COM" 		value="$COM"> 
-			<input type="hidden" name="LOGO" 		value="$LOGO"> 
+			<input type="hidden" name="CN" value="$args{FirstName} $args{LastName}"> 
+			<input type="hidden" name="EMAIL" value="$args{Email}"> 
+			<input type="hidden" name="ownertown" value="$args{City}"> 
+			<input type="hidden" name="COM" value="$COM"> 
+			<input type="hidden" name="LOGO" value="$LOGO"> 
   };
   if ($lang eq 'fr') {
   	print qq{
@@ -234,7 +240,7 @@ sub error {
 	my $errtxt2 = qq{Veuillez effectuer les corrections nécessaires sur la page précédente};
 	if ($lang eq 'en') {
 		$errtxt1 = qq{error};
-		$errtxt2 = qq{Back on the previous page and fix these errors};
+		$errtxt2 = qq{Back on the previous page and fix the errors};
 	}
 	print qq{
 	<h2>$errtxt1</h2>
