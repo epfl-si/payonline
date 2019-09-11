@@ -75,9 +75,9 @@ my %nat_comptable = (
 			'740055', '740055 : Vente, Formation continue',
 			'740060', '740060 : Congrès, Séminaires, Conférences',
 			'741070', '741070 : Produits de manifestations',
-			'746020', '746020 : Dons, donations, legs reçus',
 			'747040', '747040 : Cotisations et abonnements divers',
 			'783120', '783120 : Contrat de service suisse',
+			'786030', '786030 : Autres dons',
 			},
 		en => {
 			'', '---select---',
@@ -92,9 +92,9 @@ my %nat_comptable = (
 			'740055', '740055 : Sales, Continuing Education',
 			'740060', '740060 : Congres, Seminaires, Conferences',
 			'741070', '741070 : Produits de manifestations',
-			'746020', '746020 : Dons, donations, legs reçus',
 			'747040', '747040 : Cotisations et abonnements divers',
 			'783120', '783120 : Contrat de service suisse',
+			'786030', '786030 : Gift',
 			},
 );
 			
@@ -1301,10 +1301,7 @@ sub authenticate {
   $email 	= $tequila->{attrs}->{email};
   
 # impersonate
-#  $sciper 	 = '145744' if $sciper eq '104782';
-
-#  $respunits = join(",", Droits::getAllUnitsWhereHasRight($sciper,'payonline'));
-#  $respunits = join(",", $payonline_tools::Rights->getAllUnitsWhereHasRight ($sciper, 'payonline'));
+#  $sciper 	 = '218056' if $sciper eq '104782';
 
   my $ref_units = $payonline_tools::Accreds->getAllUnitsWhereHasRight ($sciper, 38);	#	- 'payonline'
   $respunits = join ",", keys %$ref_units;

@@ -2,8 +2,9 @@
 #
 ##############################################################################
 #
-# File Name:    ress.pl
-# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2005
+# Service Name  payonline 
+#	File Name			do
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2005-2019
 #
 #########################################################################
 #####
@@ -27,7 +28,7 @@ my $tmpldir = '/var/www/vhosts/payonline.epfl.ch/private/tmpl/XX/';
 my $logfile	= '/var/log/httpd/payonline.log';
 
 my $noHeaderInsts = 'cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
-
+my $bypassReturn 	= 'ybvoa633uvw3b56hxhxr665yiqwyboni';
 my %errmsgs	= (
 	fr => [
 		' *** Attention : version de test. Ne pas utiliser, svp ! ***',	
@@ -135,7 +136,18 @@ payonline offline status change
   my $query	= payonline_tools::getQuery ($id_trans);
   return unless $query;
 warn "payonline cert: ... 3 query OK\n";
-  
+
+  # - get transaction data
+  my $trans= payonline_tools::getTrans ($id_trans,'');
+
+  # - get instance data
+  my $sql  = qq{select * from instances where id=?};
+  my $sth  = payonline_tools::dbquery ($sql, ($trans->{id_inst}));
+  my $inst = $sth->fetchrow_hashref();
+  my $etat = $inst->{etat};
+warn "payonline cert: etat=$etat\n";
+  $payonline_tools::SHAsalt	= $payonline_tools::SHAsaltTest if $etat eq 'test';
+
   my $hashdata = {
 	orderID 	=> $args{orderID},
 	currency 	=> $args{currency},
@@ -148,35 +160,34 @@ warn "payonline cert: ... 3 query OK\n";
 	NCERROR 	=> $args{NCERROR},
 	BRAND 		=> $args{BRAND},	
   };
+  my $hash 		= payonline_tools::makeHash ($hashdata, 'out');
+# - check hash --------
+  unless ($hash eq $args{SHASIGN}) {
+  	warn "** ERR : payonline :: cert FAILED : $id_trans\n$hash\n$args{SHASIGN}\n";
+  	return;
+  }
 
-  # - get transaction data
-  my $trans= payonline_tools::getTrans ($id_trans,'');
   if ($trans->{etat} eq 'payé') {
-  	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction payed: status=$args{STATUS}\n";
-		my $msg = qq{
-		error :: id_trans=$id_trans :: transaction already payed, status=$args{STATUS}
-		};
+  	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction already payed: status=$args{STATUS}\n";
+		my $msg = qq{error :: id_trans=$id_trans :: transaction already payed, status=$args{STATUS}	};
+		if ($args{STATUS} eq '2') {
+			my $sql = qq{update transact set etat='' where id=?};
+			my $sth = payonline_tools::dbquery ($sql, ($id_trans));
+			$sth->finish ();
+			warn "payonline cert id_trans=$id_trans :: ** TRANSACTION REFUSED **, status updated\n ";
+			$msg .= qq{
+			transaction refused : status updated
+			};
+		}
 		payonline_tools::send_mail ('payonline\@epfl.ch', "payonline WARNING :: transaction payed: status=$args{STATUS}", $msg);
   	return;
+  } else {
+		if ($args{STATUS} eq '2') {
+			warn "** ERR : payonline :: transaction refused : $id_trans ";
+			return;
+		}
   }
-  
-  # - get instance data
-  my $sql  = qq{select * from instances where id=?};
-  my $sth  = payonline_tools::dbquery ($sql, ($trans->{id_inst}));
-  my $inst = $sth->fetchrow_hashref();
-  my $etat = $inst->{etat};
-warn "payonline cert: etat=$etat\n";
-  $payonline_tools::SHAsalt	= $payonline_tools::SHAsaltTest if $etat eq 'test';
 
-warn "payonline cert: SHAsalt=$payonline_tools::SHAsalt\n";
-  my $hash 		= payonline_tools::makeHash ($hashdata, 'out');
-  
-# - check hash --------
-warn "payonline cert: ... 4 hash=$hash, arghash=$args{SHASIGN}\n";
-  unless ($hash eq $args{SHASIGN}) {
-  	warn "** ERR : payonline :: cert FAILED : $id_trans ";
-  	return;
-  }
   my $sql = qq{update transact set
   	 etat='payé',
 	 datecr=Now(),
@@ -187,33 +198,76 @@ warn "payonline cert: ... 4 hash=$hash, arghash=$args{SHASIGN}\n";
 warn " ==>> payonline cert: OK : $id_trans\n";
   $sth->finish ();
 
-  if ($etat eq 'prod') {
-	  # - send email
-	  my $email = $query->{Email};
-	  $lang 	= $query->{lang} ? $query->{lang} : 'en';
+warn " ==>> payonline cert: : query Email=$query->{Email}\n";
+ my $email = $etat eq 'prod' 
+ 					 ? $query->{Email}
+ 					 : 'payonline@epfl.ch';
+  $lang		 = $query->{lang} ? $query->{lang} : 'en';
+  my $msg  = qq{
+	$errmsgs{$lang}->[1]
 
-	  my $msg = qq{
-		$errmsgs{$lang}->[1]
+		$inst->{descr}
 
-			$inst->{descr}
-
-		$errmsgs{$lang}->[2] $id_trans
-		$errmsgs{$lang}->[3] $args{PAYID}
-		$errmsgs{$lang}->[4] $args{PM} $args{BRAND}
-		Date : $trans->{datecr}
-		$errmsgs{$lang}->[5] $query->{Total} $query->{Currency}
-
-		$errmsgs{$lang}->[6]
-		$query->{FirstName} $query->{LastName}
-		$query->{Addr}
-		$query->{Country}, $query->{ZipCode} $query->{City}
+	$errmsgs{$lang}->[2] $id_trans
+	$errmsgs{$lang}->[3] $args{PAYID}
+	$errmsgs{$lang}->[4] $args{PM} $args{BRAND}
+	Date : $trans->{datecr}
+	$errmsgs{$lang}->[5] $query->{Total} $query->{Currency}
 	
-		};
+	$errmsgs{$lang}->[6]
+	$query->{FirstName} $query->{LastName}
+	$query->{Addr}
+	$query->{Country}, $query->{ZipCode} $query->{City}
+	};
+	if ( $payonline_tools::exceptions->{$inst->{id}}) {
+		$payonline_tools::mailFrom = $payonline_tools::exceptions->{$inst->{id}}->{mailFrom};
+		if ($query->{anonymous}) {
+			$msg .= qq{
+	Anonymous donation
+			};
+			$email = '';
+		} else {
+			my $date = substr ($trans->{datecr}, 0, 10);
+			$msg = qq{
+Madame, Monsieur,
+ 
+Par la présente, nous vous confirmons la réception de votre donation de $query->{Total} $query->{Currency} pour le $query->{purpose} faite le $date.  Nous vous en sommes très reconnaissants.
+ 
+L'Ecole Polytechnique Fédérale de Lausanne (ci-après EPFL) est un établissement de droit public doté de la personnalité juridique.  Notre établissement est considéré d'utilité publique, exempté des impôts fédéraux, cantonaux, et communaux.
+ 
+Les donations faites à l'EPFL peuvent être déduites fiscalement selon les normes cantonales et fédérales en vigueur. L'EPFL vous enverra une attestation à cet effet dans les meilleurs délais.
+ 
+En vous remerciant à nouveau de votre soutien, nous vous envoyons nos sincères salutations,
+ 
+Nathalie Fontana
+Directrice de la Philanthropie
+ 
+ 
+Dear $query->{FirstName} $query->{LastName},
+ 
+We hereby acknowledge receipt of your donation of $query->{Total} $query->{Currency} on $date for the $query->{purpose}.  We are extremely grateful for your generous contribution.
+ 
+EPFL is a public institution and benefits from a non-profit status meaning that donations are tax deductible in accordance with cantonal and federal norms. EPFL will send you an official receipt as soon as possible.
+ 
+Once again, please accept our sincere gratitude for your donation.
+ 
+Best wishes,
+ 
+Nathalie Fontana
+Director of Philanthropy
+			};
+		}
+		if ($query->{Total} >= $payonline_tools::exceptions->{$inst->{id}}->{alertOn} &&
+				$payonline_tools::exceptions->{$inst->{id}}->{alertTo}) 
+		{
+warn "==> cert $payonline_tools::exceptions->{$inst->{id}} : mailBcc=$payonline_tools::mailBcc\n";
+			$payonline_tools::mailBcc = $payonline_tools::exceptions->{$inst->{id}}->{alertTo};
+		}
+	}
 
-	  payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL payonline :: payment confirmation', $msg);
-	#    payonline_tools::send_mail ($email, 'EPFL payonline :: payment confirmation', $msg);
+	payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL payonline :: payment confirmation', $msg);
+#    payonline_tools::send_mail ($email, 'EPFL payonline :: payment confirmation', $msg);
 	warn " ==>> payonline cert: confirmation email to : $email, $inst->{mailinst}\n";    
-  }
   
   postResult ($id_trans, 1, );
 
@@ -267,29 +321,35 @@ warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
 	  exit;
   }
   
-  $resultcode 				= '' if $trans->{etat} ne 'payé';
-  my $resp  				= payonline_tools::getPersonInfos ($inst->{sciper});
-  my $query					= payonline_tools::getQuery ($id_trans);
-  my $email 				= $query->{Email};
-  $lang 					= $query->{lang} ? $query->{lang} : 'en';
-  $tmpldir 					=~ s/XX/$lang/;
+  $resultcode 	= '' if $trans->{etat} ne 'payé';
+  my $resp  		= payonline_tools::getPersonInfos ($inst->{sciper});
+  my $query			= payonline_tools::getQuery ($id_trans);
+  my $email 		= $query->{Email};
+  $lang 				= $query->{lang} ? $query->{lang} : 'en';
+  $tmpldir 			=~ s/XX/$lang/;
 
   my $tmpl_file = $noHeaderInsts =~ /$trans->{id_inst}/ ? 'result-noheader.tmpl' : 'result.tmpl';
   my $template	= initTempl($tmpl_file);
+
+#  my $sOnLoad 	= qq{onload="window.location.href='$inst->{url}';"} if $bypassReturn =~ /$trans->{id_inst}/;
+  my $sOnLoad 	= qq{onload="window.location.href='$inst->{url}';"} if $inst->{bypass_return} && $resultcode;
+
+
   $template->param(OrderIDShop 	=> $id_trans);
-  $template->param(Currency 	=> $query->{Currency});
-  $template->param(Total 		=> $query->{Total});
-  $template->param(LastName 	=> payonline_tools::utf8tolatin1($query->{LastName}));
-  $template->param(FirstName 	=> payonline_tools::utf8tolatin1($query->{FirstName}));
-  $template->param(Email 		=> $email);
-  $template->param(Tel 			=> $query->{Phone});
-  $template->param(Fax 			=> $query->{Fax});
-  $template->param(Addr 		=> payonline_tools::utf8tolatin1($query->{Addr}));
-  $template->param(ZipCode 		=> $query->{ZipCode});
-  $template->param(City 		=> $query->{City});
-  $template->param(Country 		=> $query->{Country});
-  $template->param(ResultCode	=> $resultcode);
+  $template->param(Currency 		=> $query->{Currency});
+  $template->param(Total 				=> $query->{Total});
+  $template->param(LastName 		=> payonline_tools::utf8tolatin1($query->{LastName}));
+  $template->param(FirstName 		=> payonline_tools::utf8tolatin1($query->{FirstName}));
+  $template->param(Email 				=> $email);
+  $template->param(Tel 					=> $query->{Phone});
+  $template->param(Fax 					=> $query->{Fax});
+  $template->param(Addr 				=> payonline_tools::utf8tolatin1($query->{Addr}));
+  $template->param(ZipCode 			=> $query->{ZipCode});
+  $template->param(City 				=> $query->{City});
+  $template->param(Country 			=> $query->{Country});
+  $template->param(ResultCode		=> $resultcode);
   $template->param(TransactionID=> $trans->{PaymentID});
+  $template->param(sOnLoad	 		=> $sOnLoad);
 
   if ($inst->{contact}) {
 	  $template->param(Resp 		=> $inst->{contact});
@@ -426,120 +486,4 @@ warn "do_post a : $url, $id_transact, $result\n";
   my $content  = $response->decoded_content();
 warn "do_post done : $content\n";
 
-}
-
-sub do_post_old {
-  my ($id_transact, $result, $trans, $url, $queryArgs) = @_;
-
-  return eval {
-    local $SIG {ALRM} = sub { die "payonline :: do :do_post: ** ERR Timeout ** $id_transact"; };
-    alarm (10);
-	
-	my $datecr	  = $trans->{datecr};
-	$datecr	  	  =~ s/ /+/g;
-	my $PaymentID = $trans->{PaymentID};
-	my $paymode	  = $trans->{paymode};
-	$paymode	  =~ s/ /+/g;
-	
-	my ($httptype, $host, $path, $port) = http_items($url);
-warn "payonline :: do :do_post 1 : httptype=$httptype, host=$host, path=$path\n";  
-	return unless $host and $path;
-	return if ($host eq '127.0.0.1') or ($host eq 'payonline.epfl.ch');
-
-	my $sock;
-warn "payonline :: do :do_post 2 : $host\n";  
-	
-	$usessl = $httptype =~ /^https/i;
-	if ($usessl) {
-		require IO::Socket::SSL; import IO::Socket::SSL;
-		$sock = new IO::Socket::SSL ("$host:https");
-		unless ($sock) {
-			warn "payonline :: do : do_post : ** SSL ERR : $! [id_transact:$id_transact] $host\n";
-			return;
-		}
-	} else {
-		my $sslKO;
-		eval { use Socket; };
-		my $proto = (getprotobyname ("tcp"))[2];
-		my  $addr = (gethostbyname ($host))[4];
-		my  $that = pack ('S n a4 x8', &AF_INET, $port, $addr);
-		socket  ($sock, &AF_INET, &SOCK_STREAM, $proto) || { $sslKO  = "SSL open $host:$port" };
-		connect ($sock, $that)      					|| { $sslKO .= "SSL connect $host:$port" };
-		select  ((select ($sock), $| = 1) [$[])      	|| { $sslKO .= "SSL select $host:$port" };
-		if ($sslKO) {
-			warn "payonline :: do : do_post : **ERR** [id_transact:$id_transact] $sslKO\n";
-			return;
-		}
-	}
-warn "payonline :: do :do_post 3 : sock OK\n"; 
-	my $postdata = qq{id_transact=$id_transact&result=$result&datecr=$datecr&PaymentID=$PaymentID&paymode=$paymode};
-warn "payonline :: do :do_post 4 : $postdata\n";
-	if ($queryArgs) {
-		foreach my $key (keys %$queryArgs) {
-			next if $key eq 'id_transact';
-			my $elem = $queryArgs->{$key};
-			$elem =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
-			$postdata .= qq{&$key=$elem}
-		}
-	}
-	my $contentlen = length ($postdata);
-	my $socktxt = qq{POST $path HTTP/1.1\r\nHost: $host\r\nContent-Length: $contentlen\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n$postdata\r\n};
-warn "payonline :: do :do_post 5 : $socktxt\n";
-	print $sock $socktxt || error ("unable to send data to $host");
-	
-	#----------------------
-	my $statusline =<$sock>;
-	if ($statusline =~ /^HTTP\/1.[01]\s(\d*)\s(.*)$/) {
-	my ($status, $msg) = ($1, $2);
-	if ($status == 200) { # HTTP_OK
-	  warn qq{payonline :: do : do_post : POST OK\n};
-	  while (<$sock>) { 
-	  	warn "payonline :: do : do_post : POSTResult : $_\n";
-	  	last if /^[\r\n]*$/;
-	  }
-#	  while (<$sock>) { warn "payonline :: do : do_post : POSTResult : $_\n"  if $verbose; }
-	} elsif ($status == 302 or $status == 301) {
-	  warn qq{payonline :: do : do_post : POST retcode=$status\n};
-	  my $newLocation;
-	  while (<$sock>) { 
-	  	warn "payonline :: do : do_post : POSTResult : $_\n" if $verbose; 
-	  	if (/^Location: (.*)$/) {
-	  		$newLocation = $1;
-	  		$newLocation =~ s/\r//g;
-	  	}
-	  }
-	  warn "payonline :: do : do_post : redirect to $newLocation\n" if $verbose; 
-	  
-	  do_post ($id_transact, $result, $trans, $newLocation,'') if $newLocation;
-	  
-	} else {
-	  warn ("payonline :: do : do_post : POST error : ($status : $msg)\n");
-	  while (<$sock>) { warn "payonline :: do : do_post : POSTResult : $_\n" if $verbose; }
-	}
-	} else {
-	warn ("payonline :: do : do_post : POST bogus data : $_\n");  
-	}
-	#----------------------
-	
-	warn "payonline :: do : do_post DONE \n";
-	close ($sock);
-	return 1;
-
-  } || { return 1 };
-	
-}
-
-sub http_items {
-	my ($url) = @_;
-	return unless $url;
-	
-	my ($httptype, $host, $path, $port);
-	if ($url =~ m|(\w+)://([^/:]+)(:\d+)?/(.*)|) {
-		$httptype 	= $1;
-		$host		= $2;
-		$path 		= "/" . $4;
-		if ($3 =~ /:(\d+)/) { $port = $1} else { $port = 80} 
-	}
-	
-	return ($httptype, $host, $path, $port);
 }

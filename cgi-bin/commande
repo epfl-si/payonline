@@ -31,9 +31,9 @@ my $mailresp	= 'ion.cionca@epfl.ch';
 my $masterIP	= '128.178.1.146';
 
 #	- inst id qui contournent les Conditions Générales de payonline
-my $bypassCondGen = 'y8xou4juffbh586ua1astocwsnmuh1y4,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8,6yz8pygfkg0ldordglzygll8qwf56t3a';
+my $bypassCondGen = 'yga58nahvdaqc2drgfcbtv5pwpqmatzs,y8xou4juffbh586ua1astocwsnmuh1y4,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8,6yz8pygfkg0ldordglzygll8qwf56t3a,ybvoa633uvw3b56hxhxr665yiqwyboni';
 my $noHeaderPage  = 'maintrans-noheader.tmpl';
-my $noHeaderInsts = 'cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8';
+#my $noHeaderInsts = 'yga58nahvdaqc2drgfcbtv5pwpqmatzs,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8,ybvoa633uvw3b56hxhxr665yiqwyboni';
 
 my %errmsgs	= (
 	fr => [
@@ -112,7 +112,8 @@ my %errmsgs	= (
 #------
 sub maintrans {
 
-  my $tmpl_file = $noHeaderInsts =~ /$args{id_inst}/ ? 'maintrans-noheader.tmpl' : 'maintrans.tmpl';
+#  my $tmpl_file = $noHeaderInsts =~ /$args{id_inst}/ ? 'maintrans-noheader.tmpl' : 'maintrans.tmpl';
+  my $tmpl_file = 'maintrans.tmpl';
 
 #warn "-_> maintrans : tmpl_file=$tmpl_file\n";
 
@@ -246,12 +247,15 @@ warn "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\n";
   my $COM 	 	= $inst->{descr};
   $COM 	  	 	= substr($COM, 0, 99) if length($COM) > 100;
   #	- EPFL Shop
-  my $sOnLoad 	= 'onload="document.cmd.submit();"' if $bypassCondGen =~ /$args{id_inst}/;
-  my $CGchecked = 'checked' 												if $bypassCondGen =~ /$args{id_inst}/;
+#   my $sOnLoad 	= 'onload="document.cmd.submit();"' if $bypassCondGen =~ /$args{id_inst}/;
+#   my $CGchecked = 'checked' 												if $bypassCondGen =~ /$args{id_inst}/;
+  my $sOnLoad 	= 'onload="document.cmd.submit();"' if $inst->{bypass_cg};
+  my $CGchecked = 'checked' 												if $inst->{bypass_cg};
   
   $template->param(CGchecked 			=> $CGchecked); # CG checked
   $template->param(sErrMsg 				=> $errmsg);
   $template->param(YellowPaySrv		=> $payonline_tools::YellowPaySrv);
+  $template->param(epflLOGO				=> $payonline_tools::epflLOGO);
   $template->param(txtShopId 			=> $payonline_tools::ShopID);
   $template->param(txtOrderIDShop => $id_trans);
   $template->param(txtInstDescr 	=> $COM);

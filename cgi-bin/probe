@@ -14,26 +14,30 @@ use strict;
 use lib '/opt/dinfo/lib/perl';
 
 use CGI;
-use Net::LDAPS;
-use Mail::Sendmail;
 
 use Cadi::CadiDB;
 use Cadi::WSUtils;
 
 my $pi = $ENV {PATH_INFO};
 
-warn "--> start probe from $ENV{REMOTE_ADDR} : pathinfo=$pi\n";
-
 my $config_items = {
-		accreddb  	=> { active => '1', critical => 'true', label => 'mysql accred/dinfo db access',},
-		payonlinedb	=> { active => '1', critical => 'true', label => 'mysql payonline db access',},
+		accreddb 		=> { active => '1', critical => 'true', label => 'mysql accred/dinfo db access',},
+		payonline		=> { active => '1', critical => 'true', label => 'mysql payonline db access',},
 };
+my $DEBUG					= -f '/opt/dinfo/etc/MASTER' ? 0 : 1;
+ 
+my $query = new CGI;
+my %args;
+my @params = $query->param;
+foreach my $item (@params) {
+	if ($item eq 'metrics') {
+		$args{$item} = 1;
+	}
+} 
 
 my $probe ;
    $probe->{status} = 'ok';
-
-my $sciper = '104782';
-
+	
 if ( $pi =~ /usage/ ) {
 	my $return = {  
 		status => 'ok', 
@@ -44,80 +48,82 @@ if ( $pi =~ /usage/ ) {
 	exit;
 }	
 
-foreach my $key ( keys %$config_items ) {
-	my $item = $config_items->{$key};
-	next unless $item->{active};
+	my $metrics;
+	my $line = $DEBUG ? 'test' : 'prod';
 
-	$probe->{$key}->{status} = 'ko';
+	foreach my $key ( keys %$config_items ) {
+		my $item = $config_items->{$key};
+		next unless $item->{active};
 
-	if ( $key eq 'payonlinedb' ) {
-		my $dbh = new Cadi::CadiDB (
-			dbname => 'payonline',
-			 trace => 1,
-		) ;
+		$probe->{items}->{$key}->{status} = 'ko';
+
+		if ( $key eq 'payonline' ) {
+			my $dbh = new Cadi::CadiDB (
+				dbname => 'payonline',
+				 trace => 1,
+			) ;
 		
-		if ( $dbh ) {
-			my $sql = qq{SELECT * FROM payonline.instances LIMIT 0, 10};
-			my $sth = $dbh->prepare( $sql) ;
+			if ( $dbh ) {
+				my $sql = qq{SELECT sciper FROM payonline.instances LIMIT 0, 1};
+				my $sth = $dbh->prepare( $sql) ;
 
-			if ($sth) {
-				$sth->execute () ;
-				my $sciper = $sth->fetchrow;
-				$probe->{$key}->{action} = "SELECT * FROM payonline.instances";
-				if ( $sciper eq $sciper ) {
-					$probe->{$key}->{status} = 'ok';
-				} else {
-					$probe->{$key}->{status} = 'ko';
+				if ($sth) {
+					$sth->execute () ;
+					my $sciper = $sth->fetchrow;
+					if ( $sciper ne '' ) {
+						$probe->{items}->{$key}->{status} = 'ok';
+					} else {
+						$probe->{items}->{$key}->{status} = 'ko';
+					}
 				}
 			}
 		}
-	}
-	if ( $key eq 'accreddb' ) {
-		my $dbh = new Cadi::CadiDB (
-			dbname => 'dinfo',
-			 trace => 1,
-			utf8 => 1,
-		) ;
-		if ( $dbh ) {
-			my $sql = qq{SELECT sciper FROM dinfo.sciper where sciper=$sciper LIMIT 0, 10};
-			my $sth = $dbh->prepare( $sql) ;
-			if ($sth) {
-				$sth->execute () ;
-				my $sciper = $sth->fetchrow;
-				$probe->{$key}->{action} = "get sciper $sciper from dinfo.sciper";
-				if ( $sciper eq $sciper ) {
-					$probe->{$key}->{status} = 'ok';
-				} else {
-					$probe->{$key}->{status} = 'ko';
+		if ( $key eq 'accreddb' ) {
+			my $dbh = new Cadi::CadiDB (
+				dbname => 'dinfo',
+				 trace => 1,
+				utf8 => 1,
+			) ;
+			if ( $dbh ) {
+				my $sql = qq{SELECT sciper FROM dinfo.sciper LIMIT 0, 1};
+				my $sth = $dbh->prepare( $sql) ;
+				if ($sth) {
+					$sth->execute () ;
+					my $sciper = $sth->fetchrow;
+					if ( $sciper ne '' ) {
+						$probe->{items}->{$key}->{status} = 'ok';
+					} else {
+						$probe->{items}->{$key}->{status} = 'ko';
+					}
 				}
 			}
 		}
-	}
-	if ( $key eq 'translate' ) {
-		my $text_fr	= qq{Crevettes sauvages au pesto d'ail des ours};
-		my $text_en	= rest_tools::translate($text_fr);
-		$probe->{$key}->{status} = $text_en ? 'ok' : 'ko';
-		$probe->{$key}->{action} = "google translate : $text_fr => $text_en";
-	}
-			
-	$probe->{$key}->{label} 		= $item->{label};
-	$probe->{$key}->{critical} = $item->{critical};
+	
+		$probe->{items}->{$key}->{label} = $item->{label};
+		unless ( $probe->{items}->{$key}->{status} eq 'ok' ) {
+			$probe->{status} = $item->{critical} ? 'ko' : 'warning';
+		}
 
-	unless ( $probe->{$key}->{status} eq 'ok' ) {
-		$probe->{status} = $item->{critical} eq 'true' ? 'ko' : 'warning';
-	}
-}
+		my $item_status = $probe->{items}->{$key}->{status} eq 'ok' ? '1' : '0';
+		$metrics .= qq{payonline_status{component="$key", critical="$item->{critical}", line="$line"} $item_status\n};
 
-if ( $probe->{status} ne 'ko' ) {
+	}
+
 	print "Status: 200 OK\r\n";
-} else {
-		print "Status: 503 Service Unavailable\r\n";
-}
+	if ( $args{metrics} ) {
+		my $probe_status = $probe->{status} eq 'ko' ? '0' : '1';
+		print "Content-Type: text\r\n\r\n";
+		print qq{# HELP payonline_status payonline service status: 1=OK, 0=KO
+# TYPE payonline_status gauge
+payonline_status{component="global", line="$line"} $probe_status
+$metrics} ;
+		exit;
+	}
 
-if ( $pi =~ /verbose/ ) {
-	Cadi::WSUtils::json_response ( $probe );
-} else {
-	print "Content-Type: text/html\r\n\r\n";
-}
+	if ( $args{verbose} ) {
+		Cadi::WSUtils::json_response ( $probe );
+	} else {
+		print "Content-Type: text/html\r\n\r\n";
+	}
 
-exit;
+	exit;
