@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+#
+##############################################################################
+#
+# File Name:    ress.pl
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2005
+#
+#########################################################################
+#####
+#
+#
+
+use strict;
+use payonline_tools;
+
+use vars qw(%args $lang $errmsg $crtdate $usessl $lang	);
+
+my $me 		= $ENV {SCRIPT_NAME};
+my $us 		= $ENV {SERVER_NAME};
+my $qs 		= $ENV {QUERY_STRING};
+my $pi 		= $ENV {PATH_INFO};
+
+my $DEBUG 	= '';
+my $verbose = '1';
+
+$payonline_tools::mode 	 = $DEBUG ? 'test' : 'prod';	# - test | prod
+$payonline_tools::ShopID = $DEBUG ? 'unilepflTEST' : 'unilepfl';	# - test | prod
+
+%args		= payonline_tools::loadargs ();
+$crtdate 	= payonline_tools::getcrtdate();
+$lang 		= $args{lang} ? $args{lang} : 'en' ;
+
+my %msgs	= (
+	fr => [
+		'Paiement en ligne échoué',
+		'Paiement en ligne effectué',
+		'Paiement en ligne en attente',
+		'Vous allez recevoir une confirmation à l\'adresse mail saisie sur le formulaire',
+		'Nom',
+		'Montant',
+		'Payé par',
+		'Veuillez contacter directement le support de Postfinance à l\'adresse : shopperhelp@postfinance.ch avec les détails de votre transaction',
+	],
+	en => [
+		'On line payment failed',
+		'On line payment successfull',
+		'On line payment pending',
+		'You will receive a mail confirmation at the address you provided on the form',
+		'Name',
+		'Amount',
+		'Payed by',
+		'Please contact Postfinance\'s support at : shopperhelp@postfinance.ch and provide all details of the transaction',
+	],
+	);
+payonline_tools::header ();
+  
+main ();
+
+payonline_tools::footer ();
+
+exit;
+  
+#_________
+sub main {
+
+	print qq{<h2>Formation continue UNIL/EPFL</h2>};
+	if ($args{result} eq '0') {	# - ko
+		print qq{<h3 style="color:red;">$msgs{$lang}->[0]</h3>};
+	} elsif ($args{result} eq '1') {	# - ok
+		print qq{<h3>$msgs{$lang}->[1]</h3>
+		$msgs{$lang}->[3].<br>
+		};
+	} elsif ($args{result} eq '2') {	# - ...
+		print qq{<h3>$msgs{$lang}->[2]</h3>};
+	} else {
+	}
+
+	print qq{
+		$msgs{$lang}->[4] : $args{CN}<br>
+		$msgs{$lang}->[5] : $args{amount} $args{currency}<br>
+		PAYID : $args{PAYID}<br>
+		$msgs{$lang}->[6] : $args{BRAND}<br>
+		Date : $args{TRXDATE}<br>
+
+	};
+	
+	unless ($args{result} eq '1') {
+		print qq{
+		<p>$msgs{$lang}->[7].
+		</p>
+		};
+	}
+
+#foreach my $item (keys %args) {
+#	print "$item=$args{$item}<br>";
+#}  
+
+
+}
+

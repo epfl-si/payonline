@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+  web:
+    build: .
+    hostname: dev-payonline
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - mysql_payonline
+    environment:
+      - TERM=xterm
+      - TZ=Europe/Zurich
+      - PERL5LIB=/opt/dinfo/lib/perl
+      - DATABASE_PAYONLINE_NAME=payonline
+      - DATABASE_PAYONLINE_HOST=mysql_payonline
+      - DATABASE_PAYONLINE_USER=payonline
+      - DATABASE_PAYONLINE_PWD=payonline
+      - DATABASE_DINFO_NAME=dinfo
+      - DATABASE_DINFO_HOST=mysql_payonline
+      - DATABASE_DINFO_USER=payonline
+      - DATABASE_DINFO_PWD=payonline
+      - TEQUILA_HOST=test-tequila.epfl.ch
+      - MOCK_ORACLE=1
+
+  mysql_payonline:
+    image: mysql:5.5
+    hostname: mysql-payonline
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=accred
+      - MYSQL_USER=payonline
+      - MYSQL_PASSWORD=payonline
+    volumes:
+      - ./conf/docker/initdb:/docker-entrypoint-initdb.d
+    ports:
+      - "23306:3306"

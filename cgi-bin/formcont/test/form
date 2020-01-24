@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+#
+##############################################################################
+#
+# File Name:    payonline::formcont:form
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2017
+#
+#########################################################################
+#####
+#
+#
+
+use strict;
+use payonline_tools;
+
+use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
+
+my $labels		= {
+	fr => {
+		total 		 => qq{Montant},
+		select_total => qq{Sélectioner le montant},
+		cond_gen 	 => qq{J'ai lu et approuve les <a href="./docs/CGen_08-2011.pdf" target="_blank"><strong>Conditions générales</strong></a>},
+		continuer 	 => qq{continuer},
+	},
+	en => {
+		total 		 => qq{Total amount},
+		select_total => qq{Select your amount},
+		cond_gen 	 => qq{I read and agree with the <a href="./docs/CGen_08-2011.pdf" target="_blank"><strong>General Terms</strong></a>},
+		continuer 	 => qq{continue},
+	},
+};
+
+my $me 			= $ENV {SCRIPT_NAME};
+my $us 			= $ENV {SERVER_NAME};
+my $qs 			= $ENV {QUERY_STRING};
+my $pi 			= $ENV {PATH_INFO};
+
+%args			= payonline_tools::loadargs ();
+$crtdate 		= payonline_tools::getcrtdate();
+$lang			= $args{lang};
+$lang			= 'en' unless $lang;
+
+warn "--> lang=$lang, args=$args{lang}\n";
+
+payonline_tools::header ();
+
+$payonline_tools::formContent->{$lang} =~ s/NUM_PART/$args{numpart}/;
+$payonline_tools::formContent->{$lang} =~ s/NUM_FACTURE/$args{numfacture}/;
+
+print $payonline_tools::formContent->{$lang};
+
+if ( $args{total} ) {
+	print qq{
+	  <input type="hidden" name="Total" value="cours:$args{total}">
+	  <tr>
+	  <td align=right valign=top>$labels->{$lang}->{total} :</td>
+	  <td>
+	  $args{total} CHF
+	  </td>
+	  </tr>
+	</table>
+	};
+} else {
+	print qq{
+	  <tr>
+	  <td align=right valign=top>$labels->{$lang}->{select_total}  :</td>
+	  <td>
+	  <div id='total' >  </div>
+	  </tr>
+	</table>
+
+	<script language="javascript">
+	var getPrix = new XMLHttpRequest();
+	getPrix.open("GET", "https://test-payonline.epfl.ch/cgi-bin/formcont/getPrix");
+	getPrix.send();
+	getPrix.onreadystatechange=function() 
+	{
+	  if(getPrix.readyState==4) 
+		document.getElementById('total').innerHTML = getPrix.responseText; 
+	}
+	</script>
+	};
+}
+
+print qq{
+	<p>
+	  <input name="condgen" type="checkbox" id="cg" value="1" />
+	  $labels->{$lang}->{cond_gen} <hr>
+	  <p style="font-weight: bold; font-family: Verdana, Arial, Helvetica, sans-serif;"><a href="#" onclick="form1.submit();">$labels->{$lang}->{continuer}...</a> </p>
+	</p>
+	</form>
+};
+
+payonline_tools::footer ();
+
+exit;
+

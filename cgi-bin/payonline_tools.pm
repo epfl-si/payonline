@@ -2,8 +2,9 @@
 #
 ##############################################################################
 #
-# File Name:    people
-# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2004
+# Service Name: payonline
+# File Name:    payonline_tools.pl
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2004-2019
 #
 #########################################################################
 #####
@@ -19,6 +20,7 @@ use Crypt::RC4;
 use Mail::Sendmail;
 use Digest::MD5 qw(md5_hex);
 use Digest::SHA1 ;
+use MIME::Base64 ;
 use Net::CIDR;
 use Net::CIDR ':all';
 
@@ -31,7 +33,7 @@ use strict;
 use vars qw( $absdbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfond $codeTVA
             $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
             $ges_list $SHAsalt $db_dinfo $Rights $SHAsaltTest $Accreds %YPHashSeed $rejectIP
-            );
+           $epflLOGO $mailFrom $mailBcc $exceptions);
 
 require '/var/www/vhosts/payonline.epfl.ch/private/params';
 
@@ -118,9 +120,44 @@ my @YP_IP_range = (
 
 $rejectIP = ('128.178.109.243','157.55.39.166');	#	crawlers 
 
+$epflLOGO	= 'https://web2018.epfl.ch/2.0.0/icons/epfl-logo.svg';
 $demfond 	= 'bertold.walther@epfl.ch,ion.cionca@epfl.ch';
-$su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
+$su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490,254724,229454';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
 $codeTVA	= 'Q7';
+$mailFrom	= 'noreply@epfl.ch';
+
+$exceptions = {
+	'ybvoa633uvw3b56hxhxr665yiqwyboni' => {
+		descr		 => qq{Donation 50fifty},
+		mailFrom => 'nathalie.fontana@epfl.ch',
+		alertOn	 => 1000,
+		alertTo	 => 'campaign@epfl.ch',
+	}
+};
+
+my $alertTo = 'campaign@epfl.ch';
+my $alertTo = 'ion.cionca@epfl.ch';
+
+$exceptions = {
+	'g0svljq62cqs64t1lnje0pt266gm82e6' => {
+		descr		 => qq{Donation 50fifty},
+		mailFrom => 'nathalie.fontana@epfl.ch',
+		alertOn	 => 1000,
+		alertTo	 => $alertTo,
+	},
+	'tozdj8xsuugfrmmpzyy6e0kqblg2opkq' => {
+		descr		 => qq{Donation 50fifty},
+		mailFrom => 'nathalie.fontana@epfl.ch',
+		alertOn	 => 1000,
+		alertTo	 => $alertTo,
+	},	
+	'c7n4htdrnzjtwyotb6di2rhwre3u5gu8' => {
+		descr		 => qq{Donation 50fifty},
+		mailFrom => 'nathalie.fontana@epfl.ch',
+		alertOn	 => 1000,
+		alertTo	 => $alertTo,
+	}
+};
 
 #--------
 sub init {
@@ -147,7 +184,6 @@ sub init {
 	die "FATAL dinfo DB ACCESS" unless $db_dinfo;
 	$Accreds = new Cadi::Accreds (caller => '104782', utf8 => 1);
 	$SHAsalt = $SHAsaltTest if $DEBUG;
-
 }
 
 #--------
@@ -253,15 +289,18 @@ warn "payonline :: send_mail : $dest, $subj\n";
 sub send_mail_bc {
   my ($dest, $bcc, $subj, $msg) = @_;
 
-warn "payonline :: send_mail_bc : $dest, $bcc, $subj\n";
-  return unless $dest or $bcc;
+	$mailBcc .= ",$bcc" if $bcc;
+	$mailBcc	=~ s/^,//;
+	$mailBcc	=~ s/,$//;
+warn "payonline :: send_mail_bc : dest=$dest, mailFrom=$mailFrom, mailBcc=$mailBcc, $subj\n";
+
+  return unless $dest or $mailBcc;
   
-  $dest 	= 'payonline@epfl.ch' if $DEBUG;
-  $dest ||= 'payonline@epfl.ch';
+  $dest = 'ion.cionca@epfl.ch' if $DEBUG;
+
   my %mail;
-  $mail{From} = 'noreply@epfl.ch'; 
-  $mail{Bcc}  = $resp;
-  $mail{Bcc} .= ",$bcc" if $bcc;
+  $mail{From} = $mailFrom; 
+  $mail{Bcc}  = $mailBcc if $mailBcc;
   $mail{To}   = $dest;
 
   $mail{Smtp} 	 = 'mail.epfl.ch';
@@ -485,7 +524,6 @@ sub getFonds {
     $sql = qq{select no_fond,libelle from dinfo.fonds where cf = ? and etat='O'};
     my $sth = $db_dinfo->query ( $sql, ("F$cf"));
     while (my ($no_fond,$libelle) = $sth->fetchrow_array ()) {
-#warn "cf=$cf,no_fond=$no_fond,libelle=$libelle";
       push (@fonds, "$no_fond:$libelle");
     }
     $fondsperCF->{$cf} = \@fonds;
@@ -520,7 +558,7 @@ sub dbconnect {
 	die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
 	my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306}; 
 
-warn "dbconnect : $dsndb\n";
+#warn "dbconnect : $dsndb\n";
 
 	my $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd);
 	$dbh->{'mysql_enable_utf8'} = 1;
@@ -615,7 +653,7 @@ sub getQuery {
 sub getTVAcode {
 	my ($compteb) = @_;
 
-	return 'Q0' if $compteb =~ /(740050|740060|710100|710120|710130|710140|746020|747040)/;
+	return 'Q0' if $compteb =~ /(740050|740060|710100|710120|710130|710140|746020|747040|786030)/;
 #	- start on 2018
 	return 'C9' if $compteb =~ /(700010|700020|783120)/;
 	return 'C5' if $compteb eq '700060';
@@ -659,4 +697,24 @@ sub IPinRange {
 	}
 	return 0;
 }
+
+#-------------
+sub makeToken {
+  my ($id_transact, $trans) = @_;
+  return unless $trans && $id_transact;
+
+	#	- new sha
+  my $salt = join '', ('a'..'z')[rand 26,rand 26,rand 26,rand 26,rand 26,rand 26,rand 26,rand 26];
+  my $ctx = Digest::SHA1->new;
+  my $str = "$id_transact:$trans->{id_inst}";
+
+warn ">> salt=$salt, str=$str\n";
+  $ctx->add($str);
+  $ctx->add($salt);
+  my $token = '{SSHA}'.MIME::Base64::encode($ctx->digest . $salt,'');
+warn ">> token=$token\n";
+  return qq{$salt:$token};
+}
+
+
 1;

@@ -30,10 +30,10 @@ my @languages 	= ('fr','en');
 my $mailresp	= 'ion.cionca@epfl.ch';
 my $masterIP	= '128.178.1.146';
 
-#	- inst id qui contournent les Conditions Générales de payonline
-my $bypassCondGen = 'y8xou4juffbh586ua1astocwsnmuh1y4,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8,6yz8pygfkg0ldordglzygll8qwf56t3a';
+#	- inst id qui contournent les Conditions Gï¿½nï¿½rales de payonline
+my $bypassCondGen = 'yga58nahvdaqc2drgfcbtv5pwpqmatzs,y8xou4juffbh586ua1astocwsnmuh1y4,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8,6yz8pygfkg0ldordglzygll8qwf56t3a,ybvoa633uvw3b56hxhxr665yiqwyboni';
 my $noHeaderPage  = 'maintrans-noheader.tmpl';
-my $noHeaderInsts = 'cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8';
+#my $noHeaderInsts = 'yga58nahvdaqc2drgfcbtv5pwpqmatzs,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc,6q7yczkqj73vcsezxqsnyr2ch4yhmub8,ybvoa633uvw3b56hxhxr665yiqwyboni';
 
 my %errmsgs	= (
 	fr => [
@@ -42,21 +42,21 @@ my %errmsgs	= (
 		'<li>indentificateur de monnaie absent</li>',
 		'<li>total transaction absent</li>',
 		'<li>nom absent</li>',
-		'<li>prénom absent</li>',
+		'<li>prï¿½nom absent</li>',
 		'<li>adresse absente</li>',
 		'<li>code postal absent</li>',
 		'<li>ville absente</li>',
 		'<li>code pays absent</li>',
-		'Veuillez retourner sur la page précédente pour effectuer les corrections nécessaires.',
+		'Veuillez retourner sur la page prï¿½cï¿½dente pour effectuer les corrections nï¿½cessaires.',
 		'<li>total transaction incorrect</li>',
-		'Instance de paiement pas trouvée',
-		'Veuillez retourner sur la page précédente et suivre le lien de contact pour plus de détails.',
-		'<li>les seules monnaies acceptées : CHF, EUR, USD</li>',
+		'Instance de paiement pas trouvï¿½e',
+		'Veuillez retourner sur la page prï¿½cï¿½dente et suivre le lien de contact pour plus de dï¿½tails.',
+		'<li>les seules monnaies acceptï¿½es : CHF, EUR, USD</li>',
 		' *** Attention : version de test. Ne pas utiliser, svp ! ***',			# 15
-		'Le service <b>payonline@epfl</b> est momentanément indisponible : veuillez rester sur cette page et l\'actualiser dans quelques minutes',			# 16
-		'transaction pas trouvée',	#	- 17
+		'Le service <b>payonline@epfl</b> est momentanï¿½ment indisponible : veuillez rester sur cette page et l\'actualiser dans quelques minutes',			# 16
+		'transaction pas trouvï¿½e',	#	- 17
 		'Veuillez contacter le support payonline', 	#	- 18
-		'Erreur de paramètre de lang, fr ou en', 	#	- 19
+		'Erreur de paramï¿½tre de lang, fr ou en', 	#	- 19
 		'Instance de paiement pas active',
 	      ],
 	en => [
@@ -112,7 +112,8 @@ my %errmsgs	= (
 #------
 sub maintrans {
 
-  my $tmpl_file = $noHeaderInsts =~ /$args{id_inst}/ ? 'maintrans-noheader.tmpl' : 'maintrans.tmpl';
+#  my $tmpl_file = $noHeaderInsts =~ /$args{id_inst}/ ? 'maintrans-noheader.tmpl' : 'maintrans.tmpl';
+  my $tmpl_file = 'maintrans.tmpl';
 
 #warn "-_> maintrans : tmpl_file=$tmpl_file\n";
 
@@ -230,7 +231,7 @@ warn "payonline :: maintrans 1: query=$query\n";
   payonline_tools::setYellowPaySrv($inst->{etat});
 
   my $UserTotal 	 = sprintf "%.2f",$args{Total};
-  my $ParamTotal	 = $UserTotal * 100;	# 		- pas de décimales
+  my $ParamTotal	 = $UserTotal * 100;	# 		- pas de dï¿½cimales
 warn "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\n";
   
   my $hashdata = {
@@ -246,12 +247,15 @@ warn "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\n";
   my $COM 	 	= $inst->{descr};
   $COM 	  	 	= substr($COM, 0, 99) if length($COM) > 100;
   #	- EPFL Shop
-  my $sOnLoad 	= 'onload="document.cmd.submit();"' if $bypassCondGen =~ /$args{id_inst}/;
-  my $CGchecked = 'checked' 												if $bypassCondGen =~ /$args{id_inst}/;
+#   my $sOnLoad 	= 'onload="document.cmd.submit();"' if $bypassCondGen =~ /$args{id_inst}/;
+#   my $CGchecked = 'checked' 												if $bypassCondGen =~ /$args{id_inst}/;
+  my $sOnLoad 	= 'onload="document.cmd.submit();"' if $inst->{bypass_cg};
+  my $CGchecked = 'checked' 												if $inst->{bypass_cg};
   
   $template->param(CGchecked 			=> $CGchecked); # CG checked
   $template->param(sErrMsg 				=> $errmsg);
   $template->param(YellowPaySrv		=> $payonline_tools::YellowPaySrv);
+  $template->param(epflLOGO				=> $payonline_tools::epflLOGO);
   $template->param(txtShopId 			=> $payonline_tools::ShopID);
   $template->param(txtOrderIDShop => $id_trans);
   $template->param(txtInstDescr 	=> $COM);

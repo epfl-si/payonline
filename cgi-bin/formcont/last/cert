@@ -1,0 +1,265 @@
+#!/usr/bin/perl
+#
+##############################################################################
+#
+# File Name:    ress.pl
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2005
+#
+#########################################################################
+#####
+#
+#
+
+use strict;
+use payonline_tools;
+
+use vars qw(%args $lang $errmsg $crtdate $usessl
+	);
+
+my $me 		= $ENV {SCRIPT_NAME};
+my $us 		= $ENV {SERVER_NAME};
+my $qs 		= $ENV {QUERY_STRING};
+my $pi 		= $ENV {PATH_INFO};
+my $lang 	= 'en';
+
+my %errmsgs	= (
+	fr => [
+		' *** Attention : version de test. Ne pas utiliser, svp ! ***',	
+		'Confirmation de paiement',
+		'Transaction :',
+		'PostFinance ID :',
+		'Méthode de paiement :',
+		'Total :',
+		'Au nom de :',
+	      ],
+	en => [
+		' *** Warning : test version. Not for public usage ! ***',	# 15
+		'Payment Confirmation',
+		'Transaction :',
+		'PostFinance ID :',
+		'Payement method:',
+		'Total :',
+		'Paid for :',
+	      ],
+	);
+
+my $DEBUG 	= '';
+my $verbose = '1';
+
+$payonline_tools::mode 	 = $DEBUG ? 'test' : 'prod';	# - test | prod
+$payonline_tools::ShopID = $DEBUG ? 'unilepflTEST' : 'unilepfl';	# - test | prod
+
+%args		= payonline_tools::loadargs ();
+$crtdate 	= payonline_tools::getcrtdate();
+
+cert ();
+
+exit;
+  
+#_________
+sub cert {
+
+  print "Content-Type: text/html; charset=iso-8859-1\n\n";
+warn "formcont :: done cert: ** CERT from YellowPay **\n";
+  my $YPSrv = $ENV{REMOTE_ADDR};
+  return unless $YPSrv;
+warn "formcont :: done cert: ... 1 YPSrv=$YPSrv\n";
+  return unless ($payonline_tools::YPServersIP =~ /$YPSrv/);
+  
+foreach my $item (keys %args) {
+	warn "formcont :: done .. cert args : $item=$args{$item}\n";
+}  
+
+  unless ($args{result}) {
+	warn "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO **\n";
+  	exit;
+  }
+
+  my $trans	= payonline_tools::getTrans ($args{orderID});
+  $trans->{total} = $args{amount};
+  
+  my $id_trans = $trans->{id};
+warn "formcont :: done cert: ... 2 id_trans=$id_trans\n";
+  return unless $id_trans;
+  return if  $id_trans =~ /select/i;
+  return if  $id_trans =~ /insert/i;
+  return if  $id_trans =~ /update/i;
+ 
+  my $hashdata = {
+	orderID 	=> $args{orderID},
+	currency 	=> $args{currency},
+	amount 		=> $args{amount},
+	PM 			=> $args{PM},
+	ACCEPTANCE 	=> $args{ACCEPTANCE},
+	STATUS 		=> $args{STATUS},
+	CARDNO 		=> $args{CARDNO},
+	PAYID 		=> $args{PAYID},
+	NCERROR 	=> $args{NCERROR},
+	BRAND 		=> $args{BRAND},	
+  };
+
+  my $hash 	= payonline_tools::makeHash ($hashdata, 'out');
+  
+# - check hash --------
+warn "formcont :: done cert: ... 4 hash=$hash, arghash=$args{SHASIGN}\n";
+  unless ($hash eq $args{SHASIGN}) {
+  	warn "** ERR : formcont :: cert FAILED : $id_trans ";
+  	return;
+  }
+  my $sql = qq{update transact set
+  	 etat='payé',
+	 paymode='$args{PM} $args{BRAND}', 
+	 PaymentID='$args{PAYID}' 
+	 where id='$id_trans'};
+  my $sth = payonline_tools::dbquery($sql);
+warn " ==>> formcont cert: OK : $id_trans\n";
+  $sth->finish ();
+
+  # - post result
+#  do_post ($trans);
+  
+  # - send email
+  my $email = $trans->{email};
+  
+  my $msg = qq{
+Confirmation de paiement
+
+Transaction : $args{orderID}
+PostFinance ID : $args{PAYID}
+Méthode de paiement : $args{PM} $args{BRAND}
+Total : $args{amount} CHF
+Au nom de : $trans->{name} $trans->{firstname}
+	$trans->{email}
+	$trans->{city}
+
+    };
+
+#  payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL formcont :: payment confirmation', $msg);
+  payonline_tools::send_mail ($email, 'Formation continue UNIL/EPFL :: payment confirmation', $msg) if $payonline_tools::mode eq 'prod';
+    
+warn " ==>> formcont cert: confirmation email to : $email $msg\n";    
+
+warn " ==>> formcont cert: args dump <<==\n";
+ foreach my $item (keys %args) {
+    warn "$item=$args{$item}\n";
+ }
+ exit;
+
+}
+
+#____________
+sub do_post {
+  my ($trans) = @_;
+  
+  my $id_transact = $trans->{id_transact};
+  return unless $id_transact;
+  my $result = 1;
+
+  my $postURL = qq{http://formcont.epfl.ch/formcont/vendage/ipn};
+  warn "formcont :: do_post : $postURL, $id_transact\n";  
+
+  return eval {
+    local $SIG {ALRM} = sub { die "formcont :: do :do_post: ** ERR Timeout ** $id_transact"; };
+    alarm (10);
+	
+	my $datecr	  = $trans->{datecr};
+	$datecr	  	  =~ s/ /+/g;
+	my $PaymentID = $trans->{PaymentID};
+	my $paymode	  = $trans->{paymode};
+	$paymode	  =~ s/ /+/g;
+	my $total	  = $trans->{total};
+	
+	my ($httptype, $host, $path, $port) = http_items($postURL);
+warn "formcont :: httptype=$httptype, host=$host, path=$path\n";  
+	return unless $host and $path;
+	return if ($host eq '127.0.0.1') or ($host eq 'payonline.epfl.ch');
+
+	my $sock;
+warn "formcont :: host : $host\n";  
+	
+	$usessl = $httptype =~ /^https/i;
+	if ($usessl) {
+		require IO::Socket::SSL; import IO::Socket::SSL;
+		$sock = new IO::Socket::SSL ("$host:https");
+		unless ($sock) {
+			warn "formcont :: do : do_post : ** SSL ERR** [id_transact:$id_transact] $host\n";
+			return;
+		}
+	} else {
+		my $sslKO;
+		eval { use Socket; };
+		my $proto = (getprotobyname ("tcp"))[2];
+		my  $addr = (gethostbyname ($host))[4];
+		my  $that = pack ('S n a4 x8', &AF_INET, $port, $addr);
+		socket  ($sock, &AF_INET, &SOCK_STREAM, $proto) || { $sslKO  = "SSL open $host:$port" };
+		connect ($sock, $that)      					|| { $sslKO .= "SSL connect $host:$port" };
+		select  ((select ($sock), $| = 1) [$[])      	|| { $sslKO .= "SSL select $host:$port" };
+		if ($sslKO) {
+			warn "formcont :: do : do_post : **ERR** [id_transact:$id_transact] $sslKO\n";
+			return;
+		}
+	}
+warn "formcont :: sock OK\n"; 
+	my $postdata = qq{id_transact=$id_transact&result=$result&datecr=$datecr&PaymentID=$PaymentID&paymode=$paymode&total=$total};
+warn "formcont :: postdata : $postdata\n";
+
+	my $contentlen = length ($postdata);
+	my $socktxt = qq{POST $path HTTP/1.1\r\nHost: $host\r\nContent-Length: $contentlen\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n$postdata\r\n};
+warn "formcont :: socktxt : $socktxt\n";
+	print $sock $socktxt || error ("unable to send data to $host");
+	
+	#----------------------
+	my $statusline =<$sock>;
+	if ($statusline =~ /^HTTP\/1.[01]\s(\d*)\s(.*)$/) {
+	my ($status, $msg) = ($1, $2);
+	if ($status == 200) { # HTTP_OK
+	  warn qq{formcont :: POST OK\n};
+	  while (<$sock>) { 
+	  	warn "formcont :: OK POSTResult : $_\n";
+	  	last if /^[\r\n]*$/;
+	  }
+#	  while (<$sock>) { warn "formcont :: do : do_post : POSTResult : $_\n"  if $verbose; }
+	} elsif ($status == 302) {
+	  warn qq{formcont :: POST retcode=302\n};
+	  my $newLocation;
+	  while (<$sock>) { 
+	  	warn "formcont :: 302 POSTResult : $_\n" if $verbose; 
+	  	if (/^Location: (.*)$/) {
+	  		$newLocation = $1;
+	  		$newLocation =~ s/\r//g;
+	  	}
+	  }
+	  warn "formcont :: redirect to $newLocation\n" if $verbose; 
+	  
+	  do_post ($id_transact, $result, $trans, $newLocation,'') if $newLocation;
+	  
+	} else {
+	  warn ("formcont :: POST ERROR : $status : $msg\n");
+	  while (<$sock>) { warn "formcont :: ERROR POSTResult : $_\n" if $verbose; }
+	}
+	} else {
+		warn ("formcont :: POST bogus data : $_\n");  
+	}
+	#----------------------
+	
+	close ($sock);
+	return 1;
+
+  } || { return 1 };
+	
+}
+
+sub http_items {
+	my ($url) = @_;
+	return unless $url;
+	
+	my ($httptype, $host, $path, $port);
+	if ($url =~ m|(\w+)://([^/:]+)(:\d+)?/(.*)|) {
+		$httptype 	= $1;
+		$host		= $2;
+		$path 		= "/" . $4;
+		if ($3 =~ /:(\d+)/) { $port = $1} else { $port = 80} 
+	}
+	
+	return ($httptype, $host, $path, $port);
+}

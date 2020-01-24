@@ -1,0 +1,196 @@
+#!/usr/bin/perl
+#
+##############################################################################
+#
+# File Name:    ress.pl
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2005
+#
+#########################################################################
+#####
+#
+#
+
+use strict;
+use payonline_tools;
+
+use vars qw(%args $lang $errmsg $crtdate $usessl
+	);
+
+my $me 		= $ENV {SCRIPT_NAME};
+my $us 		= $ENV {SERVER_NAME};
+my $qs 		= $ENV {QUERY_STRING};
+my $pi 		= $ENV {PATH_INFO};
+my $lang 	= 'en';
+
+my %errmsgs	= (
+	fr => [
+		' *** Attention : version de test. Ne pas utiliser, svp ! ***',	
+		'Confirmation de paiement',
+		'Transaction :',
+		'PostFinance ID :',
+		'Méthode de paiement :',
+		'Total :',
+		'Au nom de :',
+	      ],
+	en => [
+		' *** Warning : test version. Not for public usage ! ***',	# 15
+		'Payment Confirmation',
+		'Transaction :',
+		'PostFinance ID :',
+		'Payement method:',
+		'Total :',
+		'Paid for :',
+	      ],
+	);
+
+my $verbose = '1';
+%args		= payonline_tools::loadargs ();
+$crtdate 	= payonline_tools::getcrtdate();
+
+cert ();
+
+exit;
+  
+#_________
+sub cert {
+
+	print "Content-Type: text/html; charset=iso-8859-1\n\n";
+warn "formcont :: done cert: ** CERT from YellowPay **\n";
+	my $YPSrv = $ENV{REMOTE_ADDR};
+	return unless $YPSrv;
+warn "formcont :: done cert: ... 1 YPSrv=$YPSrv\n";
+	return unless ($payonline_tools::YPServersIP =~ /$YPSrv/);
+
+	foreach my $item (keys %args) {
+warn "formcont :: done .. cert args : $item=$args{$item}\n";
+	}  
+
+	unless ($args{result}) {
+warn "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO ** : result=$args{result}\n";
+#		exit;
+	}
+
+	my $trans	= payonline_tools::getTrans ($args{orderID});
+	$trans->{total} = $args{amount};
+
+	my $id_trans = $trans->{id};
+	warn "formcont :: done cert: ... 2 id_trans=$id_trans\n";
+	return unless $id_trans;
+	return if  $id_trans =~ /select/i;
+	return if  $id_trans =~ /insert/i;
+	return if  $id_trans =~ /update/i;
+
+	my $hashdata = {
+	orderID 	=> $args{orderID},
+	currency 	=> $args{currency},
+	amount 		=> $args{amount},
+	PM 			=> $args{PM},
+	ACCEPTANCE 	=> $args{ACCEPTANCE},
+	STATUS 		=> $args{STATUS},
+	CARDNO 		=> $args{CARDNO},
+	PAYID 		=> $args{PAYID},
+	NCERROR 	=> $args{NCERROR},
+	BRAND 		=> $args{BRAND},	
+	};
+
+	my $hash 	= payonline_tools::makeHash ($hashdata, 'out');
+
+	# - check hash --------
+warn "formcont :: done cert: ... 4 hash=$hash, arghash=$args{SHASIGN}\n";
+	unless ($hash eq $args{SHASIGN}) {
+warn "** ERR : formcont :: cert SHASIGN FAILED : $id_trans ";
+		return;
+	}
+	
+	# 	- post result if id_transact
+	do_post( $trans, $args{result} ) if $trans->{id_transact};
+
+	if ($args{result} eq '1') {
+		my $sql = qq{update transact set
+		 etat='payé',
+		 paymode='$args{PM} $args{BRAND}', 
+		 PaymentID='$args{PAYID}' 
+		 where id='$id_trans'};
+		my $sth = payonline_tools::dbquery($sql);
+warn " ==>> formcont cert: OK : $id_trans\n";
+		$sth->finish ();
+
+		# 	- send email
+		my $email = $trans->{email};
+
+		my $msg = qq{
+		Confirmation de paiement
+
+		Transaction : $args{orderID}
+		PostFinance ID : $args{PAYID}
+		Méthode de paiement : $args{PM} $args{BRAND}
+		Total : $args{amount} CHF
+		Au nom de : $trans->{name} $trans->{firstname}
+		$trans->{email}
+		$trans->{city}
+
+		};
+
+		#  payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL formcont :: payment confirmation', $msg);
+		payonline_tools::send_mail ($email, 'Formation continue UNIL/EPFL :: payment confirmation', $msg) if $payonline_tools::mode eq 'prod';
+
+	warn " ==>> formcont cert: confirmation email to : $email $msg\n";    
+	}
+	
+warn " ==>> formcont cert: args dump <<==\n";
+	foreach my $item (keys %args) {
+warn "$item=$args{$item}\n";
+	}
+	exit;
+
+}
+
+#____________
+sub do_post {
+	my ($trans, $result) = @_;
+
+	my $id_transact = $trans->{id_transact};
+
+warn "formcont :: do_post 1 : id_transact=$id_transact, result=$result\n";
+
+	return unless $id_transact;
+
+	my $url 	  = $payonline_tools::postURL;
+	my $datecr	  = $trans->{datecr};
+	   $datecr	  =~ s/ /+/g;
+	my $PaymentID = $trans->{PaymentID};
+	my $paymode	  = $trans->{paymode};
+	$paymode	  =~ s/ /+/g;
+	my $total	  = $trans->{total};
+
+warn "formcont :: do_post 2 : postURL=$url\n";
+
+	use LWP::UserAgent; 
+
+	my $ua = new LWP::UserAgent;
+	push @{ $ua->requests_redirectable }, 'POST';
+
+	warn "do_post : $url, $id_transact, $result\n";
+
+	my $postdata    = {
+		id_transact	=> $id_transact,
+		result		=> $result,
+		datecr		=> $trans->{datecr},
+		PaymentID	=> $trans->{PaymentID},
+		paymode		=> $trans->{paymode},
+	};
+
+	my $queryArgs   = payonline_tools::getArgs($trans->{query});
+	if ($queryArgs) {
+		foreach my $key (keys %$queryArgs) {
+			next if $key eq 'id_transact';
+			my $elem = $queryArgs->{$key};
+			$postdata->{$key} = $elem ;
+		}
+	}
+
+	my $response = $ua->post($url, $postdata);
+	my $content  = $response->decoded_content();
+	warn "do_post done : $content\n";
+
+}
