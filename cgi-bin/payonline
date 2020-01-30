@@ -17,6 +17,7 @@ use payonline_tools;
 
 use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits $tmpldir $lang $errmsg %CFs $crtdate	);
 
+$ENV {SERVER_NAME} = $ENV {SITE_URL} if ($ENV {SERVER_NAME} eq '127.0.0.1' && $ENV {SITE_URL});
 my $me 			= $ENV {SCRIPT_NAME};
 my $us 			= $ENV {SERVER_NAME};
 my $qs 			= $ENV {QUERY_STRING};
@@ -30,31 +31,31 @@ my @statlist	= ('test','prod');
 my %errmsgs	= (
 	fr => [
 		'Erreur(s) de saisie',
-		'Veuillez retourner sur la page pr�c�dente pour effectuer les corrections n�cessaires.',
-		'pas trouv�e ou inactive',
-		'<li>Date d�but absent ou erron�e</li>',
+		'Veuillez retourner sur la page précédente pour effectuer les corrections nécessaires.',
+		'pas trouvée ou inactive',
+		'<li>Date début absent ou erronée</li>',
 		'<li>Description absente</li>',
 		'<li>Fonds absent</li>',
 		'<li>Centre financier absent</li>',
-		'<li>Date fin absente ou erron�e</li>',
-		'<li>La date de fin doit �tre apr�s la date d�but</li>',
-		'<li>Compte budg�taire absent</li>',
+		'<li>Date fin absente ou erronée</li>',
+		'<li>La date de fin doit être après la date début</li>',
+		'<li>Compte budgétaire absent</li>',
 		'<li>Date fin obligatoire</li>',
-		'<li>Op�ration inconnue</li>',
-		'Transactions pay�es',
-		'Transactions non pay�es',
+		'<li>Opération inconnue</li>',
+		'Transactions payées',
+		'Transactions non payées',
 	      ],
 	en => [
 		'Input error(s)',												# 0
 		'Please return on the previous page and correct the input',		# 1
-		'pas trouv�e ou inactive',										# 2
+		'pas trouvée ou inactive',										# 2
 		'<li>Start date missing or wrong format</li>',					# 3
 		'<li>Description missing</li>',									# 4
 		'<li>Fund missing</li>',										# 5
 		'<li>Financial center missing</li>',							# 6
 		'<li>End date missing or wrong format</li>',					# 7
 		'<li>End date must be after Start date</li>',					# 8
-		'<li>Compte budg�taire missing</li>',							# 9
+		'<li>Compte budgétaire missing</li>',							# 9
 		'<li>End date is compulsory</li>',								# 10
 		'<li>Unknown operation</li>',									# 11
 		'Transactions payed',									# 12
@@ -73,7 +74,7 @@ my %nat_comptable = (
 			'710140', '710140 : Taxes certifications conformes',
 			'740050', '740050 : Vente, Formation tiers',
 			'740055', '740055 : Vente, Formation continue',
-			'740060', '740060 : Congr�s, S�minaires, Conf�rences',
+			'740060', '740060 : Congrès, Séminaires, Conférences',
 			'741070', '741070 : Produits de manifestations',
 			'747040', '747040 : Cotisations et abonnements divers',
 			'783120', '783120 : Contrat de service suisse',
@@ -159,7 +160,7 @@ sub main {
   my $template = initTempl('default.tmpl');
   $template->param(sErrMsg => $errmsg);
 
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -170,7 +171,7 @@ sub priv {
 
   $template->param(sErrMsg => $errmsg);
   $template->param(sAuthstr	=> 1 );
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -181,7 +182,7 @@ sub search {
 
   $template->param(sErrMsg 	=> $errmsg);
   $template->param(sAuthstr	=> 1 );
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -291,7 +292,7 @@ sub listinst {
   $template->param(sEtat	=> $args{etat});
   $template->param(sIsSuperUSer	=> payonline_tools::IsSuperUser($sciper) );
   $template->param(sLoop	=> \@inst );
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -301,9 +302,9 @@ sub dettrans {
   my $template = initTempl('dettrans.tmpl');
 
   unless ($args{id_trans} or $args{id_pay}) {
-     my $errmsg = qq{cl� de recherche de la transaction absente};
+     my $errmsg = qq{clé de recherche de la transaction absente};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
   
@@ -322,9 +323,9 @@ sub dettrans {
   my $sth = payonline_tools::dbquery ($sql, @params);
   my $result = $sth->fetchrow_hashref ();
   unless ($result) {
-     my $errmsg = qq{transaction pas trouv�e};
+     my $errmsg = qq{transaction pas trouvée};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
 
@@ -333,9 +334,9 @@ sub dettrans {
   my $sth = payonline_tools::dbquery ($sql, ($id_inst));
   my $resultinst = $sth->fetchrow_hashref ();
   unless ($resultinst) {
-     my $errmsg = qq{instance no: $id_inst pas trouv�e};
+     my $errmsg = qq{instance no: $id_inst pas trouvée};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
   my $descr 		= $resultinst->{descr};
@@ -375,7 +376,7 @@ sub dettrans {
 	 'Phone', 		$queryArgs->{Phone} ,
 	 'Fax', 		$queryArgs->{Fax}   ,
   );
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -388,7 +389,7 @@ sub listtrans {
   unless ($id_inst) {
      my $errmsg = qq{identificateur d'instance absent};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
 
@@ -396,9 +397,9 @@ sub listtrans {
   my $sth = payonline_tools::dbquery ($sql, ($id_inst));
   my $result = $sth->fetchrow_hashref ();
   unless ($result) {
-     my $errmsg = qq{instance no: $id_inst pas trouv�e};
+     my $errmsg = qq{instance no: $id_inst pas trouvée};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
   my $descr 		= $result->{descr};
@@ -412,7 +413,7 @@ sub listtrans {
   my @params;
   my $sql = qq{select * from transact where id_inst = ?};
   push @params, $id_inst;
-  $sql   .= qq{ and etat='pay�'} unless $args{op};
+  $sql   .= qq{ and etat='payé'} unless $args{op};
   $sql 	 .= qq{ and etat=''} 	 if $args{op} eq 'notpayed';
   $sql   .= qq{ order by datecr desc $limit};
 
@@ -465,7 +466,7 @@ sub listtrans {
 	 'sTitleDate'	, $args{op} ? 'Date' : 'Date payment' ,
 	 'sLoop'		, \@inst 
   );
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -479,7 +480,7 @@ sub extrans {
   unless ($id_inst) {
      my $errmsg = qq{identificateur d'instance absent};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
 
@@ -487,9 +488,9 @@ sub extrans {
   my $sth = payonline_tools::dbquery ($sql, ($id_inst));
   my $result = $sth->fetchrow_hashref ();
   unless ($result) {
-     my $errmsg = qq{instance no: $id_inst pas trouv�e};
+     my $errmsg = qq{instance no: $id_inst pas trouvée};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
   my $descr 		= $result->{descr};
@@ -499,7 +500,7 @@ sub extrans {
   my $urlconf	 	= $result->{urlconf};
 
   my $sql = qq{select * from transact where id_inst = ?};
-  $sql   .= qq{ and etat='pay�'} unless $args{op};
+  $sql   .= qq{ and etat='payé'} unless $args{op};
   $sql 	 .= qq{ and etat=''} 	 if $args{op} eq 'notpayed';
   $sql   .= qq{ order by datecr};
 
@@ -509,7 +510,7 @@ sub extrans {
   unless ($result) {
      my $errmsg = qq{aucune transaction};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
 
@@ -517,7 +518,7 @@ sub extrans {
   my $query  		= payonline_tools::getArgs ($result->{query});
   my $skeys 		= qq{date${separator}PaymentID${separator}methode${separator}}.join($separator, keys %$query);
 
-  print "Content-Type: application/vnd.ms-excel; charset=iso-8859-1\n\n";
+  print "Content-Type: application/vnd.ms-excel; charset=utf-8\n\n";
   my @params;
   do {
     my $queryArgs = payonline_tools::getArgs($result->{query});
@@ -564,7 +565,7 @@ sub detinst {
   unless ($id) {
      my $errmsg = qq{identificateur d'instance absent};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
   
@@ -587,9 +588,9 @@ sub detinst {
   my $result = $sth->fetchrow_hashref ();
 
   unless ($result->{descr}) {
-     my $errmsg = qq{instance pas trouv�e ou en dehors de votre responsabilit�};
+     my $errmsg = qq{instance pas trouvée ou en dehors de votre responsabilité};
      $template->param(sErrMsg 	=> $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
   my $selfonds = $result->{fonds};
@@ -699,7 +700,7 @@ sub detinst {
   $template->param(sAuthstr		=> 1 );
   $template->param(sDelPath		=> "javascript:confirmDelete(\'$lang\', \'$me/doneinst?lang=$lang&id=$result->{id}&del=1\')");
 
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -724,9 +725,9 @@ sub newinst {
   $seltxt2 .= qq{</select>\n};
 
   unless( $nbfonds ) {
-	my $errmsg = qq{Aucun fonds ouvert disponible , veuillez contacter vos accr�diteurs};
+	my $errmsg = qq{Aucun fonds ouvert disponible , veuillez contacter vos accréditeurs};
 	$template->param(sErrMsg 	=> $errmsg);
-	print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+	print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
 	exit;
   }
 
@@ -753,7 +754,7 @@ sub newinst {
   $template->param(sFormaction	=> "$me/doneinst?lang=$lang"		);
  
   $template->param(sErrMsg => $errmsg);
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 #------
@@ -768,7 +769,7 @@ sub demvalid {
   unless($id) {
 	my $errmsg = qq{identificateur d'instance absent};
 	$template->param(sErrMsg 	=> $errmsg);
-	print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+	print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
 	exit;
   }
 
@@ -777,10 +778,10 @@ sub demvalid {
   my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$d1,$d2,$d3,$ois) = $sth->fetchrow_array ();
 
   unless ($descr) {
-   my $errmsg = qq{instance $id pas trouv�e ou en dehors de votre contr�le};
+   my $errmsg = qq{instance $id pas trouvée ou en dehors de votre contrôle};
 	$template->param(sErrMsg 	=> $errmsg);
 	$template->param(sAuthstr	=> 1 );
-	print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+	print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
 	exit;
   }
   
@@ -800,13 +801,13 @@ Description : $descr
 Responsable : $resp->{prenom} $resp->{nom} [sciper: $sciper, mail:$resp->{mail}]
 Centre financier : $cf
 Fonds : $fonds
-Date d�but: $datedeb
+Date début: $datedeb
 Date fin : $datefin
 
 };
 
   my $txt1 = qq{
-Veuillez cliquer sur ce lien pour valider les donn�es financi�res de l'instance ci-dessus :
+Veuillez cliquer sur ce lien pour valider les données financières de l'instance ci-dessus :
 http://payonline.epfl.ch/cgi-bin/};
   $txt1 .= "dev/" if $payonline_tools::DEBUG;
   $txt1 .= qq{payonline/detinst?id=$id&lang=$lang
@@ -818,7 +819,7 @@ Votre service de paiement en ligne
   $txt .= s/\r/<br>/g;
   $template->param(sMsg 	=> $txt);
   $template->param(sErrMsg 	=> $errmsg);
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -832,7 +833,7 @@ sub doneinst {
   unless ($args{del} or $args{mod} or $args{add} or $args{valid} or $args{activate} or $args{inactivate}) {
      $template->param(sErrMsg 	=> $errmsgs{$lang}->[11]);
      $template->param(sAuthstr	=> 1 );
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
   
@@ -866,7 +867,7 @@ sub doneinst {
        my $errmsg = qq{identificateur d'instance absent};
        $template->param(sErrMsg 	=> $errmsg);
        $template->param(sAuthstr	=> 1 );
-       print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+       print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
        exit;
      }
 
@@ -884,10 +885,10 @@ sub doneinst {
      my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$monnaie,$mailinst,$contact,$ois) = $sth->fetchrow_array ();
 
      unless ($descr) {
-      my $errmsg = qq{instance $id pas trouv�e ou en dehors de votre contr�le};
+      my $errmsg = qq{instance $id pas trouvée ou en dehors de votre contrôle};
        $template->param(sErrMsg 	=> $errmsg);
        $template->param(sAuthstr	=> 1 );
-       print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+       print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
        exit;
      }
      $etat_precedent = $etat;
@@ -897,16 +898,16 @@ sub doneinst {
        $sql = qq{delete from instances where id = ?};
        payonline_tools::dbquery ($sql, ($id));
        my $msg = qq{
-     	  <h3>Instance effac�e</h3>
+     	  <h3>Instance effacée</h3>
 		  <li>id instance=$id 
 		  <li>cf=$CF 
 		  <li>fonds=$Fonds
 		  <li>OIS=$ois 
 		  <li>descr=$descr 
-		  <li>compte budg�taire=$naturecomptable
-		  <li>date d�but=$datedeb
+		  <li>compte budgétaire=$naturecomptable
+		  <li>date début=$datedeb
 		  <li>date fin=$datefin
-		  <li>�tat=$etat	
+		  <li>état=$etat	
 		  <li>monnaie=$monnaie
 		  <li>url manifestation=$urlconf
 		  <li>url=$url
@@ -916,7 +917,7 @@ sub doneinst {
        payonline_tools::write_log_db ($sciper, qq{delinst::$id;$cf;$fonds;$naturecomptable;$urlconf;$descr;$datedeb;$datefin;$monnaie;$url});
        $template->param(sMsg 	=> $msg);
        $template->param(sAuthstr	=> 1 );
-       print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+       print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
        exit;
 
      }
@@ -939,7 +940,7 @@ sub doneinst {
   if ($errtxt) {
     $errmsg .= "<h3>$errmsgs{$lang}->[0]</h3><ul>$errtxt</ul>$errmsgs{$lang}->[1]";
     $template->param(sErrMsg    => $errmsg);
-    print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+    print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
     exit;
   }
   $descr			=~ s/;/,/g;
@@ -974,11 +975,11 @@ sub doneinst {
 		   <li>fonds=$Fonds
 		   <li>OIS=$ois 
 		   <li>descr=$descr 
-		   <li>compte budg�taire=$naturecomptable
+		   <li>compte budgétaire=$naturecomptable
 		   <li>code TVA=$codetva
-		   <li>date d�but=$datedeb
+		   <li>date début=$datedeb
 		   <li>date fin=$datefin
-		   <li>�tat=$etat	
+		   <li>état=$etat	
 		   <li>monnaie=$monnaie
 		   <li>url manifestation=$urlconf
 		   <li>url=$url
@@ -986,8 +987,8 @@ sub doneinst {
 		   <li>contact mail=$contact
 		   <hr>
 		   L'instance passe en mode <b>production</b> : toutes les transaction de test ont
-		   �t� effac�es.<br>
-		   Le responsable de l'instance est averti par mail de cette op�ration.
+		   été effacées.<br>
+		   Le responsable de l'instance est averti par mail de cette opération.
 		};
 
 	  # - delete test transactions
@@ -1006,16 +1007,16 @@ Description : $descr
 Responsable : $resp->{prenom} $resp->{nom} [sciper: $sciper, mail:$resp->{mail}]
 Centre financier : $CF
 Fonds : $Fonds
-Compte budg�taire : $naturecomptable
+Compte budgétaire : $naturecomptable
 URL Manifestation : $urlconf
 Mail confirmation : $mailinst
 Contact mail : $contact
-Date d�but: $datedeb
+Date début: $datedeb
 Date fin : $datefin
 Monnaie : $monnaie
 
-L'instance a �t� valid�e par le Service Financier de l'EPFL et est pass�e en mode *production*.
-Toutes les transactions de test ont �t� effac�es.
+L'instance a été validée par le Service Financier de l'EPFL et est passée en mode *production*.
+Toutes les transactions de test ont été effacées.
 
 Votre service de paiement en ligne
 };
@@ -1050,16 +1051,16 @@ Votre service de paiement en ligne
 		payonline_tools::dbquery($sql, @params);
 		
 		$msg = qq{
- 		<h3>Mise � jour de l'instance</h3>
+ 		<h3>Mise à jour de l'instance</h3>
 		<li>id instance=$id 
 		<li>cf=$CF 
 		<li>fonds=$Fonds
 		<li>OIS=$ois 
 		<li>descr=$descr 
-		<li>compte budg�taire=$naturecomptable
-		<li>date d�but=$datedeb
+		<li>compte budgétaire=$naturecomptable
+		<li>date début=$datedeb
 		<li>date fin=$datefin
-		<li>�tat=$etat	
+		<li>état=$etat	
 		<li>monnaie=$monnaie
 		<li>url manifestation=$urlconf
 		<li>url=$url
@@ -1082,10 +1083,10 @@ Votre service de paiement en ligne
 		<li>fonds=$Fonds
 		<li>OIS=$ois 
 		<li>descr=$descr 
-		<li>compte budg�taire=$naturecomptable
-		<li>date d�but=$datedeb
+		<li>compte budgétaire=$naturecomptable
+		<li>date début=$datedeb
 		<li>date fin=$datefin
-		<li>�tat=$etat	
+		<li>état=$etat	
 		<li>monnaie=$monnaie
 		<li>url manifestation=$urlconf
 		<li>url=$url
@@ -1108,10 +1109,10 @@ Votre service de paiement en ligne
 		<li>fonds=$Fonds
 		<li>OIS=$ois 
 		<li>descr=$descr 
-		<li>compte budg�taire=$naturecomptable
-		<li>date d�but=$datedeb
+		<li>compte budgétaire=$naturecomptable
+		<li>date début=$datedeb
 		<li>date fin=$datefin
-		<li>�tat=inactive-$etat	
+		<li>état=inactive-$etat	
 		<li>monnaie=$monnaie
 		<li>url manifestation=$urlconf
 		<li>url=$url
@@ -1149,17 +1150,17 @@ Votre service de paiement en ligne
      
      payonline_tools::write_log_db ($sciper, qq{newinst::$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
      $msg = qq{
-      <h3>L'instance no "$id" a �t� cr��e</h3>
+      <h3>L'instance no "$id" a été créée</h3>
       l'instance est en mode de <b>test</b>
       <pre>$descr</pre>
 
-      <h3>Prochaines �tapes:</h3>
+      <h3>Prochaines étapes:</h3>
       <ol>
-      <li>pr�parer le <b>formulaire de saisie</b> soit avec le nouveau module de paiement en ligne d'InForm soit avec les comp�tences informatiques de votre unit� ; le num�ro de l'instance <b>$id</b> doit faire partie de ce formulaire pour identifier les transactions</li>
+      <li>préparer le <b>formulaire de saisie</b> soit avec le nouveau module de paiement en ligne d'InForm soit avec les compétences informatiques de votre unité ; le numéro de l'instance <b>$id</b> doit faire partie de ce formulaire pour identifier les transactions</li>
       <li>effectuer les essais du formulaire de paiement en ligne et consulter les transactions correspondantes avec cette interface</li>
-      <li>� la fin des tests, ouvrir la fiche de l'instance et demander sa validation par le <b>Service financier</b> de l'EPFL</li>
-      <li>d�s validation par le SF, l'instance passe automatiquement en mode <b>production</b> ; vous recevrez un message de confirmation ; toutes les transctions des essais seront automatiquement effac�es</li>
-      <li>� l'�ch�ance de la date de fin, l'instance passe automatiquement en mode <b>archive</b> : aucune transaction ne sera plus accept�e</li>
+      <li>à la fin des tests, ouvrir la fiche de l'instance et demander sa validation par le <b>Service financier</b> de l'EPFL</li>
+      <li>dès validation par le SF, l'instance passe automatiquement en mode <b>production</b> ; vous recevrez un message de confirmation ; toutes les transctions des essais seront automatiquement effacées</li>
+      <li>à l'échéance de la date de fin, l'instance passe automatiquement en mode <b>archive</b> : aucune transaction ne sera plus acceptée</li>
       </ol>
      };
   }
@@ -1170,7 +1171,7 @@ Votre service de paiement en ligne
   $template->param(sAuthstr	=> 1 );
   $template->param(sDescr	=> $args{descr} );
   $template->param(sErrMsg 	=> $errmsg);
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -1193,7 +1194,7 @@ sub demfnd {
   $template->param(sFormaction	=> "$me/donefnd?lang=$lang"		);
  
   $template->param(sErrMsg => $errmsg);
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -1212,19 +1213,19 @@ sub donefnd {
 
   $errtxt .= qq{<li>centre financier absent</li>} 	unless $CF;
   $errtxt .= qq{<li>description absente</li>} 		unless $descr;
-  $errtxt .= qq{<li>date d�but absente ou erron�e</li>} unless $datedeb or $datedebvalide;
-  $errtxt .= qq{<li>date d�but dans le pass�e</li>} 	unless $datedebvalide ge $crtdate ;
+  $errtxt .= qq{<li>date début absente ou erronée</li>} unless $datedeb or $datedebvalide;
+  $errtxt .= qq{<li>date début dans le passée</li>} 	unless $datedebvalide ge $crtdate ;
 
   if ($datefin) {
     $datefinvalide = payonline_tools::datevalide($datefin);
-    $errtxt .= qq{<li>date fin erron�e</li>} 		unless $datefinvalide;
-    $errtxt .= qq{<li>date fin dans le pass�</li>} 	unless $datefinvalide gt $crtdate;
+    $errtxt .= qq{<li>date fin erronée</li>} 		unless $datefinvalide;
+    $errtxt .= qq{<li>date fin dans le passé</li>} 	unless $datefinvalide gt $crtdate;
   }
  
   if ($errtxt) {
     $errmsg .= "<br><b>Erreurs de saisie</b><ul>$errtxt</ul>";
     $template->param(sErrMsg => $errmsg);
-    print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+    print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
     exit;
   }
   
@@ -1235,7 +1236,7 @@ sub donefnd {
   Centre Financier:   $CF
   Raison de la demande:
   $descr
-  Date d�but :        $datedeb
+  Date début :        $datedeb
   Date fin:           $datefin
   };
   my $subj = qq{Paiement en ligne: demande de fonds};
@@ -1248,7 +1249,7 @@ sub donefnd {
   $template->param(sdatedeb		=> payonline_tools::prdate($crtdate,'date') );
   $template->param(sFormaction	=> "$me/fnddone?lang=$lang"		);
  
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -1309,8 +1310,8 @@ sub authenticate {
   unless (payonline_tools::IsSuperUser($sciper) or $respunits) {
     my $template = initTempl('default.tmpl');
     $template->param(sErrMsg => qq{Pas de droits pour ce service : le droit <b>payonline</b> est requis.
-    	<br>Plus de d�tails aupr�s de votre responsable accr�ditation.});
-    print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+    	<br>Plus de détails auprès de votre responsable accréditation.});
+    print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
     exit;
   }
 

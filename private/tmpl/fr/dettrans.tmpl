@@ -5,12 +5,12 @@
 <TMPL_ELSE>
 
     <h3><TMPL_VAR NAME=sDescrInst></h3>
-    <div class="redborder"><b>l'instance est en état <TMPL_VAR NAME=etatinst></b></div>
+    <div class="redborder"><b>l'instance est en Ã©tat <TMPL_VAR NAME=etatinst></b></div>
 
     <b>responsable : <TMPL_VAR NAME=respPrenom> <TMPL_VAR NAME=respNom></b><br>
     <b>fonds : <TMPL_VAR NAME=fonds></b><br>
-    <b>compte budgétaire : <TMPL_VAR NAME=naturecomptable></b><br>
-    <b>numéro d'instance : <a href="<TMPL_VAR NAME=sPathMe>/listtrans?id=<TMPL_VAR NAME=sIDInst>"><TMPL_VAR NAME=sIDInst></a></b><br>
+    <b>compte budgÃ©taire : <TMPL_VAR NAME=naturecomptable></b><br>
+    <b>numÃ©ro d'instance : <a href="<TMPL_VAR NAME=sPathMe>/listtrans?id=<TMPL_VAR NAME=sIDInst>"><TMPL_VAR NAME=sIDInst></a></b><br>
     <b>transaction no. : <TMPL_VAR NAME=idtrans></b>
     <p></p>
 	<TMPL_IF NAME=etat>
@@ -20,7 +20,7 @@
 	</TMPL_IF>
 	<table width="100%" border="0" cellspacing="2" cellpadding="0">
 	   <tr>
-		  <td width="20%" align="right"><strong>Nom Prénom</strong></td>
+		  <td width="20%" align="right"><strong>Nom PrÃ©nom</strong></td>
 		  <td><TMPL_VAR NAME="LastName"> <TMPL_VAR NAME="FirstName"></td>
 	   </tr>
 	   <tr>
@@ -28,7 +28,7 @@
 		  <td><TMPL_VAR NAME=Email></td>
 	   </tr>
 	   <tr>
-		  <td width="20%" align="right"><strong>Tél.</strong></td>
+		  <td width="20%" align="right"><strong>TÃ©l.</strong></td>
 		  <td><TMPL_VAR NAME=Phone></td>
 	   </tr>
 	   <tr>
@@ -48,7 +48,7 @@
 	   <TMPL_IF NAME=etat>
 		  <tr>
 			 <td width="20%" align="right"><strong>Etat</strong></td>
-			 <td> payé  <img src=/images/ok.gif align=middle></td>
+			 <td> payÃ©  <img src=/images/ok.gif align=middle></td>
 		  </tr>
 		  <tr>
 			 <td width="20%" align="right"><strong>Date paiement</strong></td>
@@ -59,16 +59,16 @@
 			 <td><TMPL_VAR NAME=PaymentID></td>
 		  </tr>
 		  <tr>
-			 <td width="20%" align="right"><strong>Payé par</strong></td>
+			 <td width="20%" align="right"><strong>PayÃ© par</strong></td>
 			 <td><TMPL_VAR NAME=paymode></td>
 		  </tr>
 		<TMPL_ELSE>
 		  <tr>
 			 <td width="20%" align="right"><strong>Etat</strong></td>
-			 <td> non payé  <img src=/images/ko.gif align=middle></td>
+			 <td> non payÃ©  <img src=/images/ko.gif align=middle></td>
 		  </tr>
 		  <tr>
-			 <td width="20%" align="right"><strong>Date accès</strong></td>
+			 <td width="20%" align="right"><strong>Date accÃ¨s</strong></td>
 			 <td><TMPL_VAR NAME="datecr"></td>
 		  </tr>
 		</TMPL_IF>

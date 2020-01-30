@@ -5,7 +5,7 @@
 <TMPL_ELSE>
 
 <div  class="editbox">
-<h3>Détails de l'instance</h3>
+<h3>DÃ©tails de l'instance</h3>
 <form id="form1" name="form1" method="post" action="<TMPL_VAR NAME=sFormaction>">
   <input name="id" type="hidden" id="id" value="<TMPL_VAR NAME=id>">
   <input type="hidden" name="mod" >
@@ -46,12 +46,12 @@
 
     <tr>
       <td align="right" valign="top">Description 
-      <br><i>(Vous êtes priés de préciser les dates de la manifestation)</i>
+      <br><i>(Vous Ãªtes priÃ©s de prÃ©ciser les dates de la manifestation)</i>
       </td>
       <td><textarea name="descr" cols="48" rows="2" id="descr"><TMPL_VAR NAME=Descr></textarea></td>
     </tr>
 	<tr>
-	  <td align="right">Compte budgétaire </td>
+	  <td align="right">Compte budgÃ©taire </td>
 	  <td><TMPL_VAR NAME=sNCTxt></td>
 	</tr>
 	
@@ -95,11 +95,11 @@
     <tr>
       <td align="right" valign="top">URL Retour  </td>
       <td><input name="url" type="text" id="url" size="48"  value="<TMPL_VAR NAME=URL>" />
-      <br><i>(veuillez consulter l'aide en ligne pour plus de détails à ce sujet)</i></td>
+      <br><i>(veuillez consulter l'aide en ligne pour plus de dÃ©tails Ã  ce sujet)</i></td>
     </tr>
     <tr>
 	  <td align="right" valign="top">Mail de confirmation des transactions </td>
-      <td><input name="mailinst" type="text" id="mailinst" size="48"  value="<TMPL_VAR NAME=mailinst>" /> <i><br>(si présent, déclenche un message de confirmation pour les transactions réussies)</i></td>
+      <td><input name="mailinst" type="text" id="mailinst" size="48"  value="<TMPL_VAR NAME=mailinst>" /> <i><br>(si prÃ©sent, dÃ©clenche un message de confirmation pour les transactions rÃ©ussies)</i></td>
 	  </td>
     </tr>
     <tr>
@@ -127,7 +127,7 @@
  [ <a href="#" OnClick="document.form1.activate.value=1;form1.submit();">activer</a> ]
  </TMPL_IF>
  <TMPL_IF NAME=sInactivate>
- [ <a href="#" OnClick="document.form1.inactivate.value=1;form1.submit();">désactiver</a> ]
+ [ <a href="#" OnClick="document.form1.inactivate.value=1;form1.submit();">dÃ©sactiver</a> ]
  </TMPL_IF>
 </form>
 </div>
