@@ -1,0 +1,81 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  labels:
+    app: payonline
+  name: payonline
+spec:
+  replicas: 2
+  selector:
+    app: payonline
+    deploymentconfig: payonline
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftWebConsole
+      creationTimestamp: null
+      labels:
+        app: payonline
+        deploymentconfig: payonline
+    spec:
+      containers:
+        - env:
+            - name: TEQUILA_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: TEQUILA_HOST
+                  name: config
+            - name: MOCK_ORACLE
+              valueFrom:
+                configMapKeyRef:
+                  key: MOCK_ORACLE
+                  name: config
+            - name: SITE_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: SITE_URL
+                  name: config
+          image: >-
+            docker-registry.default.svc:5000/payonline-test/payonline:develop
+          imagePullPolicy: Always
+          name: payonline
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /opt/dinfo/etc
+              name: volume-7s8dg
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: config
+          name: volume-7s8dg
+  test: false
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - payonline
+        from:
+          kind: ImageStreamTag
+          name: 'payonline:develop'
+          namespace: payonline-test
+      type: ImageChange
+    - type: ConfigChange

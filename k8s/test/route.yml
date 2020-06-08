@@ -1,0 +1,38 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: '2020-05-19T15:46:16Z'
+  labels:
+    app: payonline
+  name: payonline-route
+  namespace: payonline-test
+  resourceVersion: '425690214'
+  selfLink: /apis/route.openshift.io/v1/namespaces/payonline-test/routes/payonline-route
+  uid: e00f0ec5-99e7-11ea-95b1-005056ba0d26
+spec:
+  host: payonline-preprod.epfl.ch
+  port:
+    targetPort: 8080-tcp
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: httpd-ex
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+    - conditions:
+        - lastTransitionTime: '2020-05-19T15:46:16Z'
+          status: 'True'
+          type: Admitted
+      host: payonline-preprod.epfl.ch
+      routerName: router
+      wildcardPolicy: None
+    - conditions:
+        - lastTransitionTime: '2020-05-19T15:46:16Z'
+          status: 'True'
+          type: Admitted
+      host: payonline-preprod.epfl.ch
+      routerName: router-priv
+      wildcardPolicy: None
