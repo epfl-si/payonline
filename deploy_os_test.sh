@@ -18,7 +18,7 @@ if [ $? -ne 0 ]; then printerror 'oc failure, make sure it is installed, that yo
 #imagetag='develop-'`date "+%Y%m%d%H%M%S"`
 imagetag='develop'
 # Build image
-docker build -t groupes:$imagetag .
+docker build -t $image:$imagetag .
 if [ $? -ne 0 ]; then printerror 'could not build image'; fi
 # Tag image with imagetag
 docker tag $image:$imagetag os-docker-registry.epfl.ch/$project/$image:$imagetag
