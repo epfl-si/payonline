@@ -3,23 +3,17 @@ kind: Service
 metadata:
   annotations:
     openshift.io/generated-by: OpenShiftWebConsole
-  creationTimestamp: '2020-04-24T13:25:20Z'
   labels:
     app: payonline
-  name: httpd-ex
+  name: payonline-service
   namespace: payonline-test
-  resourceVersion: '410901551'
-  selfLink: /api/v1/namespaces/payonline-test/services/httpd-ex
-  uid: 0bd9b30c-862f-11ea-84fd-005056ba069b
 spec:
   ports:
-    - name: 80-tcp
-      port: 80
+    - name: 8080-tcp
+      port: 8080
       protocol: TCP
       targetPort: 8080
   selector:
     deploymentconfig: payonline
   sessionAffinity: None
   type: ClusterIP
-status:
-  loadBalancer: {}
