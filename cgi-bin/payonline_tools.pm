@@ -33,7 +33,7 @@ use strict;
 use vars qw( $absdbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfond $codeTVA
             $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
             $ges_list $SHAsalt $db_dinfo $Rights $SHAsaltTest $Accreds %YPHashSeed $rejectIP
-           $epflLOGO $mailFrom $mailBcc $exceptions);
+           $epflLOGO $mailFrom $mailBcc $exceptions $CAMIPROload);
 
 require '/var/www/vhosts/payonline.epfl.ch/private/params';
 
@@ -118,6 +118,20 @@ my @YP_IP_range = (
 	'84.199.92.128/26',
 );
 
+my @YP_IP_range = (
+	'185.8.52.0/22',
+	'212.23.45.96/28',
+	'213.254.248.96/27',
+	'212.35.124.160/27',
+	'84.233.249.96/27',
+	'62.72.112.128/28',
+	'84.199.92.128/26',
+	'91.208.214.0/24',
+	'185.8.52.0/22',
+	'185.139.244.0/22',
+
+);
+
 $rejectIP = ('128.178.109.243','157.55.39.166');	#	crawlers 
 
 $epflLOGO	= 'https://web2018.epfl.ch/2.0.0/icons/epfl-logo.svg';
@@ -125,6 +139,9 @@ $demfond 	= 'bertold.walther@epfl.ch,ion.cionca@epfl.ch';
 $su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490,254724,229454';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
 $codeTVA	= 'Q7';
 $mailFrom	= 'noreply@epfl.ch';
+
+#	- SPECIAL EXTRACTION FOR CAMIPRO
+$CAMIPROload='e4shukt1c7d7z5qx1vbdngtlymvhlm5z';
 
 $exceptions = {
 	'ybvoa633uvw3b56hxhxr665yiqwyboni' => {
@@ -210,17 +227,15 @@ sub getcrtdate {
 #--------
 sub datevalide {
   my ($date) = @_;
-  
-  return '' unless $date;
-  $date =~ s#/#-#g;
-  $date =~ s/\./-/g;
-  my ($jj,$mm,$aa) = split(/-/,$date);
+	return '' unless $date;
+
+  my ($aa, $mm, $jj) = split(/\-/,$date);
   return '' unless $aa > 2000;
   $mm =~ s/^0//;
   return '' if ($mm < 1) or ($mm > 12);
   return '' if $jj > $days[$mm] or $jj < 0;
-  my $retdate = sprintf "%4d-%02d-%02d 00:00",$aa,$mm,$jj;
-  return $retdate;
+   my $retdate = sprintf "%4d-%02d-%02d 00:00",$aa,$mm,$jj;
+   return $retdate;
 }
 #--------
 sub prdate {
@@ -231,7 +246,7 @@ sub prdate {
     my $yy = substr ($date,0,4);
     my $mm = substr ($date,5,2);
     my $dd = substr ($date,8,2);
-    my $revdate = sprintf "%02d-%02d-%04d", $dd,$mm,$yy;
+    my $revdate = sprintf "%02d.%02d.%04d", $dd,$mm,$yy;
 
     if ($flag eq 'date') {
       return ($revdate);
@@ -361,7 +376,7 @@ sub setYellowPaySrv {
 		$YellowPaySrv = 'https://e-payment.postfinance.ch/ncol/prod/orderstandard.asp'
   }
 
-warn "setYellowPaySrv : DEBUG=$DEBUG, etat=$etat, SHAsalt=$SHAsalt\n";
+warn "setYellowPaySrv : DEBUG=$DEBUG, etat=$etat\n";
 
 }
 #--------
@@ -712,7 +727,7 @@ warn ">> salt=$salt, str=$str\n";
   $ctx->add($str);
   $ctx->add($salt);
   my $token = '{SSHA}'.MIME::Base64::encode($ctx->digest . $salt,'');
-warn ">> token=$token\n";
+warn ">> token=$token\n";  
   return qq{$salt:$token};
 }
 

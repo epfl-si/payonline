@@ -217,14 +217,13 @@ warn "maintrans : ERR from $ENV{HTTP_REFERER} :: $errmsg\n";
 		 exit;
 	}
 
-	my $dest  = 'contact@datascience.ch';
-	my $dest  = 'floriane.jacquemet@epfl.ch,contact@datascience.ch';
+	my $dest  = 'mylene.tressens@epfl.ch,connect@datascience.ch';
 	
 #	   $dest .= qq{,$args{Email}};
 	   
-	my $subj = 'SDSC-Connect 2017, ETH Free Registration';
+	my $subj = 'SDSC-Connect, Free Registration';
 	my $msg  = "
-SDSC-Connect : ETH staff free registration
+SDSC-Connect : Free registration
 
 $args{Prefix} $args{FirstName} $args{LastName}
 
@@ -246,8 +245,8 @@ Country: $args{Country}
 	print qq{Content-Type: text/html; charset=iso-8859-1\n\n
 $header  
 <body style="padding: 50px;">
-<h2>SDSC-Connect, Bern Nov. 29th 2017</h2>
-<h3>ETH staff free registration</h3>
+<h2>SDSC-Connect</h2>
+<h3>Free registration</h3>
 <br>
 
 <ul style="margin-left: 20px;">
@@ -265,7 +264,7 @@ $header
 	Country: $args{Country}<br>
 </ul>
 <br>
-Your registration has been sent to $dest<br>
+Your registration has been sent to the Swiss Data Science Center<br>
 Best Regards
 </body>
 </html>

@@ -155,7 +155,7 @@ RUN echo "umask 0002" >> /etc/apache2/envvars && \
     a2enmod ssl  && \
     a2enmod rewrite && \
     a2enmod headers && \
-    a2enmod perl && \
+    a2enmod cgi && \
     a2enmod env && \
 
     a2dissite 000-default.conf && \

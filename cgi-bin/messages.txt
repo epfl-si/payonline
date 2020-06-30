@@ -1,0 +1,224 @@
+$messages = {
+		default_label => {
+			fr	=> qq{<p>payonline@epfl.ch met à votre disposition un canal d'encaissement électronique pour vos manifestations, conférences, vente de services, etc.<br>
+	L'accès à ce service est soumis au droit <b>payonline</b> du système d'accréditation. <br>
+	Veuillez contacter votre responsable accréditation pour plus de détails.</p>
+							},
+			en	=> qq{<p>	Manage your online payment instances for conferences, meetings, etc. 
+	<p>You must have the <b>payonline</b> right or the <b>respadmin</b> role to access the application. 
+	Contact your accreditation manager for more details.</p>
+							},
+		},
+		priv_head_label => {
+			fr => qq{Etapes pour la mise en place des encaissements &eacute;lectroniques de votre conf&eacute;rence},
+			en => qq{Follow these steps to set your payonline infrastructure },
+		},
+		etapes_label => {
+			fr => qq{	<ol>
+				<li> faire la <strong>demande
+				de fonds</strong> pour l'encaissement des prestations si
+				pas d&eacute;j&agrave; disponible </li>
+				<li>cr&eacute;er une <strong>instance
+				de paiement</strong> </li>
+				<li>cr&eacute;er le<strong> formulaire
+				d'enregistrement</strong> et le site de la conférence </li>
+				<li><strong>tester</strong> les
+				paiements </li>
+				<li><strong>valider</strong> l'instance
+				par le Service financier de l'EPFL : l'instance valid&eacute;e
+				passe <b>automatiquement</b> en <strong>production</strong></li>
+				<li>mettre
+				le <strong>formulaire en ligne</strong> sur le site de la manifestation </li>
+				</ol>
+			},
+			en => qq{		<ol>
+		  <li> <strong>apply for a fonds</strong> which will collect the fees due if not yet available </li>
+		  <li>create a <strong>payment instance </strong> via this interface</li>
+		  <li>create the <strong> registration form </strong>  </li>
+		  <li><strong>test</strong> the e-payments</li>
+		  <li><strong>validate</strong> the payment instance by the Financial service of EPFL</li>
+		  <li> <strong>publish the</strong> registration form on your web site </li>
+		</ol>},
+		},
+		menu_demfd_label => {
+			fr => qq{Demande de fonds},
+			en => qq{Fund Request},
+		},
+		menu_new_label => {
+			fr => qq{Nouvelle instance},
+			en => qq{New instance},
+		},
+		menu_inst_label => {
+			fr => qq{Mes instances},
+			en => qq{My instances},
+		},
+		menu_search_label => {
+			fr => qq{Recherche},
+			en => qq{Search},
+		},
+		menu_help_label => {
+			fr => qq{Aide},
+			en => qq{Help},
+		},
+		new_head_label => {
+			fr => qq{Nouvelle instance},
+			en => qq{New instance},
+		},
+		new_note_label => {
+			fr => qq{
+				Une instance de paiement correspond à une manifestation pour laquelle vous désirez
+				pouvoir effectuer des encaissements en ligne. L'instance peut être créée seulement 
+				si vous disposez d'un fonds dédié. Sinon, veuillez contacter le Service Financier.
+				<p>Les champs en <b>gras</b> sont obligatoires.</p>},
+			en => qq{
+				A payment instance corresponds to an event or conference for which you wish to organise
+				an on line payment service. You may create a new payment instance only if you have a financial account. Otherwise, please 
+				contact the Financial service. 
+				<p>Bold labeled fields below are mandatory.</p>},
+		},
+		fond_label => {
+			fr => qq{Fond},
+			en => qq{Fund},
+		},
+		descr_note_label => {
+			fr => qq{(Vous êtes priés de préciser les dates de la manifestation)},
+			en => qq{(Please provide the dates of the event)},
+		},
+		compte_label => {
+			fr => qq{Compte budgétaire},
+			en => qq{Budgetary Account},
+		},
+		date_deb_label => {
+			fr => qq{D&eacute;but validité instance},
+			en => qq{Instance Start Date},
+		},
+		date_fin_label => {
+			fr => qq{Fin validité instance},
+			en => qq{Instance End Date},
+		},
+		cur_label => {
+			fr => qq{Monnaie},
+			en => qq{Currency},
+		},
+		mail_note_label => {
+			fr => qq{(si autre contact que l'adresse du responsable)},
+			en => qq{(contact mail if not the manager's address)},
+		},
+		url_ret_label => {
+			fr => qq{(veuillez consulter l'aide en ligne pour plus de détails à ce sujet)},
+			en => qq{(please check the on line help for more details)},
+		},
+		confirm_mail_label => {
+			fr => qq{Mail de confirmation des transactions },
+			en => qq{Confirmation Mail for Valid transactions},
+		},
+		confirm_mail_note_label => {
+			fr => qq{(si présent, déclanche un message de confirmation pour les transactions réussies)},
+			en => qq{(if present, valid transactions will trigger a confirmation mail)},
+		},
+		actions_save_label => {
+			fr => qq{enregistrer},
+			en => qq{save},
+		},
+		actions_delete_label => {
+			fr => qq{supprimer},
+			en => qq{delete},
+		},
+		actions_save_valid_label => {
+			fr => qq{enregistrer et valider},
+			en => qq{save and validate},
+		},
+		actions_show_trans_label => {
+			fr => qq{consulter les transactions},
+			en => qq{display transactions},
+		},
+		actions_valid_req_label => {
+			fr => qq{demande de validation},
+			en => qq{validation request},
+		},
+		actions_enable_label => {
+			fr => qq{activer},
+			en => qq{enable},
+		},		
+		actions_disable_label => {
+			fr => qq{désactiver},
+			en => qq{disable},
+		},		
+		inst_det_label => {
+			fr => qq{Détails de l'instance},
+			en => qq{Instance details},
+		},
+		inst_id_label => {
+			fr => qq{Identificateur de l'instance},
+			en => qq{Instance identifier},
+		},
+		status_label => {
+			fr => qq{Etat de l'instance},
+			en => qq{Instance status},
+		},
+		trans_status_label => {
+			fr => qq{Etat transaction},
+			en => qq{Transaction status},
+		},
+		csv_label => {
+			fr => qq{Extraction CSV},
+			en => qq{Download as CSV},
+		},
+		show_all_label => {
+			fr => qq{afficher toutes les transactions},
+			en => qq{Show all},
+		},
+
+		name_label => {
+			fr => qq{Nom Prénom},
+			en => qq{Name Firstname},
+		},
+		addr1_label => {
+			fr => qq{Adresse},
+			en => qq{Address},
+		},
+		addr2_label => {
+			fr => qq{Code Postal, Ville, Pays},
+			en => qq{ZIP, City, Country},
+		},
+		payed_by_label => {
+			fr => qq{Payé par},
+			en => qq{Payed by},
+		},
+		phone_label => {
+			fr => qq{Tél.},
+			en => qq{Phone},
+		},
+		amount_label => {
+			fr => qq{Montant},
+			en => qq{Amount},
+		},
+		date_label => {
+			fr => qq{Date de paiement},
+			en => qq{Payment date},
+		},
+		search_label => {
+			fr => qq{Chercher par},
+			en => qq{Search by},
+		},
+		search_or_label => {
+			fr => qq{ou par},
+			en => qq{or by},
+		},
+		redirect_label => {
+			fr => qq{Redirection vers le site de Postfinance...},
+			en => qq{Redirect to Postfinance...},
+		},
+		redirect_label => {
+			fr => qq{Redirection vers le site de Postfinance...},
+			en => qq{Redirect to Postfinance...},
+		},
+		cust_label => {
+			fr => qq{Client},
+			en => qq{Customer},
+		},
+
+
+
+
+};

@@ -1,0 +1,41 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+
+    <h3><TMPL_VAR NAME=search_label></h3>
+    <p></p>
+
+    <form id="form1" name="form1" method="post" action="<TMPL_VAR NAME=sPathMe>/listinst?op=byinstanceid&lang=<TMPL_VAR NAME=sLang>">
+			<div class="col-md-12 pb5" >
+			 <div class="col-md-4 txt_right_pr5">Instance ID </div>
+			 <div class="col-md-8"><input name="id_inst" type="text" id="no_inst" /></div>
+		 </div>
+		</form>
+
+	<TMPL_VAR NAME=search_or_label>
+
+		<form id="form1" name="form2" method="post" action="<TMPL_VAR NAME=sPathMe>/dettrans?lang=<TMPL_VAR NAME=sLang>">
+			<div class="col-md-12 pb5" >
+			 <div class="col-md-4 txt_right_pr5">Transaction ID</div>
+			 <div class="col-md-8"><input name="id_trans" type="text" id="id_trans" /></div>
+		 </div>
+    </form>
+
+	<TMPL_VAR NAME=search_or_label>
+
+		<form id="form1" name="form2" method="post" action="<TMPL_VAR NAME=sPathMe>/dettrans?lang=<TMPL_VAR NAME=sLang>">
+			<div class="col-md-12 pb5" >
+			 <div class="col-md-4 txt_right_pr5">Postfinance ID</div>
+			<div class="col-md-8"><input name="id_pay" type="text" id="id_pay" /></div>
+		 </div>
+		</form>
+    
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">

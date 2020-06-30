@@ -13,19 +13,22 @@
 
 use strict;
 use HTML::Template;
-use LWP::UserAgent;
+use LWP::UserAgent; 
+use Data::Dumper;
 
 use payonline_tools;
 
-use vars qw(%args $tmpldir $lang $errmsg $crtdate $usessl
-	);
+use vars qw(%args $tmpldir $lang $errmsg $crtdate $usessl $messages	);
+
+require 'messages.txt';
 
 my $me 		= $ENV {SCRIPT_NAME};
 my $us 		= $ENV {SERVER_NAME};
 my $qs 		= $ENV {QUERY_STRING};
 my $pi 		= $ENV {PATH_INFO};
 my $lang 	= 'en';
-my $tmpldir = '/var/www/vhosts/payonline.epfl.ch/private/tmpl/XX/';
+my $tmpldir = '/var/www/vhosts/payonline.epfl.ch/private/tmpl/';
+
 my $logfile	= '/var/log/httpd/payonline.log';
 
 my $noHeaderInsts = 'cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
@@ -36,9 +39,11 @@ my %errmsgs	= (
 		'Confirmation de paiement',
 		'Transaction :',
 		'PostFinance ID :',
-		'Mï¿½thode de paiement :',
+		'Méthode de paiement :',
 		'Total :',
 		'Au nom de :',
+		'Paiement refusé',
+		'Changement de statut de la transaction',
 	      ],
 	en => [
 		' *** Warning : test version. Not for public usage ! ***',	# 15
@@ -48,6 +53,8 @@ my %errmsgs	= (
 		'Payement method:',
 		'Total :',
 		'Paid for :',
+		'Payment refused',
+		'Transaction status changed',
 	      ],
 	);
 
@@ -56,7 +63,7 @@ my $verbose = '1';
 $| = 1;
 
   payonline_tools::setLog($logfile);
-  %args		= payonline_tools::loadargs ();
+  %args			= payonline_tools::loadargs ();
   $crtdate 	= payonline_tools::getcrtdate();
 
   payonline_tools::init ();
@@ -79,7 +86,7 @@ sub dispatch {
 #------
 sub cert {
 
-  print "Content-Type: text/html; charset=iso-8859-1\n\n";
+  print "Content-Type: text/html; charset=utf-8\n\n";
 warn "payonline cert: ** CERT from YellowPay **\n";
   my $YPSrv = $ENV{REMOTE_ADDR};
   return unless $YPSrv;
@@ -140,11 +147,19 @@ warn "payonline cert: ... 3 query OK\n";
 
   # - get transaction data
   my $trans= payonline_tools::getTrans ($id_trans,'');
-
+  unless ($trans) {
+  	warn "payonline process_response: id_trans=$id_trans not found\n";
+  	return;
+  }
+  
   # - get instance data
   my $sql  = qq{select * from instances where id=?};
   my $sth  = payonline_tools::dbquery ($sql, ($trans->{id_inst}));
   my $inst = $sth->fetchrow_hashref();
+  unless ($inst) {
+  	warn "payonline process_response: instance: not found for id_trans=$id_trans\n";
+  	return;
+  }
   my $etat = $inst->{etat};
 warn "payonline cert: etat=$etat\n";
   $payonline_tools::SHAsalt	= $payonline_tools::SHAsaltTest if $etat eq 'test';
@@ -168,7 +183,7 @@ warn "payonline cert: etat=$etat\n";
   	return;
   }
 
-  if ($trans->{etat} eq 'payï¿½') {
+  if ($trans->{etat} eq 'payé') {
   	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction already payed: status=$args{STATUS}\n";
 		my $msg = qq{error :: id_trans=$id_trans :: transaction already payed, status=$args{STATUS}	};
 		if ($args{STATUS} eq '2') {
@@ -190,7 +205,7 @@ warn "payonline cert: etat=$etat\n";
   }
 
   my $sql = qq{update transact set
-  	 etat='payï¿½',
+  	 etat='payé',
 	 datecr=Now(),
 	 paymode=?, 
 	 PaymentID=? 
@@ -232,13 +247,13 @@ warn " ==>> payonline cert: : query Email=$query->{Email}\n";
 			$msg = qq{
 Madame, Monsieur,
  
-Par la prï¿½sente, nous vous confirmons la rï¿½ception de votre donation de $query->{Total} $query->{Currency} pour le $query->{purpose} faite le $date.  Nous vous en sommes trï¿½s reconnaissants.
+Par la présente, nous vous confirmons la réception de votre donation de $query->{Total} $query->{Currency} pour le $query->{purpose} faite le $date.  Nous vous en sommes très reconnaissants.
  
-L'Ecole Polytechnique Fï¿½dï¿½rale de Lausanne (ci-aprï¿½s EPFL) est un ï¿½tablissement de droit public dotï¿½ de la personnalitï¿½ juridique.  Notre ï¿½tablissement est considï¿½rï¿½ d'utilitï¿½ publique, exemptï¿½ des impï¿½ts fï¿½dï¿½raux, cantonaux, et communaux.
+L'Ecole Polytechnique Fédérale de Lausanne (ci-après EPFL) est un établissement de droit public doté de la personnalité juridique.  Notre établissement est considéré d'utilité publique, exempté des impôts fédéraux, cantonaux, et communaux.
  
-Les donations faites ï¿½ l'EPFL peuvent ï¿½tre dï¿½duites fiscalement selon les normes cantonales et fï¿½dï¿½rales en vigueur. L'EPFL vous enverra une attestation ï¿½ cet effet dans les meilleurs dï¿½lais.
+Les donations faites à l'EPFL peuvent être déduites fiscalement selon les normes cantonales et fédérales en vigueur. L'EPFL vous enverra une attestation à cet effet dans les meilleurs délais.
  
-En vous remerciant ï¿½ nouveau de votre soutien, nous vous envoyons nos sincï¿½res salutations,
+En vous remerciant à nouveau de votre soutien, nous vous envoyons nos sincères salutations,
  
 Nathalie Fontana
 Directrice de la Philanthropie
@@ -266,11 +281,11 @@ warn "==> cert $payonline_tools::exceptions->{$inst->{id}} : mailBcc=$payonline_
 		}
 	}
 
+  postResult ($id_trans, 1, );
+
 	payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL payonline :: payment confirmation', $msg);
 #    payonline_tools::send_mail ($email, 'EPFL payonline :: payment confirmation', $msg);
 	warn " ==>> payonline cert: confirmation email to : $email, $inst->{mailinst}\n";    
-  
-  postResult ($id_trans, 1, );
 
 warn " ==>> payonline cert: args dump <<==\n";
  foreach my $item (keys %args) {
@@ -291,10 +306,10 @@ warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
   
   unless ($id_trans) {
 	  $errmsg 	= qq{no transaction id};
-	  $tmpldir 	=~ s/XX/$lang/;
+#	  $tmpldir 	=~ s/XX/$lang/;
 	  my $template	= initTempl('result.tmpl');
 	  $template->param(sErrMsg 		=> $errmsg);
-	  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+	  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
 	  exit;
   }
   
@@ -304,7 +319,7 @@ warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
 	  $tmpldir 	=~ s/XX/$lang/;
 	  my $template	= initTempl('result.tmpl');
 	  $template->param(sErrMsg 		=> $errmsg);
-	  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+	  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
 	  exit;
   }
 
@@ -314,27 +329,23 @@ warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
   unless ($inst) {
 	  postResult ($id_trans, 0, );
 	  $errmsg  = qq{<br>no such instance : $trans->{id_inst} }  ;
-	  $tmpldir 	=~ s/XX/$lang/;
+#	  $tmpldir 	=~ s/XX/$lang/;
 	  my $template	= initTempl('result.tmpl');
 	  $template->param(txtOrderIDShop => $id_trans);
 	  $template->param(sErrMsg 		=> $errmsg);
-	  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+	  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
 	  exit;
   }
   
-  $resultcode 	= '' if $trans->{etat} ne 'payï¿½';
+  $resultcode 	= '' if $trans->{etat} ne 'payé';
   my $resp  		= payonline_tools::getPersonInfos ($inst->{sciper});
   my $query			= payonline_tools::getQuery ($id_trans);
   my $email 		= $query->{Email};
   $lang 				= $query->{lang} ? $query->{lang} : 'en';
-  $tmpldir 			=~ s/XX/$lang/;
+ # $tmpldir 			=~ s/XX/$lang/;
 
   my $tmpl_file = $noHeaderInsts =~ /$trans->{id_inst}/ ? 'result-noheader.tmpl' : 'result.tmpl';
   my $template	= initTempl($tmpl_file);
-
-#  my $sOnLoad 	= qq{onload="window.location.href='$inst->{url}';"} if $bypassReturn =~ /$trans->{id_inst}/;
-  my $sOnLoad 	= qq{onload="window.location.href='$inst->{url}';"} if $inst->{bypass_return} && $resultcode;
-
 
   $template->param(OrderIDShop 	=> $id_trans);
   $template->param(Currency 		=> $query->{Currency});
@@ -350,7 +361,6 @@ warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
   $template->param(Country 			=> $query->{Country});
   $template->param(ResultCode		=> $resultcode);
   $template->param(TransactionID=> $trans->{PaymentID});
-  $template->param(sOnLoad	 		=> $sOnLoad);
 
   if ($inst->{contact}) {
 	  $template->param(Resp 		=> $inst->{contact});
@@ -379,20 +389,22 @@ warn "==> result : id_transact=$id_transact\n";
 		$urlconf .= qq(?id_transact=$id_transact);
 	  }
   }  
+#  my $sOnLoad 	= qq{onload="window.location.href='$inst->{urlconf}';"} if $inst->{bypass_return} && $resultcode;
+  my $sOnLoad 	= qq{onload="window.location.href='$urlconf';"} if $inst->{bypass_return} && $resultcode;
+  $template->param(sOnLoad	=> $sOnLoad);
 
 warn "==> result : urlconf=$urlconf\n";
   $template->param(URL 			=> $urlconf);
   $template->param(Descr 		=> $inst->{descr});
   $template->param(Date			=> $trans->{datecr});
   $template->param(PayMode		=> $trans->{paymode});
-
 warn "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultcode\n";
 
-  if ($trans->{etat} ne 'payï¿½' or $resultcode ne '1') {
-    $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{ï¿½chec paiement};
+  if ($trans->{etat} ne 'payé' or $resultcode ne '1') {
+    $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{échec paiement};
     postResult ($id_trans, 0, );
     $template->param(sErrMsg 		=> $errmsg);
-    print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+    print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
     exit;
   }
   
@@ -401,7 +413,7 @@ warn "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultco
   
 #  postResult ($id_trans, $resultcode, $trans);
 
-  print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
 }
 
@@ -420,16 +432,21 @@ warn "initTempl: $tmpldir$tmplpath\n";
    $template->param(sCrtYear 	=> $year);
    $template->param(sPathMe 	=> $me);
    $template->param(sDebug 	=> $payonline_tools::DEBUG ? $errmsgs{$lang}->[0] : '');
+   $template->param(sLangFR		=> 1) if $lang eq 'fr';
+
+	 foreach my $msg (keys %{$messages}) {
+	 	next unless $msg;
+   	$template->param($msg	=> $messages->{$msg}->{$lang}) if $messages->{$msg}->{$lang};
+	 }
+
    return $template;
 }
 
 #------
 sub postResult {
-
 	my $id_trans= shift;
 	my $result  = shift;
-	my $trans	= shift;
-	
+	my $trans		= shift;
 	
 	warn "payonline :: do :postResult 1 : $id_trans, $result, $trans\n";  
 	return unless $id_trans;  
@@ -439,7 +456,7 @@ sub postResult {
 	my $id_inst	  = $trans->{id_inst};
 	return unless $id_inst;
 	warn "payonline :: do :postResult 3 result:$result\n";  
-	$result	  = $trans->{etat} eq 'payï¿½' ? 1 : 0;
+	$result	  = $trans->{etat} eq 'payé' ? 1 : 0;
 	warn "payonline :: do :postResult 4 result:$result\n";  
 	my $sql = qq{select url from instances where id=?};
 	my $sth = payonline_tools::dbquery ($sql, ($id_inst));
@@ -462,6 +479,7 @@ sub do_post {
 
   my $ua = new LWP::UserAgent;
   push @{ $ua->requests_redirectable }, 'POST';
+
 warn "do_post a : $url, $id_transact, $result\n";
 	#	- confirmation token if URL Return - but not to inform
 	my $token = payonline_tools::makeToken ($id_transact, $trans) unless $queryArgs->{informreturnaddress};
@@ -475,9 +493,9 @@ warn "do_post a : $url, $id_transact, $result\n";
   	PaymentID		=> $trans->{PaymentID},
   	paymode			=> $trans->{paymode},
   };
-use Data::Dumper;
-warn "do_post postdata\n".Dumper($postdata);
 
+warn "do_post postdata\n".Dumper($postdata);  
+  
   if ($queryArgs) {
 		foreach my $key (keys %$queryArgs) {
 			next if $key eq 'id_transact';

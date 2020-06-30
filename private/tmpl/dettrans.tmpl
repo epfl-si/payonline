@@ -1,0 +1,84 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+
+    <h3><TMPL_VAR NAME=sDescrInst></h3>
+    <div class="<TMPL_VAR NAME=etatinst>">
+    <b>Instance id : <TMPL_VAR NAME=sIDInst></b><br>
+    <b><TMPL_VAR NAME=status_label> : <TMPL_VAR NAME=etatinst></b><br>
+    <b>Responsable : <TMPL_VAR NAME=respPrenom> <TMPL_VAR NAME=respNom></b><br>
+    <b><TMPL_VAR NAME=fond_label> : <TMPL_VAR NAME=fonds></b><br>
+    <b><TMPL_VAR NAME=compte_label> : <TMPL_VAR NAME=naturecomptable></b><br>
+    <b>Transaction no. : <TMPL_VAR NAME=idtrans></b>
+    </div>
+    <p></p>
+	<TMPL_IF NAME=etat>
+		<div class="row greenborder">
+	<TMPL_ELSE>
+		<div class="row redborder">
+	</TMPL_IF>
+
+		<div class="col-md-12 pb5" >
+
+	   <div class="col-md-12 pb5">
+		  <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong><TMPL_VAR NAME=name_label></strong></div>
+		  <div class="col-md-8"><TMPL_VAR NAME="LastName"> <TMPL_VAR NAME="FirstName"></div>
+	   </div>
+	   <div class="col-md-12 pb5">
+		  <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong>Email</strong></div>
+		  <div class="col-md-8"><TMPL_VAR NAME=Email></div>
+	   </div>
+	   <div class="col-md-12 pb5">
+		  <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong><TMPL_VAR NAME=phone_label></strong></div>
+		  <div class="col-md-8"><TMPL_VAR NAME=Phone></div>
+	   </div>
+	   <div class="col-md-12 pb5">
+		  <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong><TMPL_VAR NAME=addr1_label></strong></div>
+		  <div class="col-md-8">
+		   <TMPL_VAR NAME=Addr><br>
+		   <TMPL_VAR NAME=Country>, <TMPL_VAR NAME=ZipCode> - <TMPL_VAR NAME=City>	     </div>
+	   </div>
+	   <div class="col-md-12 pb5">
+		  <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong><TMPL_VAR NAME=amount_label></strong></div>
+		  <div class="col-md-8"><TMPL_VAR NAME=Total> <TMPL_VAR NAME=Currency></div>
+	   </div>
+	   <TMPL_IF NAME=etat>
+		  <div class="col-md-12 pb5">
+			 <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong><TMPL_VAR NAME=trans_status_label></strong></div>
+			 <div class="col-md-8"> payé  <img src=/images/ok.gif align=middle></div>
+		  </div>
+		  <div class="col-md-12 pb5">
+			 <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong><TMPL_VAR NAME=date_label></strong></div>
+			 <div class="col-md-8"><TMPL_VAR NAME="datecr"></div>
+		  </div>
+		  <div class="col-md-12 pb5">
+			 <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong>PostFinance ID</strong></div>
+			 <div class="col-md-8"><TMPL_VAR NAME=PaymentID></div>
+		  </div>
+		  <div class="col-md-12 pb5">
+			 <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong><TMPL_VAR NAME=payed_by_label></strong></div>
+			 <div class="col-md-8"><TMPL_VAR NAME=paymode></div>
+		  </div>
+		<TMPL_ELSE>
+		  <div class="col-md-12 pb5">
+			 <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong>Etat</strong></div>
+			 <div class="col-md-8"> non payé  <img src=/images/ko.gif align=middle></div>
+		  </div>
+		  <div class="col-md-12 pb5">
+			 <div class="col-md-4 txt_right_pr5 txt_right_pr5"><strong>Date accès</strong></div>
+			 <div class="col-md-8"><TMPL_VAR NAME="datecr"></div>
+		  </div>
+		</TMPL_IF>
+
+    </div>
+   </div>
+
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">
