@@ -1,0 +1,18 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: payonline
+  name: payonline-route
+  namespace: payonline-test
+spec:
+  host: payonline-preprod.epfl.ch
+  port:
+    targetPort: 8080-tcp
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: payonline-service
+    weight: 100
+  wildcardPolicy: None
