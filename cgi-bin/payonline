@@ -1342,6 +1342,8 @@ sub authenticate {
   my ($n1, $n2) = split(/,/, $prenom) if ($prenom =~ /,/);
   $prenom = utf8tolatin1($n1) if $n2;
 
+warn "authenticate $sciper, $nom $prenom :: respunits=$respunits";
+
 }
 
 #--------
