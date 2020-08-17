@@ -28,8 +28,8 @@ my $qs 		= $ENV {QUERY_STRING};
 my $pi 		= $ENV {PATH_INFO};
 my $lang 	= 'en';
 my $tmpldir = '/var/www/vhosts/payonline.epfl.ch/private/tmpl/';
-
 my $logfile	= '/var/log/httpd/payonline.log';
+my $contact_sf = 'e-payment@epfl.ch';
 
 my %errmsgs	= (
 	fr => [
@@ -95,7 +95,7 @@ warn "payonline cert: $YPSrv : unknown server in static list\n";
 warn "payonline cert: OK :: $YPSrv in range\n";
 		} else {
 			my $msg = qq{error :: id_trans=$args{orderID} illegal access from server IP=$YPSrv};
-			payonline_tools::send_mail ('payonline\@epfl.ch', 'payonline ERROR :: unknown Postfinance server', $msg);
+			payonline_tools::send_mail ('payonline@epfl.ch', 'payonline ERROR :: unknown Postfinance server', $msg);
 #			return;  
 		}
   }
@@ -111,34 +111,6 @@ warn "payonline cert: ... 2 id_trans=$id_trans\n";
   return if  $id_trans =~ /insert/i;
   return if  $id_trans =~ /update/i;
 
-  if ($args{fail}) {
-warn "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: CANCEL\n";
-	return;
-  }
-  if ($args{offline}) {
-warn "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: OFFLINE\n";
-
-	my $msg = "
-payonline offline status change
-
-	orderID 	=> $args{orderID},
-	currency 	=> $args{currency},
-	amount 		=> $args{amount},
-	PM 			=> $args{PM},
-	ACCEPTANCE 	=> $args{ACCEPTANCE},
-	STATUS 		=> $args{STATUS},
-	CARDNO 		=> $args{CARDNO},
-	PAYID 		=> $args{PAYID},
-	NCERROR 	=> $args{NCERROR},
-	BRAND 		=> $args{BRAND},	
-	
-	";
-
-	payonline_tools::send_mail ('payonline\@epfl.ch', "payonline OFFLINE STATUS CHANGE : status=$args{STATUS}", $msg);
-
-	return;
-  }
- 
   my $query	= payonline_tools::getQuery ($id_trans);
   return unless $query;
 warn "payonline cert: ... 3 query OK\n";
@@ -160,8 +132,9 @@ warn "payonline cert: ... 3 query OK\n";
   }
   my $etat = $inst->{etat};
 warn "payonline cert: etat=$etat\n";
-  $payonline_tools::SHAsalt	= $payonline_tools::SHAsaltTest if $etat eq 'test';
 
+# - check hash --------
+  $payonline_tools::SHAsalt	= $payonline_tools::SHAsaltTest if $etat eq 'test';
   my $hashdata = {
 	orderID 	=> $args{orderID},
 	currency 	=> $args{currency},
@@ -175,10 +148,82 @@ warn "payonline cert: etat=$etat\n";
 	BRAND 		=> $args{BRAND},	
   };
   my $hash 		= payonline_tools::makeHash ($hashdata, 'out');
-# - check hash --------
-  unless ($hash eq $args{SHASIGN}) {
-  	warn "** ERR : payonline :: cert FAILED : $id_trans\n$hash\n$args{SHASIGN}\n";
-  	return;
+	unless ($hash eq $args{SHASIGN}) {
+		warn "** ERR : payonline :: cert FAILED : $id_trans\n$hash\n$args{SHASIGN}\n";
+		return;
+	}
+	
+	my $msg = qq{		
+	orderID 	=> $args{orderID},
+	currency 	=> $args{currency},
+	amount 		=> $args{amount},
+	PM 			=> $args{PM},
+	ACCEPTANCE 	=> $args{ACCEPTANCE},
+	STATUS 		=> $args{STATUS},
+	CARDNO 		=> $args{CARDNO},
+	PAYID 		=> $args{PAYID},
+	NCERROR 	=> $args{NCERROR},
+	BRAND 		=> $args{BRAND},	
+	};
+	#	- failed transaction - notify
+  if ($args{fail}) {
+warn "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: CANCEL\n";
+		$msg = qq{PAYONLINE FAILED TRANSACTION}.$msg;
+		payonline_tools::send_mail ('payonline@epfl.ch', "payonline FAILED TRANSACTION : status=$args{STATUS}", $msg);
+		return;
+  }
+
+	#	- offline transactions
+	$args{offline} = 1 if $trans->{etat} eq 'payé';
+  if ($args{offline}) {
+warn "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STATUS}\n";
+		#	- notify payonline
+		$msg = qq{OFFLINE STATUS CHANGE}.$msg;
+		payonline_tools::send_mail ('payonline@epfl.ch', "payonline OFFLINE STATUS CHANGE : status=$args{STATUS}", $msg);
+
+		if ($args{STATUS} eq '93') {
+		#	- TRANSACTION REFUSED
+			if ($trans->{etat} eq 'payé') {
+				#	- update etat
+				my $sql = qq{update transact set
+				 etat='refuse',
+				 paymode=?, 
+				 PaymentID=? 
+				 where id=?};
+				my $sth = payonline_tools::dbquery ($sql, ("$args{PM} $args{BRAND}", $args{PAYID}, $id_trans));
+				warn "OFFLINE UPDATE TRANSACT $id_trans: STATUS=$args{STATUS}, etat=refuse\n";
+
+				# - notify 
+				$msg = qq{payonline : TRANSACTION REFUSED
+				
+	$inst->{descr}
+
+	ID transact: $id_trans
+	PostfianceID: $args{PAYID}
+	Pay Mode: $args{PM} $args{BRAND}
+	Date : $trans->{datecr}
+	Total: $query->{Total} $query->{Currency}
+
+	Payed for
+		$query->{FirstName} $query->{LastName}
+		$query->{Addr}
+		$query->{Country}, $query->{ZipCode} $query->{City}
+				
+				};
+			my $dest = 'payonline@epfl.ch,'.$contact_sf ;
+				 $dest .= ','.$inst->{mailinst} if $inst->{mailinst};
+				 $dest .= ','.$inst->{contact}  if $inst->{contact};
+				 $dest .= ','.$query->{Email} 	if $query->{Email};
+				 $dest =~ s/^,//;
+				 $dest =~ s/,$//;
+warn ">> send_mail to : $dest\n";
+				#	- notify instance conact
+				payonline_tools::send_mail ($dest, "payonline OFFLINE TRANSACTION REFUSED : $id_trans", $msg);
+
+			}
+		}
+
+		return;
   }
 
   if ($trans->{etat} eq 'payé') {
@@ -193,7 +238,7 @@ warn "payonline cert: etat=$etat\n";
 			transaction refused : status updated
 			};
 		}
-		payonline_tools::send_mail ('payonline\@epfl.ch', "payonline WARNING :: transaction payed: status=$args{STATUS}", $msg);
+		payonline_tools::send_mail ('payonline@epfl.ch', "payonline WARNING :: transaction payed: status=$args{STATUS}", $msg);
   	return;
   } else {
 		if ($args{STATUS} eq '2') {
@@ -395,21 +440,56 @@ warn "==> result : urlconf=$urlconf\n";
   $template->param(URL 			=> $urlconf);
   $template->param(Descr 		=> $inst->{descr});
   $template->param(Date			=> $trans->{datecr});
-  $template->param(PayMode		=> $trans->{paymode});
+  $template->param(PayMode	=> $trans->{paymode});
 warn "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultcode\n";
 
-  if ($trans->{etat} ne 'payé' or $resultcode ne '1') {
-    $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{échec paiement};
+# 
+#   if ($trans->{etat} ne 'payé' or $resultcode ne '1') {
+#     $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{échec paiement};
+#     postResult ($id_trans, 0, );
+#     $template->param(sErrMsg 		=> $errmsg);
+#     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
+#     exit;
+#   }
+
+  unless ( $resultcode ) {
+		if ($trans->{etat} eq 'payé') {
+			#	- update transaction to failed
+			my $sql = qq{update transact set etat='' where id=?};
+			my $sth = payonline_tools::dbquery ($sql, $id_trans);
+warn "update failed failed transact $id_trans\n";
+			
+			my $msg = qq{TRANSACTION FAILED		
+			$inst->{descr}
+
+			orderID 	=> $id_trans,
+			PAYID 		=> $trans->{PaymentID},
+			Total 		=> $query->{Total},
+			Currency 	=> $query->{Currency},
+			BRAND 		=> $query->{BRAND},	
+			};
+
+			#	- notify 
+			my $dest = 'payonline@epfl.ch,'.$contact_sf ;
+			my $dest = 'payonline@epfl.ch' ;
+				 $dest .= ','.$inst->{mailinst} if $inst->{mailinst};
+				 $dest .= ','.$inst->{contact}  if $inst->{contact};
+				 $dest .= ','.$query->{Email} 	if $query->{Email};
+				 $dest =~ s/^,//;
+				 $dest =~ s/,$//;
+warn ">> send_mail to : $dest\n";
+			payonline_tools::send_mail ($dest, "payonline TRASACTION REFUSED : $id_trans", $msg);
+			
+		}
+
     postResult ($id_trans, 0, );
+
+    $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{échec paiement};
     $template->param(sErrMsg 		=> $errmsg);
     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
     exit;
-  }
-  
-  # - Send email
-  #...
-  
-#  postResult ($id_trans, $resultcode, $trans);
+
+	}
 
   print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
@@ -454,7 +534,7 @@ sub postResult {
 	my $id_inst	  = $trans->{id_inst};
 	return unless $id_inst;
 	warn "payonline :: do :postResult 3 result:$result\n";  
-	$result	  = $trans->{etat} eq 'payé' ? 1 : 0;
+#	$result	  = $trans->{etat} eq 'payé' ? 1 : 0;
 	warn "payonline :: do :postResult 4 result:$result\n";  
 	my $sql = qq{select url from instances where id=?};
 	my $sth = payonline_tools::dbquery ($sql, ($id_inst));

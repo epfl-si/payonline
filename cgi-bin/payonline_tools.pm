@@ -136,7 +136,7 @@ $rejectIP = ('128.178.109.243','157.55.39.166');	#	crawlers
 
 $epflLOGO	= 'https://web2018.epfl.ch/2.0.0/icons/epfl-logo.svg';
 $demfond 	= 'bertold.walther@epfl.ch,ion.cionca@epfl.ch';
-$su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490,254724,229454';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
+$su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490,254724,229454,268229';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
 $codeTVA	= 'Q7';
 $mailFrom	= 'noreply@epfl.ch';
 
