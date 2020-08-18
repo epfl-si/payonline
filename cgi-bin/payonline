@@ -19,6 +19,21 @@ use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits $tmpldir 
 
 require 'messages.txt';
 
+# Intercept warns and format for container output/Apache logs
+local $SIG{__WARN__} = sub {
+  my $message = shift;
+  logger('warning', $message);
+};
+
+sub logger {
+  my ($level, $msg) = @_;
+  if (open my $out, '>>', '/dev/stderr') {
+    chomp $msg;
+    print $out "[".scalar localtime."] [$level] [pid $$] $msg\n";
+  }
+}
+
+$ENV {SERVER_NAME} = $ENV {SITE_URL} if ($ENV {SERVER_NAME} eq '127.0.0.1' && $ENV {SITE_URL});
 my $me 			= $ENV {SCRIPT_NAME};
 my $us 			= $ENV {SERVER_NAME};
 my $qs 			= $ENV {QUERY_STRING};
@@ -32,31 +47,31 @@ my @statlist	= ('test','prod');
 my %errmsgs	= (
 	fr => [
 		'Erreur(s) de saisie',
-		'Veuillez retourner sur la page précédente pour effectuer les corrections nécessaires.',
-		'pas trouvée ou inactive',
-		'<li>Date début absent ou erronée</li>',
+		'Veuillez retourner sur la page prÃ©cÃ©dente pour effectuer les corrections nÃ©cessaires.',
+		'pas trouvÃ©e ou inactive',
+		'<li>Date dÃ©but absent ou erronÃ©e</li>',
 		'<li>Description absente</li>',
 		'<li>Fonds absent</li>',
 		'<li>Centre financier absent</li>',
-		'<li>Date fin absente ou erronée</li>',
-		'<li>La date de fin doit être après la date début</li>',
-		'<li>Compte budgétaire absent</li>',
+		'<li>Date fin absente ou erronÃ©e</li>',
+		'<li>La date de fin doit Ãªtre aprÃ¨s la date dÃ©but</li>',
+		'<li>Compte budgÃ©taire absent</li>',
 		'<li>Date fin obligatoire</li>',
-		'<li>Opération inconnue</li>',
-		'Transactions payées',
-		'Transactions non payées',
+		'<li>OpÃ©ration inconnue</li>',
+		'Transactions payÃ©es',
+		'Transactions non payÃ©es',
 	      ],
 	en => [
 		'Input error(s)',												# 0
 		'Please return on the previous page and correct the input',		# 1
-		'pas trouvée ou inactive',										# 2
+		'pas trouvÃ©e ou inactive',										# 2
 		'<li>Start date missing or wrong format</li>',					# 3
 		'<li>Description missing</li>',									# 4
 		'<li>Fund missing</li>',										# 5
 		'<li>Financial center missing</li>',							# 6
 		'<li>End date missing or wrong format</li>',					# 7
 		'<li>End date must be after Start date</li>',					# 8
-		'<li>Compte budgétaire missing</li>',							# 9
+		'<li>Compte budgÃ©taire missing</li>',							# 9
 		'<li>End date is compulsory</li>',								# 10
 		'<li>Unknown operation</li>',									# 11
 		'Transactions payed',									# 12
@@ -75,7 +90,7 @@ my %nat_comptable = (
 			'710140', '710140 : Taxes certifications conformes',
 			'740050', '740050 : Vente, Formation tiers',
 			'740055', '740055 : Vente, Formation continue',
-			'740060', '740060 : Congrès, Séminaires, Conférences',
+			'740060', '740060 : CongrÃ¨s, SÃ©minaires, ConfÃ©rences',
 			'741070', '741070 : Produits de manifestations',
 			'747040', '747040 : Cotisations et abonnements divers',
 			'783120', '783120 : Contrat de service suisse',
@@ -303,7 +318,7 @@ sub dettrans {
   my $template = initTempl('dettrans.tmpl');
 
   unless ($args{id_trans} or $args{id_pay}) {
-     my $errmsg = qq{clé de recherche de la transaction absente};
+     my $errmsg = qq{clÃ© de recherche de la transaction absente};
      $template->param(sErrMsg 	=> $errmsg);
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
@@ -324,7 +339,7 @@ sub dettrans {
   my $sth = payonline_tools::dbquery ($sql, @params);
   my $result = $sth->fetchrow_hashref ();
   unless ($result) {
-     my $errmsg = qq{transaction pas trouvée};
+     my $errmsg = qq{transaction pas trouvÃ©e};
      $template->param(sErrMsg 	=> $errmsg);
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
@@ -335,7 +350,7 @@ sub dettrans {
   my $sth = payonline_tools::dbquery ($sql, ($id_inst));
   my $resultinst = $sth->fetchrow_hashref ();
   unless ($resultinst) {
-     my $errmsg = qq{instance no: $id_inst pas trouvée};
+     my $errmsg = qq{instance no: $id_inst pas trouvÃ©e};
      $template->param(sErrMsg 	=> $errmsg);
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
@@ -398,7 +413,7 @@ sub listtrans {
   my $sth = payonline_tools::dbquery ($sql, ($id_inst));
   my $result = $sth->fetchrow_hashref ();
   unless ($result) {
-     my $errmsg = qq{instance no: $id_inst pas trouvée};
+     my $errmsg = qq{instance no: $id_inst pas trouvÃ©e};
      $template->param(sErrMsg 	=> $errmsg);
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
@@ -414,7 +429,7 @@ sub listtrans {
   my @params;
   my $sql = qq{select * from transact where id_inst = ?};
   push @params, $id_inst;
-  $sql   .= qq{ and etat='payé'} unless $args{op};
+  $sql   .= qq{ and etat='payÃ©'} unless $args{op};
   $sql 	 .= qq{ and etat=''} 	 if $args{op} eq 'notpayed';
   $sql   .= qq{ order by datecr desc $limit};
 
@@ -489,7 +504,7 @@ sub extrans {
   my $sth = payonline_tools::dbquery ($sql, ($id_inst));
   my $result = $sth->fetchrow_hashref ();
   unless ($result) {
-     my $errmsg = qq{instance no: $id_inst pas trouvée};
+     my $errmsg = qq{instance no: $id_inst pas trouvÃ©e};
      $template->param(sErrMsg 	=> $errmsg);
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
@@ -501,7 +516,7 @@ sub extrans {
   my $urlconf	 	= $result->{urlconf};
 
   my $sql = qq{select * from transact where id_inst = ?};
-  $sql   .= qq{ and etat='payé'} unless $args{op};
+  $sql   .= qq{ and etat='payÃ©'} unless $args{op};
   $sql 	 .= qq{ and etat=''} 	 if $args{op} eq 'notpayed';
   $sql   .= qq{ order by datecr};
 
@@ -587,9 +602,9 @@ sub detinst {
   }
   my $sth 	 = payonline_tools::dbquery ($sql, @params);
   my $result = $sth->fetchrow_hashref ();
-  
+
   unless ($result->{descr}) {
-     my $errmsg = qq{instance pas trouvée ou en dehors de votre responsabilité};
+     my $errmsg = qq{instance pas trouvÃ©e ou en dehors de votre responsabilitÃ©};
      $template->param(sErrMsg 	=> $errmsg);
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
@@ -727,7 +742,7 @@ sub newinst {
   $seltxt2 .= qq{</select>\n};
 
   unless( $nbfonds ) {
-	my $errmsg = qq{Aucun fonds ouvert disponible , veuillez contacter vos accréditeurs};
+	my $errmsg = qq{Aucun fonds ouvert disponible , veuillez contacter vos accrÃ©diteurs};
 	$template->param(sErrMsg 	=> $errmsg);
 	print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
 	exit;
@@ -780,7 +795,7 @@ sub demvalid {
   my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$d1,$d2,$d3,$ois) = $sth->fetchrow_array ();
 
   unless ($descr) {
-   my $errmsg = qq{instance $id pas trouvée ou en dehors de votre contrôle};
+   my $errmsg = qq{instance $id pas trouvÃ©e ou en dehors de votre contrÃ´le};
 	$template->param(sErrMsg 	=> $errmsg);
 	$template->param(sAuthstr	=> 1 );
 	print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
@@ -803,13 +818,13 @@ Description : $descr
 Responsable : $resp->{prenom} $resp->{nom} [sciper: $sciper, mail:$resp->{mail}]
 Centre financier : $cf
 Fonds : $fonds
-Date début: $datedeb
+Date dÃ©but: $datedeb
 Date fin : $datefin
 
 };
 
   my $txt1 = qq{
-Veuillez cliquer sur ce lien pour valider les données financières de l'instance ci-dessus :
+Veuillez cliquer sur ce lien pour valider les donnÃ©es financiÃ¨res de l'instance ci-dessus :
 http://payonline.epfl.ch/cgi-bin/};
   $txt1 .= "dev/" if $payonline_tools::DEBUG;
   $txt1 .= qq{payonline/detinst?id=$id&lang=$lang
@@ -887,7 +902,7 @@ sub doneinst {
      my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$monnaie,$mailinst,$contact,$ois) = $sth->fetchrow_array ();
 
      unless ($descr) {
-      my $errmsg = qq{instance $id pas trouvée ou en dehors de votre contrôle};
+      my $errmsg = qq{instance $id pas trouvÃ©e ou en dehors de votre contrÃ´le};
        $template->param(sErrMsg 	=> $errmsg);
        $template->param(sAuthstr	=> 1 );
        print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
@@ -900,16 +915,16 @@ sub doneinst {
        $sql = qq{delete from instances where id = ?};
        payonline_tools::dbquery ($sql, ($id));
        my $msg = qq{
-     	  <h3>Instance effacée</h3>
+     	  <h3>Instance effacÃ©e</h3>
 		  <li>id instance=$id 
 		  <li>cf=$CF 
 		  <li>fonds=$Fonds
 		  <li>OIS=$ois 
 		  <li>descr=$descr 
-		  <li>compte budgétaire=$naturecomptable
-		  <li>date début=$datedeb
+		  <li>compte budgÃ©taire=$naturecomptable
+		  <li>date dÃ©but=$datedeb
 		  <li>date fin=$datefin
-		  <li>état=$etat	
+		  <li>Ã©tat=$etat	
 		  <li>monnaie=$monnaie
 		  <li>url manifestation=$urlconf
 		  <li>url=$url
@@ -977,11 +992,11 @@ sub doneinst {
 		   <li>fonds=$Fonds
 		   <li>OIS=$ois 
 		   <li>descr=$descr 
-		   <li>compte budgétaire=$naturecomptable
+		   <li>compte budgÃ©taire=$naturecomptable
 		   <li>code TVA=$codetva
-		   <li>date début=$datedeb
+		   <li>date dÃ©but=$datedeb
 		   <li>date fin=$datefin
-		   <li>état=$etat	
+		   <li>Ã©tat=$etat	
 		   <li>monnaie=$monnaie
 		   <li>url manifestation=$urlconf
 		   <li>url=$url
@@ -989,8 +1004,8 @@ sub doneinst {
 		   <li>contact mail=$contact
 		   <hr>
 		   L'instance passe en mode <b>production</b> : toutes les transaction de test ont
-		   été effacées.<br>
-		   Le responsable de l'instance est averti par mail de cette opération.
+		   Ã©tÃ© effacÃ©es.<br>
+		   Le responsable de l'instance est averti par mail de cette opÃ©ration.
 		};
 
 	  # - delete test transactions
@@ -1009,16 +1024,16 @@ Description : $descr
 Responsable : $resp->{prenom} $resp->{nom} [sciper: $sciper, mail:$resp->{mail}]
 Centre financier : $CF
 Fonds : $Fonds
-Compte budgétaire : $naturecomptable
+Compte budgÃ©taire : $naturecomptable
 URL Manifestation : $urlconf
 Mail confirmation : $mailinst
 Contact mail : $contact
-Date début: $datedeb
+Date dÃ©but: $datedeb
 Date fin : $datefin
 Monnaie : $monnaie
 
-L'instance a été validée par le Service Financier de l'EPFL et est passée en mode *production*.
-Toutes les transactions de test ont été effacées.
+L'instance a Ã©tÃ© validÃ©e par le Service Financier de l'EPFL et est passÃ©e en mode *production*.
+Toutes les transactions de test ont Ã©tÃ© effacÃ©es.
 
 Votre service de paiement en ligne
 };
@@ -1053,16 +1068,16 @@ Votre service de paiement en ligne
 		payonline_tools::dbquery($sql, @params);
 		
 		$msg = qq{
- 		<h3>Mise à jour de l'instance</h3>
+ 		<h3>Mise Ã  jour de l'instance</h3>
 		<li>id instance=$id 
 		<li>cf=$CF 
 		<li>fonds=$Fonds
 		<li>OIS=$ois 
 		<li>descr=$descr 
-		<li>compte budgétaire=$naturecomptable
-		<li>date début=$datedeb
+		<li>compte budgÃ©taire=$naturecomptable
+		<li>date dÃ©but=$datedeb
 		<li>date fin=$datefin
-		<li>état=$etat	
+		<li>Ã©tat=$etat	
 		<li>monnaie=$monnaie
 		<li>url manifestation=$urlconf
 		<li>url=$url
@@ -1085,10 +1100,10 @@ Votre service de paiement en ligne
 		<li>fonds=$Fonds
 		<li>OIS=$ois 
 		<li>descr=$descr 
-		<li>compte budgétaire=$naturecomptable
-		<li>date début=$datedeb
+		<li>compte budgÃ©taire=$naturecomptable
+		<li>date dÃ©but=$datedeb
 		<li>date fin=$datefin
-		<li>état=$etat	
+		<li>Ã©tat=$etat	
 		<li>monnaie=$monnaie
 		<li>url manifestation=$urlconf
 		<li>url=$url
@@ -1111,10 +1126,10 @@ Votre service de paiement en ligne
 		<li>fonds=$Fonds
 		<li>OIS=$ois 
 		<li>descr=$descr 
-		<li>compte budgétaire=$naturecomptable
-		<li>date début=$datedeb
+		<li>compte budgÃ©taire=$naturecomptable
+		<li>date dÃ©but=$datedeb
 		<li>date fin=$datefin
-		<li>état=inactive-$etat	
+		<li>Ã©tat=inactive-$etat	
 		<li>monnaie=$monnaie
 		<li>url manifestation=$urlconf
 		<li>url=$url
@@ -1152,17 +1167,17 @@ Votre service de paiement en ligne
      
      payonline_tools::write_log_db ($sciper, qq{newinst::$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
      $msg = qq{
-      <h3>L'instance no "$id" a été créée</h3>
+      <h3>L'instance no "$id" a Ã©tÃ© crÃ©Ã©e</h3>
       l'instance est en mode de <b>test</b>
       <pre>$descr</pre>
 
-      <h3>Prochaines étapes:</h3>
+      <h3>Prochaines Ã©tapes:</h3>
       <ol>
-      <li>préparer le <b>formulaire de saisie</b> soit avec le nouveau module de paiement en ligne d'InForm soit avec les compétences informatiques de votre unité ; le numéro de l'instance <b>$id</b> doit faire partie de ce formulaire pour identifier les transactions</li>
+      <li>prÃ©parer le <b>formulaire de saisie</b> soit avec le nouveau module de paiement en ligne d'InForm soit avec les compÃ©tences informatiques de votre unitÃ© ; le numÃ©ro de l'instance <b>$id</b> doit faire partie de ce formulaire pour identifier les transactions</li>
       <li>effectuer les essais du formulaire de paiement en ligne et consulter les transactions correspondantes avec cette interface</li>
-      <li>à la fin des tests, ouvrir la fiche de l'instance et demander sa validation par le <b>Service financier</b> de l'EPFL</li>
-      <li>dès validation par le SF, l'instance passe automatiquement en mode <b>production</b> ; vous recevrez un message de confirmation ; toutes les transctions des essais seront automatiquement effacées</li>
-      <li>à l'échéance de la date de fin, l'instance passe automatiquement en mode <b>archive</b> : aucune transaction ne sera plus acceptée</li>
+      <li>Ã  la fin des tests, ouvrir la fiche de l'instance et demander sa validation par le <b>Service financier</b> de l'EPFL</li>
+      <li>dÃ¨s validation par le SF, l'instance passe automatiquement en mode <b>production</b> ; vous recevrez un message de confirmation ; toutes les transctions des essais seront automatiquement effacÃ©es</li>
+      <li>Ã  l'Ã©chÃ©ance de la date de fin, l'instance passe automatiquement en mode <b>archive</b> : aucune transaction ne sera plus acceptÃ©e</li>
       </ol>
      };
   }
@@ -1215,13 +1230,13 @@ sub donefnd {
 
   $errtxt .= qq{<li>centre financier absent</li>} 	unless $CF;
   $errtxt .= qq{<li>description absente</li>} 		unless $descr;
-  $errtxt .= qq{<li>date début absente ou erronée</li>} unless $datedeb or $datedebvalide;
-  $errtxt .= qq{<li>date début dans le passée</li>} 	unless $datedebvalide ge $crtdate ;
+  $errtxt .= qq{<li>date dÃ©but absente ou erronÃ©e</li>} unless $datedeb or $datedebvalide;
+  $errtxt .= qq{<li>date dÃ©but dans le passÃ©e</li>} 	unless $datedebvalide ge $crtdate ;
 
   if ($datefin) {
     $datefinvalide = payonline_tools::datevalide($datefin);
-    $errtxt .= qq{<li>date fin erronée</li>} 		unless $datefinvalide;
-    $errtxt .= qq{<li>date fin dans le passé</li>} 	unless $datefinvalide gt $crtdate;
+    $errtxt .= qq{<li>date fin erronÃ©e</li>} 		unless $datefinvalide;
+    $errtxt .= qq{<li>date fin dans le passÃ©</li>} 	unless $datefinvalide gt $crtdate;
   }
  
   if ($errtxt) {
@@ -1238,7 +1253,7 @@ sub donefnd {
   Centre Financier:   $CF
   Raison de la demande:
   $descr
-  Date début :        $datedeb
+  Date dÃ©but :        $datedeb
   Date fin:           $datefin
   };
   my $subj = qq{Paiement en ligne: demande de fonds};
@@ -1322,16 +1337,16 @@ sub authenticate {
   unless (payonline_tools::IsSuperUser($sciper) or $respunits) {
     my $template = initTempl('default.tmpl');
     $template->param(sErrMsg => qq{Pas de droits pour ce service : le droit <b>payonline</b> est requis.
-    	<br>Plus de détails auprès de votre responsable accréditation.});
+    	<br>Plus de dÃ©tails auprÃ¨s de votre responsable accrÃ©ditation.});
     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
     exit;
   }
-  
+
   my $fonds = payonline_tools::getFonds ($respunits);
   unless (payonline_tools::IsSuperUser($sciper) or scalar (keys %$fonds)) {
     my $template = initTempl('default.tmpl');
     $template->param(sErrMsg => qq{Pas de fonds ouverts disponibles.
-    	<br>Plus de détails auprès de votre accréditeur.});
+    	<br>Plus de dï¿½tails auprï¿½s de votre accrï¿½diteur.});
     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
     exit;
   }
