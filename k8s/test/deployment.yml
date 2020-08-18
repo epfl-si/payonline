@@ -47,6 +47,11 @@ spec:
                 configMapKeyRef:
                   key: SITE_URL
                   name: config
+            - name: E2EM_LINE
+              valueFrom:
+                configMapKeyRef:
+                  key: E2EM_LINE
+                  name: config
           image: >-
             docker-registry.default.svc:5000/payonline-test/payonline:develop
           imagePullPolicy: Always
