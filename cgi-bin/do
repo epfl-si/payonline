@@ -22,20 +22,6 @@ use vars qw(%args $tmpldir $lang $errmsg $crtdate $usessl $messages	);
 
 require 'messages.txt';
 
-# Intercept warns and format for container output/Apache logs
-local $SIG{__WARN__} = sub {
-  my $message = shift;
-  logger('warning', $message);
-};
-
-sub logger {
-  my ($level, $msg) = @_;
-  if (open my $out, '>>', '/dev/stderr') {
-    chomp $msg;
-    print $out "[".scalar localtime."] [$level] [pid $$] $msg\n";
-  }
-}
-
 my $me 		= $ENV {SCRIPT_NAME};
 my $us 		= $ENV {SERVER_NAME};
 my $qs 		= $ENV {QUERY_STRING};
@@ -485,7 +471,6 @@ warn "update failed failed transact $id_trans\n";
 
 			#	- notify 
 			my $dest = 'payonline@epfl.ch,'.$contact_sf ;
-			my $dest = 'payonline@epfl.ch' ;
 				 $dest .= ','.$inst->{mailinst} if $inst->{mailinst};
 				 $dest .= ','.$inst->{contact}  if $inst->{contact};
 				 $dest .= ','.$query->{Email} 	if $query->{Email};
