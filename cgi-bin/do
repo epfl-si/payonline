@@ -186,7 +186,7 @@ warn "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STAT
 			if ($trans->{etat} eq 'payé') {
 				#	- update etat
 				my $sql = qq{update transact set
-				 etat='refuse',
+				 etat='',
 				 paymode=?, 
 				 PaymentID=? 
 				 where id=?};
@@ -214,6 +214,7 @@ warn "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STAT
 				 $dest .= ','.$inst->{mailinst} if $inst->{mailinst};
 				 $dest .= ','.$inst->{contact}  if $inst->{contact};
 				 $dest .= ','.$query->{Email} 	if $query->{Email};
+				 $dest =~ s/,is-academia\@groupes.epfl.ch//;
 				 $dest =~ s/^,//;
 				 $dest =~ s/,$//;
 warn ">> send_mail to : $dest\n";

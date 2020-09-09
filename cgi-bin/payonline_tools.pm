@@ -185,7 +185,12 @@ sub init {
 	}
 
 	$DEBUG  = -f '/opt/dinfo/etc/MASTER' ? 0 : 1;
-	$absdbh = dbconnect ('payonline');
+#	$absdbh = dbconnect ('payonline');
+	$absdbh = new Cadi::CadiDB (
+	  dbname => 'payonline',
+	);
+	die "FATAL payonline DB ACCESS" unless $absdbh;
+	
 	my $accredconf = $DEBUG ? {
 	  accreddbname => 'accred',
 	   dinfodbname => 'dinfo',
@@ -723,11 +728,11 @@ sub makeToken {
   my $ctx = Digest::SHA1->new;
   my $str = "$id_transact:$trans->{id_inst}";
 
-warn ">> salt=$salt, str=$str\n";
+#warn ">> salt=$salt, str=$str\n";
   $ctx->add($str);
   $ctx->add($salt);
   my $token = '{SSHA}'.MIME::Base64::encode($ctx->digest . $salt,'');
-warn ">> token=$token\n";  
+#warn ">> token=$token\n";  
   return qq{$salt:$token};
 }
 
