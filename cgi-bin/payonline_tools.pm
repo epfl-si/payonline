@@ -11,6 +11,7 @@
 #
 #
 
+use lib '/opt/dinfo/lib/perl';
 use lib '/var/www/vhosts/payonline.epfl.ch/private/perl-mods/';
 
 package payonline_tools;
@@ -24,7 +25,6 @@ use MIME::Base64 ;
 use Net::CIDR;
 use Net::CIDR ':all';
 
-use lib '/opt/dinfo/lib/perl';
 use Tequila::Client;
 use Cadi::CadiDB;
 use Cadi::Accreds;
@@ -131,6 +131,9 @@ my @YP_IP_range = (
 	'185.139.244.0/22',
 
 );
+
+#	- maintenance files : $MAINT_DIR/maint_<startdate><enddate>
+my $MAINT_DIR = '/var/www/vhosts/payonline.epfl.ch/private/maintenaces';
 
 $rejectIP = ('128.178.109.243','157.55.39.166');	#	crawlers 
 
@@ -617,10 +620,10 @@ sub getPersonInfos {
 	my ($mail) = $sth->fetchrow;
 
 	my %persdata = (
-    	    sciper 	=> $sciper,
-    	    nom 	=> $nom,
-	    prenom 	=> $prenom,
-	    mail 	=> $mail,
+		sciper => $sciper,
+		nom 	 => $nom,
+		prenom => $prenom,
+		mail 	 => $mail,
 	); 
 	\%persdata;
 }
@@ -736,5 +739,26 @@ sub makeToken {
   return qq{$salt:$token};
 }
 
+#-------------
+sub inMaintenance {
+	#	- POSTFINANCE MAINTENANCE
+	my $crtdate = shift;
+
+	opendir DIR, "$MAINT_DIR" || warn "** ERR read $MAINT_DIR : $!\n";
+	my @maintenances = readdir (DIR);
+	close DIR;
+
+	foreach my $date (@maintenances) {
+		next unless $date;
+		next if $date =~ /^\./;
+		my $startdate = substr ($date, 0, 16);
+		my $enddate   = substr ($date, 16, 16);
+		next if $crtdate lt $startdate || $crtdate gt $enddate;
+warn "maintenance $crtdate : $startdate, $enddate, IN maintenance\n";
+		return qq{$startdate,$enddate};
+	}
+warn "maintenance $crtdate : NO maintenance\n";
+	return 0;	
+}
 
 1;

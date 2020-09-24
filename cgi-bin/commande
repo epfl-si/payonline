@@ -61,6 +61,7 @@ my %errmsgs	= (
 		'Veuillez contacter le support payonline', 	#	- 18
 		'Erreur de paramètre de lang, fr ou en', 	#	- 19
 		'Instance de paiement pas active',
+		'Le service de paiement en ligne est en maintenance de XXX à YYY',
 	      ],
 	en => [
 		'Input error(s)',				# 0
@@ -84,6 +85,7 @@ my %errmsgs	= (
 		'Please contact payonline support', 	#	- 18
 		'Wrong value for parameter lang : fr or en are accepted', 	#	- 19
 		'Payment instance not active',		# 20
+		'Payment service is in maintenance between XXX and YYY',		# 21
 	      ],
 	);
 
@@ -101,11 +103,19 @@ my %errmsgs	= (
      exit;
   }
 
-#  $tmpldir 	=~ s/XX/$lang/;
+	my $maintenance = payonline_tools::inMaintenance ($crtdate);
+  if ($maintenance) {
+  	 my $template = initTempl('maintrans.tmpl');
+     $errmsg .= qq{<p>$errmsgs{en}->[21]</p>} ;
+     my ($startdate, $enddate) = split /,/, $maintenance;
+     $errmsg =~ s/XXX/$startdate/;
+     $errmsg =~ s/YYY/$enddate/;
+     $template->param(sErrMsg => $errmsg);
+     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
+     exit;
+  }
 
   payonline_tools::init ();
-
-#warn "payonline :: init : tmpldir=$tmpldir\n";
   
   maintrans ();
 
