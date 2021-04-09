@@ -9,8 +9,12 @@ for h in ${hosts}; do
     ssh="ssh ${user}@${h}"
     dest="${user}@${h}"
 
-    scp -r cgi-bin/*  ${dest}:${vhost}/cgi-bin/
-    scp -r htdocs/*   ${dest}:${vhost}/htdocs/
+    scp -r cgi-bin/*      ${dest}:${vhost}/cgi-bin/
+    scp -r htdocs/extra   ${dest}:${vhost}/htdocs/
+    scp private/tmpl/*    ${dest}:${vhost}/private/tmpl/
+    scp -r htdocs/payonline.js   ${dest}:${vhost}/htdocs/
+    scp -r htdocs/payonline.css  ${dest}:${vhost}/htdocs/
+
 
     ${ssh} 'sudo apachectl graceful'
 done

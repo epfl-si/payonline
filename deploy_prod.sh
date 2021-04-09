@@ -11,7 +11,8 @@ for h in ${hosts}; do
     ssh="ssh ${user}@${h}"
     scp -r cgi-bin/* ${user}@${h}:${vhost}/cgi-bin/
     scp -r private/perl-mods/* ${user}@${h}:${vhost}/private/perl-mods/
-    scp -r private/tmpl/* ${user}@${h}:${vhost}/private/tmpl/
+    scp private/tmpl/* ${user}@${h}:${vhost}/private/tmpl/
     scp htdocs/payonline.js  ${user}@${h}:${vhost}/htdocs/
     scp htdocs/payonline.css ${user}@${h}:${vhost}/htdocs/
+    scp -r htdocs/extra ${user}@${h}:${vhost}/htdocs/
 done
