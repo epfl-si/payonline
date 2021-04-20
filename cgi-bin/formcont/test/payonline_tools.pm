@@ -25,6 +25,7 @@ use vars qw( $dbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfon
             $su_list $ges_list $SHAsalt $mode $formContent $postURL $redirectURL $URLcgi
             );
 
+use utf8;
 binmode(STDOUT, ":utf8");
 
 my $me 		= $ENV {SCRIPT_NAME};

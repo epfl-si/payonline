@@ -20,6 +20,7 @@ use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits $tmpldir 
 
 require 'messages.txt';
 
+use utf8;
 binmode(STDOUT, ":utf8");
 
 my $me 			= $ENV {SCRIPT_NAME};

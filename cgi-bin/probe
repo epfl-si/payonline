@@ -18,6 +18,7 @@ use CGI;
 use Cadi::CadiDB;
 use Cadi::WSUtils;
 
+use utf8;
 binmode(STDOUT, ":utf8");
 
 my $pi = $ENV {PATH_INFO};
