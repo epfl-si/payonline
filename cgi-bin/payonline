@@ -1292,6 +1292,17 @@ warn "initTempl: $tmpldir$tmplpath";
    return $template;
 }
 
+use Encode;
+
+sub tequila_to_unicode {
+  my ($bytes) = @_;
+  if (utf8::is_utf8($bytes)) {
+    return $bytes;
+  } else {
+    return Encode::decode('UTF-8', $bytes,     Encode::FB_CROAK);
+  }
+}
+
 #------
 sub authenticate {
 
@@ -1312,8 +1323,8 @@ sub authenticate {
   $key 		= $args {key};
   $sciper 	= $tequila->{attrs}->{uniqueid};
   $args{sciper} = $sciper;
-  $nom 		= $tequila->{attrs}->{name};
-  $prenom 	= $tequila->{attrs}->{firstname};
+  $nom 		= tequila_to_unicode($tequila->{attrs}->{name});
+  $prenom 	= tequila_to_unicode($tequila->{attrs}->{firstname});
   $email 	= $tequila->{attrs}->{email};
   
 # impersonate
