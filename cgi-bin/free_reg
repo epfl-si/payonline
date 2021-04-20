@@ -30,7 +30,7 @@ my @languages 	= ('fr','en');
 my $mailresp	= 'ion.cionca@epfl.ch';
 my $masterIP	= '128.178.1.146';
 
-#	- inst id qui contournent les Conditions Générales de payonline
+#	- inst id qui contournent les Conditions GÃ©nÃ©rales de payonline
 my $bypassCondGen = 'y8xou4juffbh586ua1astocwsnmuh1y4,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
 my $noHeaderPage  = 'maintrans-noheader.tmpl';
 my $noHeaderInsts = 'cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
@@ -42,21 +42,21 @@ my %errmsgs	= (
 		'<li>indentificateur de monnaie absent</li>',
 		'<li>total transaction absent</li>',
 		'<li>nom absent</li>',
-		'<li>prénom absent</li>',
+		'<li>prÃ©nom absent</li>',
 		'<li>adresse absente</li>',
 		'<li>code postal absent</li>',
 		'<li>ville absente</li>',
 		'<li>code pays absent</li>',
-		'Veuillez retourner sur la page précédente pour effectuer les corrections nécessaires.',
+		'Veuillez retourner sur la page prÃ©cÃ©dente pour effectuer les corrections nÃ©cessaires.',
 		'<li>total transaction incorrect</li>',
-		'Instance de paiement pas trouvée ou pas active',
-		'Veuillez retourner sur la page précédente et suivre le lien de contact pour plus de détails.',
-		'<li>les seules monnaies acceptées : CHF, EUR, USD</li>',
+		'Instance de paiement pas trouvÃ©e ou pas active',
+		'Veuillez retourner sur la page prÃ©cÃ©dente et suivre le lien de contact pour plus de dÃ©tails.',
+		'<li>les seules monnaies acceptÃ©es : CHF, EUR, USD</li>',
 		' *** Attention : version de test. Ne pas utiliser, svp ! ***',			# 15
-		'Le service <b>payonline@epfl</b> est momentanément indisponible : veuillez rester sur cette page et l\'actualiser dans quelques minutes',			# 16
-		'transaction pas trouvée',	#	- 17
+		'Le service <b>payonline@epfl</b> est momentanÃ©ment indisponible : veuillez rester sur cette page et l\'actualiser dans quelques minutes',			# 16
+		'transaction pas trouvÃ©e',	#	- 17
 		'Veuillez contacter le support payonline', 	#	- 18
-		'Erreur de paramètre de lang, fr ou en', 	#	- 19
+		'Erreur de paramÃ¨tre de lang, fr ou en', 	#	- 19
 	      ],
 	en => [
 		'Input error(s)',				# 0
@@ -132,7 +132,7 @@ my $header = qq{
   	 my $template = initTempl('maintrans.tmpl');
      $errmsg .= qq{<p>$errmsgs{en}->[19]</p>} ;
      $template->param(sErrMsg => $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=UTF-8\n\n", $template->output;
      exit;
   }
 
@@ -161,7 +161,7 @@ warn "-_> maintrans : tmpl_file=$tmpl_file\n";
 
      $errmsg .= qq{<p>$errmsgs{$lang}->[16]</p>} ;
      $template->param(sErrMsg => $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=UTF-8\n\n", $template->output;
      exit;
   }
 
@@ -184,7 +184,7 @@ warn "maintrans : ERR from $ENV{HTTP_REFERER} :: $errmsg\n";
 	 }
 
      $template->param(sErrMsg => $errmsg);
-     print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+     print "Content-Type: text/html; charset=UTF-8\n\n", $template->output;
      exit;
   }
   
@@ -213,7 +213,7 @@ warn "maintrans : ERR from $ENV{HTTP_REFERER} :: $errmsg\n";
 		 $errmsg = qq{<h3>$errmsgs{$lang}->[0]</h3><ul>$errmsg</ul>$errmsgs{$lang}->[10]
 		 };
 		 $template->param(sErrMsg => $errmsg);
-		 print "Content-Type: text/html; charset=iso-8859-1\n\n", $template->output;
+		 print "Content-Type: text/html; charset=UTF-8\n\n", $template->output;
 		 exit;
 	}
 
@@ -242,7 +242,7 @@ Country: $args{Country}
 
 	payonline_tools::send_mail ($dest, $subj, $msg);
 
-	print qq{Content-Type: text/html; charset=iso-8859-1\n\n
+	print qq{Content-Type: text/html; charset=UTF-8\n\n
 $header  
 <body style="padding: 50px;">
 <h2>SDSC-Connect</h2>

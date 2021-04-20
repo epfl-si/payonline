@@ -28,7 +28,7 @@ my %errmsgs	= (
 		'Confirmation de paiement',
 		'Transaction :',
 		'PostFinance ID :',
-		'Méthode de paiement :',
+		'MÃ©thode de paiement :',
 		'Total :',
 		'Au nom de :',
 	      ],
@@ -59,7 +59,7 @@ exit;
 #_________
 sub cert {
 
-  print "Content-Type: text/html; charset=iso-8859-1\n\n";
+  print "Content-Type: text/html; charset=UTF-8\n\n";
 warn "formcont :: done cert: ** CERT from YellowPay **\n";
   my $YPSrv = $ENV{REMOTE_ADDR};
   return unless $YPSrv;
@@ -107,7 +107,7 @@ warn "formcont :: done cert: ... 4 hash=$hash, arghash=$args{SHASIGN}\n";
   	return;
   }
   my $sql = qq{update transact set
-  	 etat='payé',
+  	 etat='payÃ©',
 	 paymode='$args{PM} $args{BRAND}', 
 	 PaymentID='$args{PAYID}' 
 	 where id='$id_trans'};
@@ -126,7 +126,7 @@ Confirmation de paiement
 
 Transaction : $args{orderID}
 PostFinance ID : $args{PAYID}
-Méthode de paiement : $args{PM} $args{BRAND}
+MÃ©thode de paiement : $args{PM} $args{BRAND}
 Total : $args{amount} CHF
 Au nom de : $trans->{name} $trans->{firstname}
 	$trans->{email}

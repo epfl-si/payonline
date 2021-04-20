@@ -18,8 +18,8 @@ use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
 my $labels		= {
 	fr => {
 		total 		 => qq{Montant},
-		select_total => qq{Sélectioner le montant},
-		cond_gen 	 => qq{J'ai lu et approuve les <a href="./docs/CGen_08-2011.pdf" target="_blank"><strong>Conditions générales</strong></a>},
+		select_total => qq{SÃ©lectioner le montant},
+		cond_gen 	 => qq{J'ai lu et approuve les <a href="./docs/CGen_08-2011.pdf" target="_blank"><strong>Conditions gÃ©nÃ©rales</strong></a>},
 		continuer 	 => qq{continuer},
 	},
 	en => {

@@ -19,7 +19,7 @@ $payonline_tools::DEBUG	 = 1;
 
 warn "getPrix..\n";
 
-print qq{Content-Type: text/plain; charset=iso-8859-1
+print qq{Content-Type: text/plain; charset=UTF-8
 Access-Control-Allow-Origin: *\n\n};
 
 my $sql = qq{select montant from prix order by montant + 0};

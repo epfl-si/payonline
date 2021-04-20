@@ -406,12 +406,12 @@ sub getTrans {
 
 #--------
 sub header {
-	print qq{Content-Type: text/html; charset=iso-8859-1
+	print qq{Content-Type: text/html; charset=UTF-8
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8">
     <title>Formation continue UNIL/EPFL</title>
 
 <style type="text/css">
@@ -701,7 +701,7 @@ OnSubmit="
 		 if (document.cmd.condgen.checked) {
 			document.cmd.submit();
 		 } else {
-			alert ('Lire les Conditions Générales et cocher la case pour continuer');
+			alert ('Lire les Conditions GÃ©nÃ©rales et cocher la case pour continuer');
 			return false; 
 		 }
 		 ">
@@ -712,7 +712,7 @@ OnSubmit="
       <td width="70%"><input name="LastName" type="text" id="lastname" size="48" /></td>
     </tr>
     <tr>
-      <td><div align="right"><strong>Prénom</strong></div></td>
+      <td><div align="right"><strong>PrÃ©nom</strong></div></td>
       <td><input name="FirstName" type="text" id="firstname" size="48" /></td>
     </tr>
     <tr>
@@ -739,11 +739,11 @@ OnSubmit="
 
 <table width="100%" border="0" cellpadding="5">
   <tr>
-    <td width="30%"><div align="right"><strong>Numéro de participant</strong></div></td>
+    <td width="30%"><div align="right"><strong>NumÃ©ro de participant</strong></div></td>
     <td width="70%"><input name="nopernum" type="text" id="nopernum" value="NUM_PART"/></td>
   </tr>
   <tr>
-    <td><div align="right"><strong>Numéro de facture</strong></div></td>
+    <td><div align="right"><strong>NumÃ©ro de facture</strong></div></td>
     <td><input name="nofacture" type="text" id="nofacture"  value="NUM_FACTURE"/></td>
   </tr>
 

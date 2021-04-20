@@ -347,7 +347,7 @@ sub dbconnect {
   }
 #warn "payonline_tools :: dbconnect : $dbname, $dbhost\n";
   my $dbh = Mysql->connect ($dbhost, $dbname, $dbuser, $dbuser.$dbpwd);
-#  send_mail ('', 'payonline :: dbconnect : ERROR ', "connexion à la base de données $dbname\@$dbhost") unless $dbh;
+#  send_mail ('', 'payonline :: dbconnect : ERROR ', "connexion Ã  la base de donnÃ©es $dbname\@$dbhost") unless $dbh;
   return $dbh;
 }
 #--------
@@ -382,12 +382,12 @@ sub getTrans {
 }
 
 sub header {
-	print qq{Content-Type: text/html; charset=iso-8859-1
+	print qq{Content-Type: text/html; charset=UTF-8
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8">
     <title>Formation continue UNIL/EPFL</title>
 
 <style type="text/css">

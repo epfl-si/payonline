@@ -18,7 +18,7 @@ function showHelp (helpURL)
 function confirmDelete(lang, delUrl) {
  var txt;
  if (lang == 'fr') {
-   txt = 'Souhaitez-vous réellement supprimer cette instance et toutes les données associées?';
+   txt = 'Souhaitez-vous rÃ©ellement supprimer cette instance et toutes les donnÃ©es associÃ©es?';
  } else {
   txt = 'Are sure you want to delete this instance and all it\'s associated data?';
  }

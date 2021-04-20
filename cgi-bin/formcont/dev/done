@@ -32,14 +32,14 @@ $lang 		= $args{lang} ? $args{lang} : 'en' ;
 
 my %msgs	= (
 	fr => [
-		'Paiement en ligne échoué',
-		'Paiement en ligne effectué',
+		'Paiement en ligne Ã©chouÃ©',
+		'Paiement en ligne effectuÃ©',
 		'Paiement en ligne en attente',
-		'Vous allez recevoir une confirmation à l\'adresse mail saisie sur le formulaire',
+		'Vous allez recevoir une confirmation Ã  l\'adresse mail saisie sur le formulaire',
 		'Nom',
 		'Montant',
-		'Payé par',
-		'Veuillez contacter directement le support de Postfinance à l\'adresse : shopperhelp\@postfinance.ch avec les détails de votre transaction',
+		'PayÃ© par',
+		'Veuillez contacter directement le support de Postfinance Ã  l\'adresse : shopperhelp\@postfinance.ch avec les dÃ©tails de votre transaction',
 	],
 	en => [
 		'On line payment failed',

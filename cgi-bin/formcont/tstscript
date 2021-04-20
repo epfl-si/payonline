@@ -35,31 +35,31 @@ my @statlist	= ('test','prod');
 my %errmsgs	= (
 	fr => [
 		'Erreur(s) de saisie',
-		'Veuillez retourner sur la page précédente pour effectuer les corrections nécessaires.',
-		'pas trouvée ou inactive',
-		'<li>Date début absent ou erronée</li>',
+		'Veuillez retourner sur la page prÃ©cÃ©dente pour effectuer les corrections nÃ©cessaires.',
+		'pas trouvÃ©e ou inactive',
+		'<li>Date dÃ©but absent ou erronÃ©e</li>',
 		'<li>Description absente</li>',
 		'<li>Fonds absent</li>',
 		'<li>Centre financier absent</li>',
-		'<li>Date fin absente ou erronée</li>',
-		'<li>La date de fin doit être après la date début</li>',
-		'<li>Compte budgétaire absent</li>',
+		'<li>Date fin absente ou erronÃ©e</li>',
+		'<li>La date de fin doit Ãªtre aprÃ¨s la date dÃ©but</li>',
+		'<li>Compte budgÃ©taire absent</li>',
 		'<li>Date fin obligatoire</li>',
-		'<li>Opération inconnue</li>',
-		'Transactions payées',
-		'Transactions non payées',
+		'<li>OpÃ©ration inconnue</li>',
+		'Transactions payÃ©es',
+		'Transactions non payÃ©es',
 	      ],
 	en => [
 		'Input error(s)',												# 0
 		'Please return on the previous page and correct the input',		# 1
-		'pas trouvée ou inactive',										# 2
+		'pas trouvÃ©e ou inactive',										# 2
 		'<li>Start date missing or wrong format</li>',					# 3
 		'<li>Description missing</li>',									# 4
 		'<li>Fund missing</li>',										# 5
 		'<li>Financial center missing</li>',							# 6
 		'<li>End date missing or wrong format</li>',					# 7
 		'<li>End date must be after Start date</li>',					# 8
-		'<li>Compte budgétaire missing</li>',							# 9
+		'<li>Compte budgÃ©taire missing</li>',							# 9
 		'<li>End date is compulsory</li>',								# 10
 		'<li>Unknown operation</li>',									# 11
 		'Transactions payed',									# 12
@@ -70,7 +70,7 @@ my %nat_comptable = (
 		fr => {
 			'', '---choisir---',
 			'740055', '740055 : Vente, Formation continue',
-			'740060', '740060 : Congrès, Séminaires, Conférences',
+			'740060', '740060 : CongrÃ¨s, SÃ©minaires, ConfÃ©rences',
 			'710100', '710100 : Candidatures bachelor et master',
 			'710130', '710130 : Amendes bachelor et master',
 			'710140', '710140 : Taxes certifications conformes',
@@ -87,7 +87,7 @@ my %nat_comptable = (
 			},
 			);
 			
-print "Content-Type: text/html; charset=iso-8859-1\n\n";
+print "Content-Type: text/html; charset=UTF-8\n\n";
 
 %args		= payonline_tools::loadargs ();
 warn "==== payonline :: tstscript ====";

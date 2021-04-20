@@ -30,22 +30,22 @@ my %errmsgs	= (
 		'<li>indentificateur de monnaie absent</li>',
 		'<li>montant formation absente</li>',
 		'<li>nom absent</li>',
-		'<li>prénom absent</li>',
+		'<li>prÃ©nom absent</li>',
 		'<li>adresse absente</li>',
 		'<li>code postal absent</li>',
 		'<li>ville absente</li>',
 		'<li>code pays absent</li>',
-		'Veuillez retourner sur la page précédente pour effectuer les corrections nécessaires.',
+		'Veuillez retourner sur la page prÃ©cÃ©dente pour effectuer les corrections nÃ©cessaires.',
 		'<li>total transaction incorrect</li>',
-		'Instance de paiement pas trouvée ou pas active',
-		'Veuillez retourner sur la page précédente et suivre le lien de contact pour plus de détails.',
-		'<li>les seules monnaies acceptées : CHF, EUR, USD</li>',
+		'Instance de paiement pas trouvÃ©e ou pas active',
+		'Veuillez retourner sur la page prÃ©cÃ©dente et suivre le lien de contact pour plus de dÃ©tails.',
+		'<li>les seules monnaies acceptÃ©es : CHF, EUR, USD</li>',
 		' *** Attention : version de test. Ne pas utiliser, svp ! ***',			# 15
-		'Le service <b>payonline@epfl</b> est momentanément indisponible : veuillez rester sur cette page et l\'actualiser dans quelques minutes',			# 16
+		'Le service <b>payonline@epfl</b> est momentanÃ©ment indisponible : veuillez rester sur cette page et l\'actualiser dans quelques minutes',			# 16
 
-		'<li>numéreo pernum absent</li>',
-		'<li>numéro de facture absent</li>',
-		'<li>numéro du cours absent</li>',
+		'<li>numÃ©reo pernum absent</li>',
+		'<li>numÃ©ro de facture absent</li>',
+		'<li>numÃ©ro du cours absent</li>',
 		'<li>email absent</li>',
 		'<li>syntaxe email incorrecte</li>',
 	      ],
@@ -126,7 +126,7 @@ sub main {
   
   payonline_tools::setYellowPaySrv();
 
-  my $ParamTotal = $UserTotal * 100;	# 		- pas de décimales
+  my $ParamTotal = $UserTotal * 100;	# 		- pas de dÃ©cimales
   my $currency  = 'CHF';
   my $userdata = {
   	name 	  => $args{LastName},
@@ -181,9 +181,9 @@ foreach my $item (keys %args) {
   if ($lang eq 'fr') {
   	print qq{
 		   <h2>Paiement en-ligne</h2>
-			   <p> Les informations vous concernant sont enregistrées.</p>
+			   <p> Les informations vous concernant sont enregistrÃ©es.</p>
 			   <p>Pour conclure le paiement du montant de <b>$UserTotal&nbsp;CHF</b>, veuillez cliquer sur le bouton <b>Effectuer le paiement</b> pour acc&eacute;d&eacute;r au service
-			   de paiement en ligne de PostFinance et finaliser l'opération
+			   de paiement en ligne de PostFinance et finaliser l'opÃ©ration
 
 			   <br><p>Les moyens de paiement disponibles sont :</p>
 			   <ul>
@@ -199,8 +199,8 @@ foreach my $item (keys %args) {
 			    
 			   <b>Attention : </b>
 			   <li>vous allez quitter le site de la Formation continue UNIL/EPFL pour celui de Postfinance
-			   <li>pour garantir le processus de paiement en ligne, vous devez suivre chaque étape comme indiqué, sans jamais fermer les fenêtres du navigateur
-			   <li>la saisie de données qui suit a lieu au travers d'une connexion sécurisée qui encrypte les informations transmises ; vous pouvez cliquer sur le cadenas affiché par le navigateur pour vérifier le certificat de sécurité de Postfinance
+			   <li>pour garantir le processus de paiement en ligne, vous devez suivre chaque Ã©tape comme indiquÃ©, sans jamais fermer les fenÃªtres du navigateur
+			   <li>la saisie de donnÃ©es qui suit a lieu au travers d'une connexion sÃ©curisÃ©e qui encrypte les informations transmises ; vous pouvez cliquer sur le cadenas affichÃ© par le navigateur pour vÃ©rifier le certificat de sÃ©curitÃ© de Postfinance
 
 		</form>
 	};
@@ -239,7 +239,7 @@ sub error {
 	return unless $txt;
 	
 	my $errtxt1 = qq{erreur};
-	my $errtxt2 = qq{Veuillez effectuer les corrections nécessaires sur la page précédente};
+	my $errtxt2 = qq{Veuillez effectuer les corrections nÃ©cessaires sur la page prÃ©cÃ©dente};
 	if ($lang eq 'en') {
 		$errtxt1 = qq{error};
 		$errtxt2 = qq{Back on the previous page and fix these errors};

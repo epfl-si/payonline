@@ -1,8 +1,8 @@
 $messages = {
 		default_label => {
-			fr	=> qq{<p>payonline@epfl.ch met à votre disposition un canal d'encaissement électronique pour vos manifestations, conférences, vente de services, etc.<br>
-	L'accès à ce service est soumis au droit <b>payonline</b> du système d'accréditation. <br>
-	Veuillez contacter votre responsable accréditation pour plus de détails.</p>
+			fr	=> qq{<p>payonline@epfl.ch met Ã  votre disposition un canal d'encaissement Ã©lectronique pour vos manifestations, confÃ©rences, vente de services, etc.<br>
+	L'accÃ¨s Ã  ce service est soumis au droit <b>payonline</b> du systÃ¨me d'accrÃ©ditation. <br>
+	Veuillez contacter votre responsable accrÃ©ditation pour plus de dÃ©tails.</p>
 							},
 			en	=> qq{<p>	Manage your online payment instances for conferences, meetings, etc. 
 	<p>You must have the <b>payonline</b> right or the <b>respadmin</b> role to access the application. 
@@ -21,7 +21,7 @@ $messages = {
 				<li>cr&eacute;er une <strong>instance
 				de paiement</strong> </li>
 				<li>cr&eacute;er le<strong> formulaire
-				d'enregistrement</strong> et le site de la conférence </li>
+				d'enregistrement</strong> et le site de la confÃ©rence </li>
 				<li><strong>tester</strong> les
 				paiements </li>
 				<li><strong>valider</strong> l'instance
@@ -66,9 +66,9 @@ $messages = {
 		},
 		new_note_label => {
 			fr => qq{
-				Une instance de paiement correspond à une manifestation pour laquelle vous désirez
-				pouvoir effectuer des encaissements en ligne. L'instance peut être créée seulement 
-				si vous disposez d'un fonds dédié. Sinon, veuillez contacter le Service Financier.
+				Une instance de paiement correspond Ã  une manifestation pour laquelle vous dÃ©sirez
+				pouvoir effectuer des encaissements en ligne. L'instance peut Ãªtre crÃ©Ã©e seulement 
+				si vous disposez d'un fonds dÃ©diÃ©. Sinon, veuillez contacter le Service Financier.
 				<p>Les champs en <b>gras</b> sont obligatoires.</p>},
 			en => qq{
 				A payment instance corresponds to an event or conference for which you wish to organise
@@ -81,19 +81,19 @@ $messages = {
 			en => qq{Fund},
 		},
 		descr_note_label => {
-			fr => qq{(Vous êtes priés de préciser les dates de la manifestation)},
+			fr => qq{(Vous Ãªtes priÃ©s de prÃ©ciser les dates de la manifestation)},
 			en => qq{(Please provide the dates of the event)},
 		},
 		compte_label => {
-			fr => qq{Compte budgétaire},
+			fr => qq{Compte budgÃ©taire},
 			en => qq{Budgetary Account},
 		},
 		date_deb_label => {
-			fr => qq{D&eacute;but validité instance},
+			fr => qq{D&eacute;but validitÃ© instance},
 			en => qq{Instance Start Date},
 		},
 		date_fin_label => {
-			fr => qq{Fin validité instance},
+			fr => qq{Fin validitÃ© instance},
 			en => qq{Instance End Date},
 		},
 		cur_label => {
@@ -105,7 +105,7 @@ $messages = {
 			en => qq{(contact mail if not the manager's address)},
 		},
 		url_ret_label => {
-			fr => qq{(veuillez consulter l'aide en ligne pour plus de détails à ce sujet)},
+			fr => qq{(veuillez consulter l'aide en ligne pour plus de dÃ©tails Ã  ce sujet)},
 			en => qq{(please check the on line help for more details)},
 		},
 		confirm_mail_label => {
@@ -113,7 +113,7 @@ $messages = {
 			en => qq{Confirmation Mail for Valid transactions},
 		},
 		confirm_mail_note_label => {
-			fr => qq{(si présent, déclanche un message de confirmation pour les transactions réussies)},
+			fr => qq{(si prÃ©sent, dÃ©clanche un message de confirmation pour les transactions rÃ©ussies)},
 			en => qq{(if present, valid transactions will trigger a confirmation mail)},
 		},
 		actions_save_label => {
@@ -141,11 +141,11 @@ $messages = {
 			en => qq{enable},
 		},		
 		actions_disable_label => {
-			fr => qq{désactiver},
+			fr => qq{dÃ©sactiver},
 			en => qq{disable},
 		},		
 		inst_det_label => {
-			fr => qq{Détails de l'instance},
+			fr => qq{DÃ©tails de l'instance},
 			en => qq{Instance details},
 		},
 		inst_id_label => {
@@ -170,7 +170,7 @@ $messages = {
 		},
 
 		name_label => {
-			fr => qq{Nom Prénom},
+			fr => qq{Nom PrÃ©nom},
 			en => qq{Name Firstname},
 		},
 		addr1_label => {
@@ -182,11 +182,11 @@ $messages = {
 			en => qq{ZIP, City, Country},
 		},
 		payed_by_label => {
-			fr => qq{Payé par},
+			fr => qq{PayÃ© par},
 			en => qq{Payed by},
 		},
 		phone_label => {
-			fr => qq{Tél.},
+			fr => qq{TÃ©l.},
 			en => qq{Phone},
 		},
 		amount_label => {

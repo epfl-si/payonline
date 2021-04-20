@@ -37,10 +37,10 @@ my %errmsgs	= (
 		'Confirmation de paiement',
 		'Transaction :',
 		'PostFinance ID :',
-		'MÈthode de paiement :',
+		'M√©thode de paiement :',
 		'Total :',
 		'Au nom de :',
-		'Paiement refusÈ',
+		'Paiement refus√©',
 		'Changement de statut de la transaction',
 	      ],
 	en => [
@@ -174,7 +174,7 @@ warn "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: CANCEL\n";
   }
 
 	#	- offline transactions
-	$args{offline} = 1 if $trans->{etat} eq 'payÈ';
+	$args{offline} = 1 if $trans->{etat} eq 'pay√©';
   if ($args{offline}) {
 warn "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STATUS}\n";
 		#	- notify payonline
@@ -183,7 +183,7 @@ warn "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STAT
 
 		if ($args{STATUS} eq '93') {
 		#	- TRANSACTION REFUSED
-			if ($trans->{etat} eq 'payÈ') {
+			if ($trans->{etat} eq 'pay√©') {
 				#	- update etat
 				my $sql = qq{update transact set
 				 etat='',
@@ -227,7 +227,7 @@ warn ">> send_mail to : $dest\n";
 		return;
   }
 
-  if ($trans->{etat} eq 'payÈ') {
+  if ($trans->{etat} eq 'pay√©') {
   	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction already payed: status=$args{STATUS}\n";
 		my $msg = qq{error :: id_trans=$id_trans :: transaction already payed, status=$args{STATUS}	};
 		if ($args{STATUS} eq '2') {
@@ -249,7 +249,7 @@ warn ">> send_mail to : $dest\n";
   }
 
   my $sql = qq{update transact set
-  	 etat='payÈ',
+  	 etat='pay√©',
 	 datecr=Now(),
 	 paymode=?, 
 	 PaymentID=? 
@@ -291,13 +291,13 @@ warn " ==>> payonline cert: : query Email=$query->{Email}\n";
 			$msg = qq{
 Madame, Monsieur,
  
-Par la prÈsente, nous vous confirmons la rÈception de votre donation de $query->{Total} $query->{Currency} pour le $query->{purpose} faite le $date.  Nous vous en sommes trËs reconnaissants.
+Par la pr√©sente, nous vous confirmons la r√©ception de votre donation de $query->{Total} $query->{Currency} pour le $query->{purpose} faite le $date.  Nous vous en sommes tr√®s reconnaissants.
  
-L'Ecole Polytechnique FÈdÈrale de Lausanne (ci-aprËs EPFL) est un Ètablissement de droit public dotÈ de la personnalitÈ juridique.  Notre Ètablissement est considÈrÈ d'utilitÈ publique, exemptÈ des impÙts fÈdÈraux, cantonaux, et communaux.
+L'Ecole Polytechnique F√©d√©rale de Lausanne (ci-apr√®s EPFL) est un √©tablissement de droit public dot√© de la personnalit√© juridique.  Notre √©tablissement est consid√©r√© d'utilit√© publique, exempt√© des imp√¥ts f√©d√©raux, cantonaux, et communaux.
  
-Les donations faites ‡ l'EPFL peuvent Ítre dÈduites fiscalement selon les normes cantonales et fÈdÈrales en vigueur. L'EPFL vous enverra une attestation ‡ cet effet dans les meilleurs dÈlais.
+Les donations faites √† l'EPFL peuvent √™tre d√©duites fiscalement selon les normes cantonales et f√©d√©rales en vigueur. L'EPFL vous enverra une attestation √† cet effet dans les meilleurs d√©lais.
  
-En vous remerciant ‡ nouveau de votre soutien, nous vous envoyons nos sincËres salutations,
+En vous remerciant √† nouveau de votre soutien, nous vous envoyons nos sinc√®res salutations,
  
 Nathalie Fontana
 Directrice de la Philanthropie
@@ -381,7 +381,7 @@ warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
 	  exit;
   }
   
-  $resultcode 	= '' if $trans->{etat} ne 'payÈ';
+  $resultcode 	= '' if $trans->{etat} ne 'pay√©';
   my $resp  		= payonline_tools::getPersonInfos ($inst->{sciper});
   my $query			= payonline_tools::getQuery ($id_trans);
   my $email 		= $query->{Email};
@@ -445,8 +445,8 @@ warn "==> result : urlconf=$urlconf\n";
 warn "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultcode\n";
 
 # 
-#   if ($trans->{etat} ne 'payÈ' or $resultcode ne '1') {
-#     $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{Èchec paiement};
+#   if ($trans->{etat} ne 'pay√©' or $resultcode ne '1') {
+#     $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{√©chec paiement};
 #     postResult ($id_trans, 0, );
 #     $template->param(sErrMsg 		=> $errmsg);
 #     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
@@ -454,7 +454,7 @@ warn "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultco
 #   }
 
   unless ( $resultcode ) {
-		if ($trans->{etat} eq 'payÈ') {
+		if ($trans->{etat} eq 'pay√©') {
 			#	- update transaction to failed
 			my $sql = qq{update transact set etat='' where id=?};
 			my $sth = payonline_tools::dbquery ($sql, $id_trans);
@@ -484,7 +484,7 @@ warn ">> send_mail to : $dest\n";
 
     postResult ($id_trans, 0, );
 
-    $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{Èchec paiement};
+    $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{√©chec paiement};
     $template->param(sErrMsg 		=> $errmsg);
     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
     exit;
@@ -534,7 +534,7 @@ sub postResult {
 	my $id_inst	  = $trans->{id_inst};
 	return unless $id_inst;
 	warn "payonline :: do :postResult 3 result:$result\n";  
-#	$result	  = $trans->{etat} eq 'payÈ' ? 1 : 0;
+#	$result	  = $trans->{etat} eq 'pay√©' ? 1 : 0;
 	warn "payonline :: do :postResult 4 result:$result\n";  
 	my $sql = qq{select url from instances where id=?};
 	my $sth = payonline_tools::dbquery ($sql, ($id_inst));
