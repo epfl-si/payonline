@@ -28,6 +28,7 @@ use Net::CIDR ':all';
 use Tequila::Client;
 use Cadi::CadiDB;
 use Cadi::Accreds;
+use Encode;
 
 use strict;
 use vars qw( $absdbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfond $codeTVA
@@ -541,6 +542,7 @@ sub getFonds {
     $sql = qq{select no_fond,libelle from dinfo.fonds where cf = ? and etat='O'};
     my $sth = $db_dinfo->query ( $sql, ("F$cf"));
     while (my ($no_fond,$libelle) = $sth->fetchrow_array ()) {
+      $libelle = decode_latin1_double_encoded($libelle);
       push (@fonds, "$no_fond:$libelle");
     }
     $fondsperCF->{$cf} = \@fonds;
@@ -548,6 +550,12 @@ sub getFonds {
   return $fondsperCF;
 }
 #=============
+
+sub decode_latin1_double_encoded {
+  my ($double_encoded) = @_;
+  my $bytes = Encode::encode("latin1", $double_encoded);
+  return  Encode::decode("utf-8", $double_encoded);
+}
 
 #___________
 sub dbconnect {
