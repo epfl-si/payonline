@@ -101,8 +101,7 @@ RUN mkdir -p /etc/apache2/conf.d && \
 COPY ./conf/docker/apache2.conf /etc/apache2/apache2.conf
 COPY ./conf/docker/ports.conf /etc/apache2/ports.conf
 COPY ./conf/docker/25-payonline.epfl.ch.conf /etc/apache2/sites-available/25-payonline.epfl.ch.conf
-COPY ./conf/docker/dinfo-perl.conf ./conf/docker/perl.conf \
-     /etc/apache2/conf.d/
+COPY ./conf/docker/perl.conf /etc/apache2/conf.d/
 
 RUN echo "umask 0002" >> /etc/apache2/envvars && \
     a2enmod ssl  && \
