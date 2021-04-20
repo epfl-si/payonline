@@ -5,19 +5,18 @@ LABEL maintainer "olivier.delobre@epfl.ch"
 # System packages
 ################################################################################
 RUN apt-get update && apt-get install -y \
-        apache2=2.4.38-3+deb10u3 \
-        libaio1=0.3.112-3 \
-        libapache2-mod-perl2=2.0.10-3 \
-        default-libmysqlclient-dev=1.0.5 \
-        locales=2.28-10 \
-        default-mysql-client=1.0.5 \
-        gettext-base=0.19.8.1-9 \
-        openssl=1.1.1d-0+deb10u3 \
-        cpanminus=1.7044-1 \
-        make=4.2.1-1.2 \
-        libdbi-perl=1.642-1+b1 \
-        gcc=4:8.3.0-1 \
-        unzip=6.0-23+deb10u1 \
+        apache2 \
+        libaio1 \
+        default-libmysqlclient-dev \
+        locales \
+        default-mysql-client \
+        gettext-base \
+        openssl \
+        cpanminus \
+        make \
+        libdbi-perl \
+        gcc \
+        unzip \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 ################################################################################
