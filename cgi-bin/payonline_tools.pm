@@ -577,8 +577,7 @@ sub dbconnect {
 
 #warn "dbconnect : $dsndb\n";
 
-	my $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd);
-	$dbh->{'mysql_enable_utf8'} = 1;
+	my $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd, {mysql_enable_utf8 => 1});
 
 	die "dbconnect : ERR DBI CONNECT : $dbhost, $dbname, $dbuser" unless $dbh;
 	

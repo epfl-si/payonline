@@ -359,8 +359,7 @@ sub dbconnect {
   die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
   my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306}; 
 warn "dbconnect : $dsndb";
-  $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd);
-  $dbh->{'mysql_enable_utf8'} = 1;
+  $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd, {mysql_enable_utf8 => 1});
 die "dbconnect : ERR DBI CONNECT : $dbhost, $dbname, $dbuser" unless $dbh;
 
 }
