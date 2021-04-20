@@ -59,7 +59,7 @@ RUN mkdir -p /opt/oracle && \
     mkdir -p /home/dinfo
 
 COPY cpanfile cpanfile
-RUN cpanm --installdeps --notest . || cat /root/.cpanm/work/*/build.log
+RUN cpanm --installdeps --notest . || ( cat /root/.cpanm/work/*/build.log; exit 1 )
 
 # Tequila config files
 COPY ./conf/docker/dbs.conf /home/dinfo
