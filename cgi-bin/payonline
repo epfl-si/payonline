@@ -368,11 +368,11 @@ sub dettrans {
 	 'etat',        $result->{etat} ,    
      'paymode', 	$result->{paymode},
 	 'PaymentID',	$result->{PaymentID},
-	 'LastName', 	payonline_tools::utf8tolatin1($queryArgs->{LastName}),
-	 'FirstName',	payonline_tools::utf8tolatin1($queryArgs->{FirstName}),
-	 'Addr', 		payonline_tools::utf8tolatin1($queryArgs->{Addr}),
+	 'LastName', 	$queryArgs->{LastName},
+	 'FirstName',	$queryArgs->{FirstName},
+	 'Addr', 		$queryArgs->{Addr},
 	 'ZipCode', 	$queryArgs->{ZipCode},
-	 'City', 		payonline_tools::utf8tolatin1($queryArgs->{City}),
+	 'City', 		$queryArgs->{City},
 	 'Country', 	$queryArgs->{Country},
 	 'Email', 		$queryArgs->{Email} ,
 	 'Phone', 		$queryArgs->{Phone} ,
@@ -432,11 +432,11 @@ sub listtrans {
     	'etat', 	$result->{etat},
     	'paymode', 	$result->{paymode},
     	'PaymentID', 	$result->{PaymentID},
-    	'LastName', 	payonline_tools::utf8tolatin1($queryArgs->{LastName}),
-    	'FirstName', 	payonline_tools::utf8tolatin1($queryArgs->{FirstName}),
-    	'Addr', 	payonline_tools::utf8tolatin1($queryArgs->{Addr}),
+    	'LastName', 	$queryArgs->{LastName},
+    	'FirstName', 	$queryArgs->{FirstName},
+    	'Addr', 	$queryArgs->{Addr},
     	'ZipCode', 	$queryArgs->{ZipCode},
-    	'City', 	payonline_tools::utf8tolatin1($queryArgs->{City}),
+    	'City', 	$queryArgs->{City},
     	'Country', 	$queryArgs->{Country},
     	'Email', 	$queryArgs->{Email} ? $queryArgs->{Email} : '&nbsp;',
     	'Phone', 	$queryArgs->{Phone} ? $queryArgs->{Phone} : '&nbsp;',
@@ -533,7 +533,7 @@ sub extrans {
     	'PaymentID',$result->{PaymentID},
     );
     foreach my $param (keys %$queryArgs) {
-    	$item{$param} = payonline_tools::utf8tolatin1($queryArgs->{$param});
+    	$item{$param} = $queryArgs->{$param};
 	push (@params, $param);
     }
     push(@inst, \%item);
@@ -1339,20 +1339,13 @@ sub authenticate {
 
 #warn "payonline :: respunits=$respunits";
   my ($n1, $n2) = split(/,/, $nom)    if ($nom =~ /,/);
-  $nom = utf8tolatin1($n1) if $n2;
+  $nom = $n1 if $n2;
   my ($n1, $n2) = split(/,/, $prenom) if ($prenom =~ /,/);
-  $prenom = utf8tolatin1($n1) if $n2;
+  $prenom = $n1 if $n2;
 
 }
 
 #--------
-sub utf8tolatin1 {
-    my $string = shift;
-    $string =~ s/([\xC0-\xDF])([\x80-\xBF])/chr(ord($1)<<6&0xC0|ord($2)&0x3F)/eg;
-    return $string;
-}
-
-#------
 sub quit {
   if ($tequila) {
     $tequila->killsession ();

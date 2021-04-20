@@ -52,12 +52,6 @@ $YPServersIP	= '194.41.152.138,194.41.152.139,194.41.216.138,194.41.216.139,212.
 $su_list	= '104782';	# - ic,
 
 #--------
-sub utf8tolatin1 {
-    my $string = shift;
-    $string =~ s/([\xC0-\xDF])([\x80-\xBF])/chr(ord($1)<<6&0xC0|ord($2)&0x3F)/eg;
-    return $string;
-}
-#--------
 sub uniq {
   my (@myarr) = @_;
   my %count;

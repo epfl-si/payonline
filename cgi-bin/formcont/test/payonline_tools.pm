@@ -68,12 +68,6 @@ warn "formcont :: DEBUG=$DEBUG\n";
 }
 
 #--------
-sub utf8tolatin1 {
-    my $string = shift;
-    $string =~ s/([\xC0-\xDF])([\x80-\xBF])/chr(ord($1)<<6&0xC0|ord($2)&0x3F)/eg;
-    return $string;
-}
-#--------
 sub uniq {
   my (@myarr) = @_;
   my %count;
