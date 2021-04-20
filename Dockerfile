@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
         cpanminus \
         make \
         libdbi-perl \
+        libnet-ssleay-perl \
         gcc \
         unzip \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
