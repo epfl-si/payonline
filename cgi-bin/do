@@ -503,6 +503,7 @@ warn "initTempl: $tmpldir$tmplpath\n";
    my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
 	   strict => 0,
 	   cache => 1,
+           utf8 => 1,
 	   die_on_bad_params => 0) or die "err : $!";
 
    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
