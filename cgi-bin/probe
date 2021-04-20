@@ -18,6 +18,8 @@ use CGI;
 use Cadi::CadiDB;
 use Cadi::WSUtils;
 
+binmode(STDOUT, ":utf8");
+
 my $pi = $ENV {PATH_INFO};
 
 my $config_items = {

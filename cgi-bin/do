@@ -20,6 +20,8 @@ use payonline_tools;
 
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $usessl $messages	);
 
+binmode(STDOUT, ":utf8");
+
 require 'messages.txt';
 
 my $me 		= $ENV {SCRIPT_NAME};

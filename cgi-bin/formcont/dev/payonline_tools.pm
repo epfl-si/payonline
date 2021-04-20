@@ -24,6 +24,8 @@ use vars qw( %dbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfon
             $su_list $ges_list $SHAsalt $mode
             );
 
+binmode(STDOUT, ":utf8");
+
 my $me 		= $ENV {SCRIPT_NAME};
 my $us 		= $ENV {SERVER_NAME};
 my $qs 		= $ENV {QUERY_STRING};

@@ -15,6 +15,8 @@ use payonline_tools;
 
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
 
+binmode(STDOUT, ":utf8");
+
 my $labels		= {
 	fr => {
 		total 		 => qq{Montant},
