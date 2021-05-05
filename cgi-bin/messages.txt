@@ -220,7 +220,23 @@ $messages = {
 			en => q{Customer},
 		},
 
+		bypass_cg_label => {
+			fr => qq{Ignorer la validation des Conditions générales payonline},
+			en => qq{Bypass payonline General Conditions check},
+		},
+		bypass_return_label => {
+			fr => qq{Retour direct sur le site de la manifestation},
+			en => qq{Return to the customer web site},
+		},
 
+		bypass_cg_txt_label => {
+			fr => qq{page de CG payonline ignorée si le site de la manifestation gère la confirmation de Conditions Générales},
+			en => qq{bypass payonline General Conditions check page if the Manifestation web site manages the GC},
+		},
 
+		bypass_txt_label => {
+			fr => qq{Pour activer les options ci-dessous, veuillez contacter le support payonline (1234\@epfl.ch)},
+			en => qq{Contact payonline support (1234\@epfl.ch) to activate the following options},
+		},
 
 };
