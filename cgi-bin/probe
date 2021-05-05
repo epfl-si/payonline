@@ -36,7 +36,7 @@ foreach my $item (@params) {
 } 
 
 my $probe ;
-$probe->{status} = 'ok';
+   $probe->{status} = 'ok';
 	
 if ( $pi =~ /usage/ ) {
 	my $return = {  
@@ -48,83 +48,85 @@ if ( $pi =~ /usage/ ) {
 	exit;
 }	
 
-my $metrics;
-my $line = $DEBUG ? 'test' : 'prod';
-$line = $ENV {E2EM_LINE} if $ENV {E2EM_LINE};
+	my $metrics;
+	my $line = $DEBUG ? 'test' : 'prod';
 
-foreach my $key ( keys %$config_items ) {
-	my $item = $config_items->{$key};
-	next unless $item->{active};
+	foreach my $key ( keys %$config_items ) {
+		my $item = $config_items->{$key};
+		next unless $item->{active};
 
-	$probe->{items}->{$key}->{status} = 'ko';
+		$probe->{items}->{$key}->{status} = 'ko';
 
-	if ( $key eq 'payonline' ) {
-		my $dbh = new Cadi::CadiDB (
-			dbname => 'payonline',
-			 trace => 1,
-		) ;
+		if ( $key eq 'payonline' ) {
+			my $dbh = new Cadi::CadiDB (
+				dbname => 'payonline',
+				 trace => 1,
+			) ;
+		
+			if ( $dbh ) {
+				my $sql = qq{SELECT sciper FROM payonline.instances LIMIT 0, 1};
+				my $sth = $dbh->prepare( $sql) ;
 
-		if ( $dbh ) {
-			my $sql = qq{SELECT sciper FROM payonline.instances LIMIT 0, 1};
-			my $sth = $dbh->prepare( $sql) ;
-
-			if ($sth) {
-				$sth->execute () ;
-				my $sciper = $sth->fetchrow;
-				if ( $sciper ne '' ) {
-					$probe->{items}->{$key}->{status} = 'ok';
-				} else {
-					$probe->{items}->{$key}->{status} = 'ko';
+				if ($sth) {
+					$sth->execute () ;
+					my $sciper = $sth->fetchrow;
+					if ( $sciper ne '' ) {
+						$probe->{items}->{$key}->{status} = 'ok';
+					} else {
+						$probe->{items}->{$key}->{status} = 'ko';
+					}
+				}
+			}
+#	- test
+#			$probe->{items}->{$key}->{status} = 'ko';
+#
+		}
+		if ( $key eq 'accreddb' ) {
+			my $dbh = new Cadi::CadiDB (
+				dbname => 'dinfo',
+				 trace => 1,
+				utf8 => 1,
+			) ;
+			if ( $dbh ) {
+				my $sql = qq{SELECT sciper FROM dinfo.sciper LIMIT 0, 1};
+				my $sth = $dbh->prepare( $sql) ;
+				if ($sth) {
+					$sth->execute () ;
+					my $sciper = $sth->fetchrow;
+					if ( $sciper ne '' ) {
+						$probe->{items}->{$key}->{status} = 'ok';
+					} else {
+						$probe->{items}->{$key}->{status} = 'ko';
+					}
 				}
 			}
 		}
-	}
-	if ( $key eq 'accreddb' ) {
-		my $dbh = new Cadi::CadiDB (
-			dbname => 'dinfo',
-			 trace => 1,
-			utf8 => 1,
-		) ;
-		if ( $dbh ) {
-			my $sql = qq{SELECT sciper FROM dinfo.sciper LIMIT 0, 1};
-			my $sth = $dbh->prepare( $sql) ;
-			if ($sth) {
-				$sth->execute () ;
-				my $sciper = $sth->fetchrow;
-				if ( $sciper ne '' ) {
-					$probe->{items}->{$key}->{status} = 'ok';
-				} else {
-					$probe->{items}->{$key}->{status} = 'ko';
-				}
-			}
+	
+		$probe->{items}->{$key}->{label} = $item->{label};
+		unless ( $probe->{items}->{$key}->{status} eq 'ok' ) {
+			$probe->{status} = $item->{critical} ? 'ko' : 'warning';
 		}
+
+		my $item_status = $probe->{items}->{$key}->{status} eq 'ok' ? '1' : '0';
+		$metrics .= qq{payonline_status{component="$key", critical="$item->{critical}", line="$line"} $item_status\n};
+
 	}
 
-	$probe->{items}->{$key}->{label} = $item->{label};
-	unless ( $probe->{items}->{$key}->{status} eq 'ok' ) {
-		$probe->{status} = $item->{critical} ? 'ko' : 'warning';
-	}
-
-	my $item_status = $probe->{items}->{$key}->{status} eq 'ok' ? '1' : '0';
-	$metrics .= qq{payonline_status{component="$key", critical="$item->{critical}", line="$line"} $item_status\n};
-
-}
-
-print "Status: 200 OK\r\n";
-if ( $args{metrics} ) {
-	my $probe_status = $probe->{status} eq 'ko' ? '0' : '1';
-	print "Content-Type: text\r\n\r\n";
-	print qq{# HELP payonline_status payonline service status: 1=OK, 0=KO
+	print "Status: 200 OK\r\n";
+	if ( $args{metrics} ) {
+		my $probe_status = $probe->{status} eq 'ko' ? '0' : '1';
+		print "Content-Type: text\r\n\r\n";
+		print qq{# HELP payonline_status payonline service status: 1=OK, 0=KO
 # TYPE payonline_status gauge
 payonline_status{component="global", line="$line"} $probe_status
 $metrics} ;
+		exit;
+	}
+
+	if ( $args{verbose} ) {
+		Cadi::WSUtils::json_response ( $probe );
+	} else {
+		print "Content-Type: text/html\r\n\r\n";
+	}
+
 	exit;
-}
-
-if ( $args{verbose} ) {
-	Cadi::WSUtils::json_response ( $probe );
-} else {
-	print "Content-Type: text/html\r\n\r\n";
-}
-
-exit;

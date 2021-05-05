@@ -13,7 +13,6 @@
 use strict;
 use HTML::Template;
 
-use lib qw/./;
 use payonline_tools;
 
 use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits $tmpldir $lang $errmsg %CFs $crtdate	$messages);
@@ -78,9 +77,9 @@ my %nat_comptable = (
 			'740055', '740055 : Vente, Formation continue',
 			'740060', '740060 : Congrès, Séminaires, Conférences',
 			'741070', '741070 : Produits de manifestations',
+			'746020', '746020 : Dons, donations, legs reçus',
 			'747040', '747040 : Cotisations et abonnements divers',
 			'783120', '783120 : Contrat de service suisse',
-			'786030', '786030 : Autres dons',
 			},
 		en => {
 			'', '---select---',
@@ -95,9 +94,9 @@ my %nat_comptable = (
 			'740055', '740055 : Sales, Continuing Education',
 			'740060', '740060 : Congres, Seminaires, Conferences',
 			'741070', '741070 : Produits de manifestations',
+			'746020', '746020 : Dons, donations, legs reçus',
 			'747040', '747040 : Cotisations et abonnements divers',
 			'783120', '783120 : Contrat de service suisse',
-			'786030', '786030 : Gift',
 			},
 );
 			
@@ -666,9 +665,10 @@ sub detinst {
   if ( ($result->{etat} eq 'prod') && ! payonline_tools::IsSuperUser($sciper) ) {
   	$monnaietxt = qq{<input type="hidden" name="monnaie" value="$result->{monnaie}"> $result->{monnaie}};
   }
+  $template->param(IsSuperUser => payonline_tools::IsSuperUser($sciper));
+#  $template->param(IsSuperUser => 0);
   
   $template->param(sMonnaie		=> $monnaietxt );
-  
   $template->param(id 				=> $result->{id});
   $template->param(sDelValid	=> ($result->{etat} eq 'test'));
   $template->param(sValid			=> ($result->{etat} eq 'validation') && payonline_tools::IsSuperUser($sciper));
@@ -702,6 +702,9 @@ sub detinst {
   $template->param(sFormaction=> "$me/doneinst?lang=$lang" );
   $template->param(sAuthstr		=> 1 );
   $template->param(sDelPath		=> "javascript:confirmDelete(\'$lang\', \'$me/doneinst?lang=$lang&id=$result->{id}&del=1\')");
+
+  $template->param(bypass_cg	=> 'checked') if $result->{bypass_cg};
+  $template->param(bypass_return=> 'checked') if $result->{bypass_return};
 
   print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
@@ -852,10 +855,13 @@ sub doneinst {
   my $datefin			= $args{datefin};
   my $etat				= $args{etat};
   my $monnaie			= $args{monnaie};
-  my $url				= $args{url};
+  my $url					= $args{url};
   my $mailinst			= $args{mailinst};
   my $contact			= $args{contact};
-  $naturecomptable 		=~s/\s//g;
+  my $bypass_cg		= $args{bypass_cg};
+  my $bypass_return= $args{bypass_return};
+
+  $naturecomptable=~s/\s//g;
 
   my $id = $args{id};
   my $etat_precedent;
@@ -966,10 +972,12 @@ sub doneinst {
 		  etat='prod',
 		  naturecomptable=?,
 		  codetva=?,
-		  urlconf=?
+		  urlconf=?,
+		  bypass_cg=?,
+		  bypass_return=?
 		  where id=?};
 
-		  payonline_tools::dbquery($sql, ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$codetva,$urlconf,$id));
+		  payonline_tools::dbquery($sql, ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$codetva,$urlconf,$bypass_cg,$bypass_return,$id));
 
 		$msg = qq{
 		   <h3>Validation de l'instance</h3>
@@ -988,6 +996,8 @@ sub doneinst {
 		   <li>url=$url
 		   <li>mail confirmation=$mailinst
 		   <li>contact mail=$contact
+		   <li>bypass cg=$bypass_cg
+		   <li>bypass return=$bypass_return
 		   <hr>
 		   L'instance passe en mode <b>production</b> : toutes les transaction de test ont
 		   été effacées.<br>
@@ -1017,6 +1027,8 @@ Contact mail : $contact
 Date début: $datedeb
 Date fin : $datefin
 Monnaie : $monnaie
+CG gérées par la manifestation : $bypass_cg
+Retour sur sit manifestation : $bypass_return
 
 L'instance a été validée par le Service Financier de l'EPFL et est passée en mode *production*.
 Toutes les transactions de test ont été effacées.
@@ -1041,9 +1053,11 @@ Votre service de paiement en ligne
 		  mailinst=?,
 		  contact=?,
 		  naturecomptable=?,
-		  monnaie=?
+		  monnaie=?,
+		  bypass_cg=?,
+		  bypass_return=?
 		};
-		my @params = ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$monnaie);
+		my @params = ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$monnaie,$bypass_cg,$bypass_return);
 
 		if ($urlconf) {
 			$sql .= qq{,urlconf=?};
@@ -1069,6 +1083,8 @@ Votre service de paiement en ligne
 		<li>url=$url
 		<li>mail confirmation=$mailinst
 		<li>contact mail=$contact
+		<li>bypass cg=$bypass_cg
+		<li>bypass return=$bypass_return
 		};
 
 		payonline_tools::write_log_db ($sciper, qq{modinst::$id;$etat;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
@@ -1095,6 +1111,8 @@ Votre service de paiement en ligne
 		<li>url=$url
 		<li>mail confirmation=$mailinst
 		<li>contact mail=$contact
+		<li>bypass cg=$bypass_cg
+		<li>bypass return=$bypass_return
 		};
 
 		payonline_tools::write_log_db ($sciper, qq{modinst:active=$etat:$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
@@ -1121,6 +1139,8 @@ Votre service de paiement en ligne
 		<li>url=$url
 		<li>mailinst=$mailinst
 		<li>contact mail=$contact
+		<li>bypass cg=$bypass_cg
+		<li>bypass return=$bypass_return
 		};
 
 		payonline_tools::write_log_db ($sciper, qq{modinst:inactive:$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
@@ -1145,11 +1165,13 @@ Votre service de paiement en ligne
 		  naturecomptable=?,
 		  sciper=?,
 		  monnaie=?,
-		  urlconf=?
+		  urlconf=?,
+		  bypass_cg=?,
+		  bypass_return=?
   	   where   	   id=?
      };
      
-     payonline_tools::dbquery($sql, ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$sciper,$monnaie,$urlconf,$id));
+     payonline_tools::dbquery($sql, ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$sciper,$monnaie,$urlconf,$bypass_cg,$bypass_return,$id));
      
      payonline_tools::write_log_db ($sciper, qq{newinst::$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
      $msg = qq{
@@ -1315,7 +1337,7 @@ sub authenticate {
   $email 	= $tequila->{attrs}->{email};
   
 # impersonate
-#  $sciper 	 = '145744' if $sciper eq '104782';
+#  $sciper 	 = '106442' if $sciper eq '104782';
 
   my $ref_units = $payonline_tools::Accreds->getAllUnitsWhereHasRight ($sciper, 38);	#	- 'payonline'
   $respunits = join ",", keys %$ref_units;
@@ -1337,11 +1359,14 @@ sub authenticate {
     exit;
   }
 
-#warn "payonline :: respunits=$respunits";
+use Data::Dumper;
+warn ">> fonds\n".Dumper($fonds);
+  
   my ($n1, $n2) = split(/,/, $nom)    if ($nom =~ /,/);
   $nom = utf8tolatin1($n1) if $n2;
   my ($n1, $n2) = split(/,/, $prenom) if ($prenom =~ /,/);
   $prenom = utf8tolatin1($n1) if $n2;
+warn "authenticate $sciper, $nom $prenom :: respunits=$respunits";
 
 }
 
