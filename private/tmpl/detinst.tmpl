@@ -98,17 +98,14 @@
       </div>
 	  </div>
 
-		<div class="col-md-12 pb5 <TMPL_VAR NAME=style>">
-			<em><TMPL_VAR NAME=bypass_txt_label></em>
-		</div>
-
 		<div class="col-md-12 pb5 <TMPL_VAR NAME=style>" >
 			<div class="col-md-4 txt_right_pr5" ><TMPL_VAR NAME=bypass_cg_label> </div>
 			<div class="col-md-8">
 				<TMPL_IF NAME=IsSuperUser>
 					<input type="checkbox" name="bypass_cg" value="1" <TMPL_VAR NAME=bypass_cg>> <em>(<TMPL_VAR NAME=bypass_cg_txt_label>)</em>
 				<TMPL_ELSE>
-					<input type="checkbox" name="bypass_cg" value="1" <TMPL_VAR NAME=bypass_cg> disabled> <em>(<TMPL_VAR NAME=bypass_cg_txt_label>)</em>
+					<input type="checkbox" name="bypass_cg" value="1" <TMPL_VAR NAME=bypass_cg> disabled> <em>(<TMPL_VAR NAME=bypass_cg_txt_label>)<br>
+					<TMPL_VAR NAME=bypass_txt_label></em>
 					<input name="bypass_cg" type="hidden" value="<TMPL_VAR NAME=bypass_cg>">
 				</TMPL_IF>	
 			</div>
@@ -118,12 +115,7 @@
 		<div class="col-md-12 pb5 <TMPL_VAR NAME=style>" >
 			<div class="col-md-4 txt_right_pr5" ><TMPL_VAR NAME=bypass_return_label> </div>
 			<div class="col-md-8">
-				<TMPL_IF NAME=IsSuperUser>
 					<input type="checkbox" name="bypass_return" value="1" <TMPL_VAR NAME=bypass_return>> </div>
-				<TMPL_ELSE>
-					<input type="checkbox" name="bypass_return" value="1" <TMPL_VAR NAME=bypass_return> disabled> </div>
-					<input name="bypass_return" type="hidden" value="<TMPL_VAR NAME=bypass_return>">
-				</TMPL_IF>	
 		</div>
 
     <div class="col-md-12 pb5 <TMPL_VAR NAME=style>" >
