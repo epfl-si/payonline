@@ -47,21 +47,10 @@ warn "date=$date, mailSF=$mailSF\n";
 
 	$ENV{REMOTE_ADDR} = 'ignore';	#	bypass web check
 	payonline_tools::init ();
-
-	unless ($payonline_tools::DEBUG) {
-		open (LOCK, ">$lockfile") or warn "***ERR** unable to create lock file : $lockfile ($!)";
-		# - extract daily transactions and mail to FS
-	}
+        $payonline_tools::DEBUG = 0;
 
 	# ---------- extract and send daily instances to SF
 	extrans ($date);
-
-	unless ($payonline_tools::DEBUG) {
-		# ---------- close old instances (archive)
-		closeinst ($date);
-		close LOCK;
-		unlink $lockfile or warn "***ERR** unable to delete lock file : $lockfile ($!)";
-	}
 
 exit;
 
