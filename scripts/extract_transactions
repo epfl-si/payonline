@@ -1,0 +1,203 @@
+#!/usr/bin/perl
+#
+##############################################################################
+#
+# File Name:    extract - extractions payonline -> Service Financier EPFL
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2007
+#
+#########################################################################
+#####
+#
+#
+
+use lib '/opt/dinfo/lib/perl';
+use lib '/var/www/vhosts/payonline.epfl.ch/cgi-bin';
+
+use strict;
+use Mail::Sendmail;
+use MIME::Lite;
+use HTML::Entities ();
+use Encode;
+
+use payonline_tools;
+
+my $mailresp	= 'ion.cionca@epfl.ch';
+my $mailSF		= 'marc.fromentin@epfl.ch,pascal.schweingruber@epfl.ch,pierre.fournier@epfl.ch,barbara.bouteiller@epfl.ch,ana.henriques@epfl.ch';
+
+my $separator	= ';';
+my $tmpfile 	= '/tmp/payonline.txt';
+my $lockfile	= '/tmp/payonline.lock';
+
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time - 86400);
+
+###################################################
+#	l'extraction est faite pour le jour d'avant
+###################################################
+
+$mon++;
+$year += 1900;
+my $date = sprintf "%4d-%02d-%02d", $year, $mon, $mday;
+
+#---------------------
+#my $date   = '2021-03-28' ;
+#my $mailSF = 'ion.cionca@epfl.ch';
+
+warn "date=$date, mailSF=$mailSF\n";
+#---------------------
+
+	$ENV{REMOTE_ADDR} = 'ignore';	#	bypass web check
+	payonline_tools::init ();
+
+	unless ($payonline_tools::DEBUG) {
+		open (LOCK, ">$lockfile") or warn "***ERR** unable to create lock file : $lockfile ($!)";
+		# - extract daily transactions and mail to FS
+	}
+
+	# ---------- extract and send daily instances to SF
+	extrans ($date);
+
+	unless ($payonline_tools::DEBUG) {
+		# ---------- close old instances (archive)
+		closeinst ($date);
+		close LOCK;
+		unlink $lockfile or warn "***ERR** unable to delete lock file : $lockfile ($!)";
+	}
+
+exit;
+
+#------
+sub extrans {
+  my ($date) = @_;
+  
+  my $sql  			= qq{select * from instances where etat='prod'};
+#  my $sql  			= qq{select * from instances where etat='test'};
+  my $sth_inst  = payonline_tools::dbquery ($sql);
+  return unless $sth_inst;
+
+  open (OUT, ">$tmpfile") or die "err open payonline tmp : $!";
+  binmode(OUT, ":utf8");  
+
+  my $count = 0;
+  
+  while (my $inst = $sth_inst->fetchrow_hashref ) {	# - get active instances
+     my $descr 	= $inst->{descr};
+     my $fonds 	= $inst->{fonds};
+        $fonds	=~ s/;/,/g;
+     my $ois 		= $inst->{ois};
+        $ois		=~ s/;/,/g;
+     my $naturecomptable= $inst->{naturecomptable};
+        $naturecomptable=~ s/;/,/g;
+     my $id			= $inst->{id};
+     my $codetva= $inst->{codetva};
+     my $sql 		= qq{select * from transact where 
+									id_inst = '$id' and 
+									etat='payé' and 
+									TIMEDIFF(datecr,TIMESTAMP('$date 00:00:00')) >= '00:00:00' and
+									TIMEDIFF(TIMESTAMP('$date 23:59:59'),datecr) >= '00:00:00' 
+									order by datecr
+								};
+     my $sth 	= payonline_tools::dbquery ($sql);
+     next unless $sth;
+     
+    while (my $result = $sth->fetchrow_hashref) {	# - get transactions for instance
+			my $query	= payonline_tools::getArgs ($result->{query});
+			my $datecr	= $result->{datecr};
+			$datecr	=~ s/\-//g;
+			$datecr	=~ s/://g;
+			$datecr	=~ s/ //g;
+			$datecr	= substr($datecr,0,length($datecr)-2);
+			$descr =~ s/\n/ /g;
+			$descr =~ s/\r/ /g;
+			$descr =~ s/;/,/g;
+warn ">> $descr, $datecr\n";
+			my $TVAcode = $codetva ? $codetva : payonline_tools::getTVAcode($naturecomptable);
+				 $TVAcode =~ s/A/C/;
+				 $TVAcode =~ s/Q7/C7/;
+				 
+			if ($result->{id_inst} eq $payonline_tools::CAMIPROload) {
+				$TVAcode = '';
+				$fonds 	 = '';
+				$naturecomptable = '201500';
+			}
+
+			my $rettxt = "${fonds}${separator}";
+			$rettxt	.= "${naturecomptable}${separator}";
+			$rettxt	.= "${descr}${separator}";
+			$rettxt	.= payonline_tools::utf8tolatin1(HTML::Entities::decode($query->{LastName})).${separator};
+			$rettxt	.= payonline_tools::utf8tolatin1(HTML::Entities::decode($query->{FirstName})).${separator};
+			$rettxt	.= payonline_tools::utf8tolatin1(HTML::Entities::decode($query->{City})).${separator};
+			$rettxt	.= "$query->{Country}${separator}";
+			$rettxt	.= "$query->{Total}${separator}";
+			$rettxt	.= "$query->{Currency}${separator}";
+			$rettxt	.= "$result->{paymode}${separator}";
+			$rettxt	.= "$result->{PaymentID}${separator}";
+			$rettxt	.= "$datecr${separator}";
+			$rettxt	.= "$TVAcode${separator}";
+			$rettxt	.= "$result->{id}${separator}";
+			$rettxt	.= "$ois";
+			
+			$rettxt =~ s/&#39;/'/;
+
+			printf OUT "%s\n", $rettxt;
+			$count++;
+     }
+
+  }
+   close OUT;
+
+   return if $payonline_tools::DEBUG;
+
+   if ( $count ) {
+	  my $msg = MIME::Lite->new(
+		 From    => 'noreply@epfl.ch',
+		 Cc	  	 => $mailresp,
+		 To      => $mailSF,
+		 Subject => "payonline :: paiements du ". payonline_tools::prdate($date),
+		 Type    =>'multipart/mixed',
+	  );
+	  $msg->attach(
+			 Type		 => 'text/plain',
+			 Path		 => "$tmpfile",
+			 Filename	 => "payonline.txt",
+			 Disposition => 'attachment',
+	  );
+	  $msg->send('smtp', 'mail.epfl.ch') or die "err send: $!";
+warn "--> mailto=$mailSF\ncount=$count\n";
+
+   }
+
+}
+
+#------
+sub closeinst {
+  my ($date) = @_;
+  
+  my $sql = qq{select * from instances where DATEDIFF(datefin,TIMESTAMP('$date')) < '00:00:00' and etat <> 'archive'};
+  my $sth 	= payonline_tools::dbquery ($sql);
+  while (my $result = $sth->fetchrow_hashref) {
+   my $resp = payonline_tools::getPersonInfos ($result->{sciper});
+   my $txt = qq{Instance no: $result->{id} passe en mode *archive*
+Description : $result->{descr}
+Responsable : $resp->{prenom} $resp->{nom} [sciper: $result->{sciper}, mail:$resp->{mail}]
+Centre financier : $result->{cf}
+Fonds : $result->{fonds}
+Compte budgétaire : $result->{naturecomptable}
+Code TVA : $result->{codetva}
+Date début: $result->{datedeb}
+Date fin : $result->{datefin}
+};
+
+   my $dest = $payonline_tools::DEBUG ? '' : $resp->{mail} ;
+   payonline_tools::send_mail ($dest, 'payonline : fermeture instance de paiement', $txt) ;
+
+   warn "$result->{descr}\t$result->{datefin}\tarchive";
+   payonline_tools::dbquery (qq{update instances set etat='archive' where id='$result->{id}'});
+  } 
+
+}
+#--------
+sub utf8tolatin1 {
+    my $string = shift;
+    $string =~ s/([\xC0-\xDF])([\x80-\xBF])/chr(ord($1)<<6&0xC0|ord($2)&0x3F)/eg;
+    return $string;
+}
