@@ -22,7 +22,7 @@ use Encode;
 use payonline_tools;
 
 my $mailresp	= 'idev-fsd@groupes.epfl.ch';
-my $mailSF		= 'marc.fromentin@epfl.ch,pascal.schweingruber@epfl.ch,pierre.fournier@epfl.ch,barbara.bouteiller@epfl.ch,ana.henriques@epfl.ch';
+my $mailSF		= $ENV{PAYONLINE_MAIL_SF_RECIPIENTS};
 
 my $separator	= ';';
 my $tmpfile 	= '/tmp/payonline.txt';
