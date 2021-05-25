@@ -13,3 +13,4 @@ requires 'HTML::Template', '2.9';
 requires 'JSON::SL', '1.0.7';
 requires 'local::lib', '2.000024';
 requires 'Net::CIDR', '0.19';
+requires 'MIME::Lite', '3.031';

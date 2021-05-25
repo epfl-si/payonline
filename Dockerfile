@@ -138,6 +138,12 @@ COPY ./conf/docker/docker-entrypoint.sh /home/dinfo/
 RUN chmod a+x /home/dinfo/docker-entrypoint.sh
 
 ################################################################################
+# Cron scripts
+################################################################################
+COPY ./scripts /opt/dinfo/scripts/
+RUN chmod a+x /opt/dinfo/scripts/*
+
+################################################################################
 # Ownership so that these folders can be written when running in K8S
 ################################################################################
 RUN chgrp -R 0 /opt/dinfo/etc && chmod -R g=u /opt/dinfo/etc
