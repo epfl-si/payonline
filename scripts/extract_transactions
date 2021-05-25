@@ -21,7 +21,7 @@ use Encode;
 
 use payonline_tools;
 
-my $mailresp	= 'ion.cionca@epfl.ch';
+my $mailresp	= 'idev-fsd@groupes.epfl.ch';
 my $mailSF		= 'marc.fromentin@epfl.ch,pascal.schweingruber@epfl.ch,pierre.fournier@epfl.ch,barbara.bouteiller@epfl.ch,ana.henriques@epfl.ch';
 
 my $separator	= ';';
