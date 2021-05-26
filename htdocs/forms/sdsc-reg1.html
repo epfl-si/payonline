@@ -102,7 +102,7 @@ Kursaal, Bern
 <br>
 <em>Please fill in all fields below (<span style="text-decoration: underline;">one form per attendee</span>)</em>
 <br>
-<form id="form" name="form1" method="post" action="https://payonline.epfl.ch/cgi-bin/commande" enctype="multipart/form-data">
+<form id="form" name="form1" method="post" action="/cgi-bin/commande" enctype="multipart/form-data">
 
   <div style="width: 100%; float: left;">
     <div class="row">
@@ -457,11 +457,11 @@ Kursaal, Bern
     // check if checkbox is checked
     if ( document.querySelector('#no_eth').checked ) {
       // if checked
-      form.action = 'https://payonline.epfl.ch/cgi-bin/commande';
+      form.action = '/cgi-bin/commande';
       form.submit();
     } else {
 	    if (document.querySelector('#eth').checked) {
-		    form.action = 'https://payonline.epfl.ch/cgi-bin/free_reg';
+		    form.action = '/cgi-bin/free_reg';
 			form.submit();
 		} else {
 			alert ('Please check one option');
@@ -476,12 +476,12 @@ Kursaal, Bern
       // if checked
       document.getElementById('go_free_reg').style.display='block';
       document.getElementById('go_pay').style.display='none';
-      form.action = 'https://payonline.epfl.ch/cgi-bin/free_reg';
+      form.action = '/cgi-bin/free_reg';
     } else {
       // if unchecked
       document.getElementById('go_free_reg').style.display='none';
       document.getElementById('go_pay').style.display='block';
-      form.action = 'https://payonline.epfl.ch/cgi-bin/commande';
+      form.action = '/cgi-bin/commande';
     }
   }
   function goPay() {
@@ -490,12 +490,12 @@ Kursaal, Bern
       // if checked
       document.getElementById('go_pay').style.display='block';
       document.getElementById('go_free_reg').style.display='none';
-      form.action = 'https://payonline.epfl.ch/cgi-bin/commande';
+      form.action = '/cgi-bin/commande';
     } else {
       // if unchecked
       document.getElementById('go_pay').style.display='none';
       document.getElementById('go_free_reg').style.display='block';
-      form.action = 'https://payonline.epfl.ch/cgi-bin/free_reg';
+      form.action = '/cgi-bin/free_reg';
     }
   }
 </script>

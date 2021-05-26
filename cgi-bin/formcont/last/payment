@@ -166,7 +166,7 @@ foreach my $item (keys %args) {
   my $LOGO 	  = qq{http://www.formation-continue-unil-epfl.ch/images/logo.png};
   
   print qq{
-	   <form action="$payonline_tools::YellowPaySrv" method="POST" name="cmd" enctype="multipart/form-data">
+	   <form action="$payonline_tools::YellowPaySrv" method="POST" name="cmd">
 
 			<input type="hidden" name="PSPID" value="$payonline_tools::ShopID"> 
 			<input type="hidden" name="orderID" value="$id_trans"> 
