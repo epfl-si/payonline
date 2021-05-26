@@ -33,7 +33,7 @@ use Encode;
 use strict;
 use vars qw( $absdbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfond $codeTVA
             $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
-            $ges_list $SHAsalt $db_dinfo $Rights $SHAsaltTest $Accreds %YPHashSeed $rejectIP
+            $ges_list $SHAsalt $db_dinfo $Rights $SHAsaltTest $Accreds $rejectIP
            $epflLOGO $mailFrom $mailBcc $exceptions $CAMIPROload);
 
 require '/var/www/vhosts/payonline.epfl.ch/private/params';

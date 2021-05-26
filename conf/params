@@ -1,11 +1,6 @@
 #       payonline.epfl.ch
 #       - private parameters
 
-%YPHashSeed     = (
-                'CHF',  '3V_5vAbPw@',
-                'USD',  '^%a9]V}6;2gwY7*_{',
-                'EUR',  '6.$3U[pA(&24t?m^\'',
-        );
 $ShopID                 = 'epfl2543_yp';
 $SHAsalt                = ';6E=-tw!rE_nsg./TzwrtGs*';
 $SHAsaltTest    = 'MotoVelo_1234-4!S-';
