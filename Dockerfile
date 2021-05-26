@@ -127,6 +127,7 @@ COPY ./cgi-bin/messages.txt /opt/dinfo/lib/perl/messages.txt
 # App
 ################################################################################
 COPY ./cgi-bin/. /var/www/vhosts/payonline.epfl.ch/cgi-bin/
+RUN find cgi-bin/ -name "*.pm" -delete
 COPY ./htdocs/. /var/www/vhosts/payonline.epfl.ch/htdocs/
 COPY ./private/tmpl/. /var/www/vhosts/payonline.epfl.ch/private/tmpl/
 
