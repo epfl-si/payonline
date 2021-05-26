@@ -190,7 +190,7 @@ sub init {
 		exit;
 	}
 
-	$DEBUG  = -f '/opt/dinfo/etc/MASTER' ? 0 : 1;
+	$DEBUG  = 0;
 #	$absdbh = dbconnect ('payonline');
 	$absdbh = new Cadi::CadiDB (
 	  dbname => 'payonline',
