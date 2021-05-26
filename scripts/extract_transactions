@@ -14,6 +14,8 @@ use lib '/opt/dinfo/lib/perl';
 use lib '/var/www/vhosts/payonline.epfl.ch/cgi-bin';
 
 use strict;
+use utf8;
+
 use Mail::Sendmail;
 use MIME::Lite;
 use HTML::Entities ();
@@ -78,11 +80,11 @@ sub extrans {
         $naturecomptable=~ s/;/,/g;
      my $id			= $inst->{id};
      my $codetva= $inst->{codetva};
-     my $sql 		= qq{select * from transact where 
-									id_inst = '$id' and 
-									etat='payé' and 
+     my $sql 		= qq{select * from transact where
+									id_inst = '$id' and
+									etat LIKE 'pay%' and
 									TIMEDIFF(datecr,TIMESTAMP('$date 00:00:00')) >= '00:00:00' and
-									TIMEDIFF(TIMESTAMP('$date 23:59:59'),datecr) >= '00:00:00' 
+									TIMEDIFF(TIMESTAMP('$date 23:59:59'),datecr) >= '00:00:00'
 									order by datecr
 								};
      my $sth 	= payonline_tools::dbquery ($sql);
@@ -112,9 +114,9 @@ warn ">> $descr, $datecr\n";
 			my $rettxt = "${fonds}${separator}";
 			$rettxt	.= "${naturecomptable}${separator}";
 			$rettxt	.= "${descr}${separator}";
-			$rettxt	.= payonline_tools::utf8tolatin1(HTML::Entities::decode($query->{LastName})).${separator};
-			$rettxt	.= payonline_tools::utf8tolatin1(HTML::Entities::decode($query->{FirstName})).${separator};
-			$rettxt	.= payonline_tools::utf8tolatin1(HTML::Entities::decode($query->{City})).${separator};
+			$rettxt	.= HTML::Entities::decode($query->{LastName}).${separator};
+			$rettxt	.= HTML::Entities::decode($query->{FirstName}).${separator};
+			$rettxt	.= HTML::Entities::decode($query->{City}).${separator};
 			$rettxt	.= "$query->{Country}${separator}";
 			$rettxt	.= "$query->{Total}${separator}";
 			$rettxt	.= "$query->{Currency}${separator}";
@@ -170,9 +172,9 @@ Description : $result->{descr}
 Responsable : $resp->{prenom} $resp->{nom} [sciper: $result->{sciper}, mail:$resp->{mail}]
 Centre financier : $result->{cf}
 Fonds : $result->{fonds}
-Compte budgétaire : $result->{naturecomptable}
+Compte budgÃ©taire : $result->{naturecomptable}
 Code TVA : $result->{codetva}
-Date début: $result->{datedeb}
+Date dÃ©but: $result->{datedeb}
 Date fin : $result->{datefin}
 };
 
@@ -181,12 +183,6 @@ Date fin : $result->{datefin}
 
    warn "$result->{descr}\t$result->{datefin}\tarchive";
    payonline_tools::dbquery (qq{update instances set etat='archive' where id='$result->{id}'});
-  } 
+  }
 
-}
-#--------
-sub utf8tolatin1 {
-    my $string = shift;
-    $string =~ s/([\xC0-\xDF])([\x80-\xBF])/chr(ord($1)<<6&0xC0|ord($2)&0x3F)/eg;
-    return $string;
 }
