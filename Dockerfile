@@ -67,8 +67,7 @@ RUN cpanm --installdeps --notest . || ( cat /root/.cpanm/work/*/build.log; exit 
 COPY ./conf/docker/dbs.conf /home/dinfo
 COPY ./conf/docker/tequila.conf /home/dinfo
 RUN touch /etc/tequila.conf
-COPY ./conf/docker/25-payonline.epfl.ch.conf /home/dinfo
-
+COPY ./conf/docker/25-payonline.epfl.ch.conf /etc/apache2/sites-available/
 ################################################################################
 # Vhost
 ################################################################################
