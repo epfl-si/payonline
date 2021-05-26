@@ -16,6 +16,7 @@ use HTML::Template;
 use lib qw/./;
 use payonline_tools;
 
+use Devel::Confess;
 use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits $tmpldir $lang $errmsg %CFs $crtdate	$messages);
 
 require 'messages.txt';
