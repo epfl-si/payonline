@@ -536,8 +536,16 @@ sub getFonds {
 
 sub decode_latin1_double_encoded {
   my ($double_encoded) = @_;
-  my $bytes = Encode::encode("latin1", $double_encoded);
-  return  Encode::decode("utf-8", $double_encoded);
+  my $decoded;
+  eval {
+    my $bytes = Encode::encode("latin1", $double_encoded);
+    $decoded =  Encode::decode("utf-8", $double_encoded);
+  };
+  if ($@) {
+    return $double_encoded;
+  } else {
+    return $decoded;
+  }
 }
 
 #___________
