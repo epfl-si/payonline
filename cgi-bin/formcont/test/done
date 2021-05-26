@@ -25,7 +25,7 @@ use vars qw( %args $lang $errmsg $crtdate );
 	$crtdate 	= payonline_tools::getcrtdate();
 	$lang 		= $args{lang} ? $args{lang} : 'en' ;
 
-use utf8;
+use utf8::all;
 binmode(STDOUT, ":utf8");
 
 warn "==> done test \n";

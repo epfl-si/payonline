@@ -16,7 +16,7 @@ use payonline_tools;
 
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
 
-use utf8;
+use utf8::all;
 binmode(STDOUT, ":utf8");
 
 my $me 			= $ENV {SCRIPT_NAME};
@@ -158,7 +158,7 @@ foreach my $item (keys %args) {
   my $LOGO 	  = qq{http://www.formation-continue-unil-epfl.ch/images/logo.png};
   
   print qq{
-	   <form action="$payonline_tools::YellowPaySrv" method="POST" name="cmd" >
+	   <form action="$payonline_tools::YellowPaySrv" method="POST" name="cmd" enctype="multipart/form-data">
 
 			<input type="hidden" name="PSPID" 		value="$payonline_tools::ShopID"> 
 			<input type="hidden" name="orderID" 	value="$id_trans"> 

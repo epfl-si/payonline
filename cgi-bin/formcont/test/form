@@ -15,7 +15,7 @@ use payonline_tools;
 
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
 
-use utf8;
+use utf8::all;
 binmode(STDOUT, ":utf8");
 
 my $labels		= {

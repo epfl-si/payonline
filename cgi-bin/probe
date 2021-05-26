@@ -13,12 +13,12 @@ use strict;
 
 use lib '/opt/dinfo/lib/perl';
 
-use CGI;
+use CGI qw(-utf8);
 
 use Cadi::CadiDB;
 use Cadi::WSUtils;
 
-use utf8;
+use utf8::all;
 binmode(STDOUT, ":utf8");
 
 my $pi = $ENV {PATH_INFO};

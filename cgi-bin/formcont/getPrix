@@ -15,7 +15,7 @@ use strict;
 use lib '/var/www/vhosts/payonline.epfl.ch/cgi-bin/formcont/test';
 use payonline_tools;
 
-use utf8;
+use utf8::all;
 binmode(STDOUT, ":utf8");
 
 $payonline_tools::DEBUG	 = 1;

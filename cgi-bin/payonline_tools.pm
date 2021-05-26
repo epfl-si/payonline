@@ -30,6 +30,8 @@ use Cadi::CadiDB;
 use Cadi::Accreds;
 use Encode;
 
+use CGI qw/ :cgi-lib -utf8 /;
+
 use strict;
 use vars qw( $absdbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfond $codeTVA
             $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
@@ -192,6 +194,7 @@ sub init {
 #	$absdbh = dbconnect ('payonline');
 	$absdbh = new Cadi::CadiDB (
 	  dbname => 'payonline',
+          utf8 => 1
 	);
 	die "FATAL payonline DB ACCESS" unless $absdbh;
 	
@@ -483,27 +486,7 @@ sub md5pwd {
 }
 #--------
 sub loadargs {
-
-  my $query = $ENV{QUERY_STRING};
-  my $postdata;
-  
-  if ($ENV{'REQUEST_METHOD'} && $ENV{'REQUEST_METHOD'} eq 'POST') {
-   read (STDIN, $postdata, $ENV{'CONTENT_LENGTH'});
-  }
-  my $allargs = $query . '&' . $postdata;
-  my @fields  = split (/&/, $allargs);
-  foreach (@fields) {
-    s/\+/ /g;  
-    s/%([0-9a-f]{2,2})/pack ("C", hex ($1))/gie;
-  }
-  my %args;
-  foreach my $field (@fields) {
-    next unless ($field =~ /=/);  
-    my ($name, $value) = split(/=/, $field, 2);  
-    $args {$name} .= ' ' if $args {$name};  
-    $args {$name} .= "$value";
-  }
-  %args
+  return Vars;
 }
 #--------
 sub IsSuperUser {

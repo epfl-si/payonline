@@ -18,7 +18,7 @@ use payonline_tools;
 
 use vars qw(%args $tmpldir $lang $errmsg $crtdate);
 
-use utf8;
+use utf8::all;
 binmode(STDOUT, ":utf8");
 
 my $me 			= $ENV {SCRIPT_NAME};

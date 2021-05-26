@@ -47,7 +47,7 @@
       <span class="visuallyhidden">Search</span>
     </a>
     <div id="search" class="visible-s visible-m visible-l visible-xl visible-xxl" role="search">
-      <form id="search-form" class="form form-inline" action="search.html">
+      <form id="search-form" class="form form-inline" action="search.html" enctype="multipart/form-data">
         <div class="form-input-group">
           <div class="form-input">
             <label class="visuallyhidden" for="search-query">Search query</label>

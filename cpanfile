@@ -15,3 +15,5 @@ requires 'local::lib', '2.000024';
 requires 'Net::CIDR', '0.19';
 requires 'MIME::Lite', '3.031';
 requires 'Devel::Confess', '0.009004';
+requires 'CGI', '4.52';
+requires 'utf8::all', '0.024';

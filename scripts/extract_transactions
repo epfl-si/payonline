@@ -14,7 +14,7 @@ use lib '/opt/dinfo/lib/perl';
 use lib '/var/www/vhosts/payonline.epfl.ch/cgi-bin';
 
 use strict;
-use utf8;
+use utf8::all;
 
 use Mail::Sendmail;
 use MIME::Lite;

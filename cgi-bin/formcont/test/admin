@@ -19,7 +19,7 @@ use payonline_tools;
 
 use vars qw(%args $lang $errmsg $crtdate $sciper $key $tequila);
 
-use utf8;
+use utf8::all;
 binmode(STDOUT, ":utf8");
 
 my $me 			= $ENV {SCRIPT_NAME};
@@ -65,7 +65,7 @@ sub init {
 sub prix {
 
 	print qq{<h4>Gestion des prix</h4>
-	<form name="form" action="$URL/prix?op=add" method="post" style="margin-bottom: 0;">
+	<form name="form" action="$URL/prix?op=add" method="post" style="margin-bottom: 0;" enctype="multipart/form-data"> 
 	<li style="margin-left: 20px;">ajouter un prix : <input name="prix"> CHF (<em>xxx.yy</em>)</li>
 	</form>
 	<br>
@@ -157,7 +157,7 @@ sub transact {
 
   print qq{
 <!--
-   <form action=$me/search method=POST>
+   <form action=$me/search method=POST enctype="multipart/form-data">
    <b>Recherche transactions</b> par 
    <table >
    <tr><td align=right>nom : <td><input name=name width=32></tr>

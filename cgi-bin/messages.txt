@@ -1,4 +1,4 @@
-use utf8;
+use utf8::all;
 
 $messages = {
 		default_label => {

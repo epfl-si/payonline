@@ -25,7 +25,7 @@ use vars qw( $dbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfon
             $su_list $ges_list $SHAsalt $mode $formContent $postURL $redirectURL $URLcgi
             );
 
-use utf8;
+use utf8::all;
 binmode(STDOUT, ":utf8");
 
 my $me 		= $ENV {SCRIPT_NAME};
@@ -725,7 +725,7 @@ OnSubmit="
 			alert ('Lire les Conditions Générales et cocher la case pour continuer');
 			return false; 
 		 }
-		 ">
+		 " enctype="multipart/form-data">
   <input type=hidden name=lang value=en>
   <table width="100%" border="0" cellpadding="5">
     <tr>
@@ -779,7 +779,7 @@ OnSubmit="
 			alert ('Please read the General Terms and check the bxo to continue');
 			return false; 
 		 }
-		 ">
+		 " enctype="multipart/form-data">
   <input type=hidden name=lang value=en>
   <table width="100%" border="0" cellpadding="5">
     <tr>
