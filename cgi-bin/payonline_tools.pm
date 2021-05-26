@@ -38,7 +38,7 @@ use vars qw( $absdbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $dem
             $ges_list $SHAsalt $db_dinfo $Rights $SHAsaltTest $Accreds $rejectIP
            $epflLOGO $mailFrom $mailBcc $exceptions $CAMIPROload);
 
-require '/var/www/vhosts/payonline.epfl.ch/private/params';
+require '/opt/dinfo/etc/params';
 
 my $me 		= $ENV {SCRIPT_NAME};
 my $us 		= $ENV {SERVER_NAME};
