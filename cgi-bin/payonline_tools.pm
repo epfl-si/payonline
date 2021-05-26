@@ -525,7 +525,6 @@ sub getFonds {
     $sql = qq{select no_fond,libelle from dinfo.fonds where cf = ? and etat='O'};
     my $sth = $db_dinfo->query ( $sql, ("F$cf"));
     while (my ($no_fond,$libelle) = $sth->fetchrow_array ()) {
-      $libelle = decode_latin1_double_encoded($libelle);
       push (@fonds, "$no_fond:$libelle");
     }
     $fondsperCF->{$cf} = \@fonds;
@@ -533,22 +532,6 @@ sub getFonds {
   return $fondsperCF;
 }
 #=============
-
-sub decode_latin1_double_encoded {
-  my ($double_encoded) = @_;
-  my $decoded;
-  eval {
-    my $bytes = Encode::encode("latin1", $double_encoded);
-    $decoded =  Encode::decode("utf-8", $double_encoded);
-  };
-  if ($@) {
-    return $double_encoded;
-  } else {
-    return $decoded;
-  }
-}
-
-#___________
 sub dbconnect {
 	my ($dbkey) = @_;
 
