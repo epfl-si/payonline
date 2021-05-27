@@ -659,7 +659,7 @@ sub ip2dec ($) {
     unpack N => pack CCCC => split /\./ => shift;
 }
 
-sub IPinRange {
+sub is_ip_in_postfinance_ranges {
   my @YP_IP_range = (
     '185.8.52.0/22',
     '212.23.45.96/28',

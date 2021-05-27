@@ -94,7 +94,7 @@ warn "payonline cert: ** CERT from YellowPay **\n";
 warn "payonline cert: ... 1 YPSrv=$YPSrv\n";
   unless ($payonline_tools::YPServersIP =~ /$YPSrv/) {
 warn "payonline cert: $YPSrv : unknown server in static list\n";
-		if (payonline_tools::IPinRange($YPSrv)) {
+		if (payonline_tools::is_ip_in_postfinance_ranges($YPSrv)) {
 warn "payonline cert: OK :: $YPSrv in range\n";
 		} else {
 			my $msg = qq{error :: id_trans=$args{orderID} illegal access from server IP=$YPSrv};
