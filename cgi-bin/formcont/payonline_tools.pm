@@ -51,7 +51,7 @@ $YPServersIP	= '185.8.54.254,185.8.52.254,194.41.152.138,194.41.152.139,194.41.2
 
 $su_list	= '104782';	# - ic,
 
-$DEBUG 		= '1';
+$DEBUG 		= '0';
 $mode   	= $DEBUG ? 'test' : 'prod';	# - test | prod
 $ShopID 	= $DEBUG ? 'unilepflTEST' : 'unilepfl';	# - test | prod
 $URLcgi		= $DEBUG ? '/cgi-bin/formcont/test/payment' : '/cgi-bin/formcont/payment';
