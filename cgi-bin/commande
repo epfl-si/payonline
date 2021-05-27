@@ -244,21 +244,21 @@ warn "payonline :: maintrans 1: query=$query\n";
 	  my $sth   = payonline_tools::dbquery ($sql, ($args{id_inst},$lang,$query,$id_trans));
   
   }
-  
-  payonline_tools::setYellowPaySrv($inst->{etat});
 
   my $UserTotal 	 = sprintf "%.2f",$args{Total};
   my $ParamTotal	 = $UserTotal * 100;	# 		- pas de décimales
 warn "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\n";
-  
+
+  my $flow = YellowPayFlow::Payonline->by_instance($inst);
+
   my $hashdata = {
 	orderID 	=> $id_trans,
 	amount 		=> $ParamTotal,
 	currency 	=> $args{Currency},
-	PSPID 		=> $payonline_tools::ShopID,
+	PSPID 		=> $flow->get_shop_id(),
   };
 
-  my $txtHash = payonline_tools::makeHash ($hashdata, 'in');
+  my $send_hash = $flow->makeHash($hashdata);
   
   my $txtLang	= $lang eq 'fr' ? 'fr_FR' : 'en_US';
   my $COM 	 	= $inst->{descr};
@@ -271,9 +271,9 @@ warn "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\n";
   
   $template->param(CGchecked 			=> $CGchecked); # CG checked
   $template->param(sErrMsg 				=> $errmsg);
-  $template->param(YellowPaySrv		=> $payonline_tools::YellowPaySrv);
+  $template->param(YellowPaySrv		=> $flow->get_server_url());
   $template->param(epflLOGO				=> $payonline_tools::epflLOGO);
-  $template->param(txtShopId 			=> $payonline_tools::ShopID);
+  $template->param(txtShopId 			=> $flow->get-shop_id());
   $template->param(txtOrderIDShop => $id_trans);
   $template->param(txtInstDescr 	=> $COM);
   $template->param(txtArtCurrency => $args{Currency});
@@ -288,7 +288,7 @@ warn "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\n";
   $template->param(txtPM	 				=> $args{PM}) 	 if $args{PM};
   $template->param(txtBRAND				=> $args{BRAND}) if $args{BRAND};
 
-  $template->param(txtHash 				=> $txtHash);
+  $template->param(txtHash 				=> $send_hash);
   $template->param(txtBAddr1 			=> $Addr);
   $template->param(txtBZipCode 		=> substr($args{ZipCode}, 0, 10));
   $template->param(txtBCity 			=> $args{City});

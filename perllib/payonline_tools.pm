@@ -33,9 +33,9 @@ use Encode;
 use CGI qw/ :cgi-lib -utf8 /;
 
 use strict;
-use vars qw( $absdbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfond $codeTVA
-            $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $ShopID $tmpldir
-            $ges_list $SHAsalt $db_dinfo $Rights $SHAsaltTest $Accreds $rejectIP
+use vars qw( $absdbh $DEBUG $su_list $logfile $rc4key $errmsg $demfond $codeTVA
+            $tmpldir
+            $ges_list $HMAC_salts $PayonlineShopID $db_dinfo $Rights $Accreds $rejectIP
            $epflLOGO $mailFrom $mailBcc $exceptions $CAMIPROload);
 
 require '/opt/dinfo/etc/params';
@@ -131,7 +131,6 @@ sub init {
 	) unless $db_dinfo;
 	die "FATAL dinfo DB ACCESS" unless $db_dinfo;
 	$Accreds = new Cadi::Accreds (caller => '104782', utf8 => 1);
-	$SHAsalt = $SHAsaltTest if $DEBUG;
 }
 
 #--------
@@ -178,25 +177,6 @@ sub prdate {
     } else {
       return ("$revdate $hourpart");
     }
-}
-
-#-------------
-sub makeHash {
-  my ($data, $flag) = @_;
-
-  my $ctx = Digest::SHA1->new;
-  my $txt;
-  if ($flag eq 'in') {
-  	$txt = $data->{orderID}.$data->{amount}.$data->{currency}.$data->{PSPID}
-  } else {
-  	$txt = $data->{orderID}.$data->{currency}.$data->{amount}.$data->{PM}.$data->{ACCEPTANCE}.$data->{STATUS}.$data->{CARDNO}.$data->{PAYID}.$data->{NCERROR}.$data->{BRAND}
-  }
-  $txt .= $SHAsalt;
-#warn "makeHash : txt=$txt\n";
-  $ctx->add($txt);
-  my $hexdigest = uc($ctx->hexdigest);
-#warn "makeHash : digest=$hexdigest\n";
-  return ($hexdigest);
 }
 
 #--------
@@ -289,20 +269,6 @@ warn "payonline :: gentablekey : key=$key\n";
       return $key if $sth;
     }
  }
-}
-#--------
-sub setYellowPaySrv {
-  my $etat = shift;
-
-  if ($DEBUG or ($etat eq 'test')) {
-		$YellowPaySrv = 'https://e-payment.postfinance.ch/ncol/test/orderstandard.asp';
-		$SHAsalt	  = $SHAsaltTest;
-  } else {
-		$YellowPaySrv = 'https://e-payment.postfinance.ch/ncol/prod/orderstandard.asp'
-  }
-
-warn "setYellowPaySrv : DEBUG=$DEBUG, etat=$etat\n";
-
 }
 #--------
 sub setLog {
@@ -687,6 +653,104 @@ warn "maintenance $crtdate : $startdate, $enddate, IN maintenance\n";
 	}
 warn "maintenance $crtdate : NO maintenance\n";
 	return 0;	
+}
+
+package YellowPayFlow;  #########################################
+
+sub _makeHash {
+  my ($data, $hmac_key) = @_;
+
+  $data->{currency} ||= "CHF";
+
+  my $ctx = Digest::SHA1->new;
+  my $txt;
+  if (exists $data->{PSPID}) {
+    # "in" hash formula
+    $txt = $data->{orderID}.$data->{amount}.$data->{currency}.$data->{PSPID}
+  } elsif (exists $data->{PAYID}) {
+    # "out" hash formula
+    $txt = $data->{orderID}.$data->{currency}.$data->{amount}.$data->{PM}.$data->{ACCEPTANCE}.$data->{STATUS}.$data->{CARDNO}.$data->{PAYID}.$data->{NCERROR}.$data->{BRAND}
+  }
+  $txt .= $hmac_key;
+#warn "makeHash : txt=$txt\n";
+  $ctx->add($txt);
+  my $hexdigest = uc($ctx->hexdigest);
+#warn "makeHash : digest=$hexdigest\n";
+  return ($hexdigest);
+}
+
+
+sub _postfinance_srv {
+  my ($test_or_prod) = @_;
+  return 'https://e-payment.postfinance.ch/ncol/$test_or_prod/orderstandard.asp';
+};
+
+sub get_server_url { shift->{srv} }
+sub get_shop_id { shift->{shopID} }
+
+package YellowPayFlow::Payonline;
+
+use base qw(YellowPayFlow);
+
+sub test {
+  bless {
+    shopID => $payonline_tools::PayonlineShopID,
+    hmac   => $payonline_tools::HMAC_salts->{epfl}->{test},
+    srv => YellowPayFlow::_postfinance_srv("test"),
+  }, shift
+}
+
+sub prod {
+  bless {
+    shopID => $payonline_tools::PayonlineShopID,
+    hmac   => $payonline_tools::HMAC_salts->{epfl}->{prod},
+    srv => YellowPayFlow::_postfinance_srv("prod"),
+  }, shift
+}
+
+sub by_instance {
+  my ($class, $instance) = @_;
+  $instance->{etat} eq 'test' ? $class->test : $class->prod;
+}
+
+sub makeHash {
+  my ($self, $struct) = @_;
+  return YellowPayFlow::_makeHash($struct, $self->{hmac});
+}
+
+package YellowPayFlow::FormCont;
+
+use base qw(YellowPayFlow);
+
+sub test {
+  bless {
+    shopID => 'unilepflTEST',
+    hmac_in => $payonline_tools::HMAC_salts->{unil}->{in},
+    hmac_out => $payonline_tools::HMAC_salts->{unil}->{out},
+    srv => YellowPayFlow::_postfinance_srv("test"),
+  }, shift
+}
+
+sub prod {
+  bless {
+    shopID => 'unilepfl',
+    hmac_in => $payonline_tools::HMAC_salts->{unil}->{in},
+    hmac_out => $payonline_tools::HMAC_salts->{unil}->{out},
+    srv => YellowPayFlow::_postfinance_srv("prod"),
+  }, shift
+}
+
+sub makeHash {
+  my ($self, $struct) = @_;
+  return YellowPayFlow::_makeHash($struct,
+                                  exists $struct->{PAYID} ?
+                                  $self->{hmac_out} :
+                                  $self->{hmac_in});
+}
+
+sub current {
+  my ($class, $mode) = @_;
+  $ENV{FORMCONT_TEST_MODE} ? $class->test : $class->prod;
 }
 
 1;

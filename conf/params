@@ -1,6 +1,0 @@
-#       payonline.epfl.ch
-#       - private parameters
-
-$ShopID                 = 'epfl2543_yp';
-$SHAsalt                = ';6E=-tw!rE_nsg./TzwrtGs*';
-$SHAsaltTest    = 'MotoVelo_1234-4!S-';

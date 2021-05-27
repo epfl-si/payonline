@@ -120,8 +120,6 @@ sub main {
 
   error ($errmsg) if $errmsg;
   
-  payonline_tools::setYellowPaySrv();
-
   my $ParamTotal = $UserTotal * 100;	# 		- pas de décimales
   my $currency   = 'CHF';
   my $userdata   = {
@@ -146,27 +144,30 @@ warn " ==>> formcont payment : args dump <<==\n";
 foreach my $item (keys %args) {
 	warn "$item=$args{$item}\n";
 }
- 
+
+  my $flow = YellowPayFlow::FormCont->current();
   my $hashdata = {
 	orderID 	=> $id_trans,
 	amount 		=> $ParamTotal,
-	PSPID 		=> $payonline_tools::ShopID,
+	PSPID 		=> $flow->get_shop_id(),
   };
 
-  my $txtHash = payonline_tools::makeHash ($hashdata, 'in');
+  my $send_hash = $flow->makeHash($hashdata);
   my $txtLang = $lang eq 'fr' ? 'fr_FR' : 'en_US';
   my $COM 	  = qq{Payement en ligne : Formation continue UNIL/EPFL};
   my $LOGO 	  = qq{http://www.formation-continue-unil-epfl.ch/images/logo.png};
+  my $srv_url	  = $flow->get_server_url();
+  my $shopID      = $flow->get_shop_id();
   
   print qq{
-	   <form action="$payonline_tools::YellowPaySrv" method="POST" name="cmd" enctype="multipart/form-data">
+	   <form action="$srv_url" method="POST" name="cmd" enctype="multipart/form-data">
 
-			<input type="hidden" name="PSPID" 		value="$payonline_tools::ShopID"> 
+			<input type="hidden" name="PSPID" 		value="$shopID"> 
 			<input type="hidden" name="orderID" 	value="$id_trans"> 
 			<input type="hidden" name="amount" 		value="$ParamTotal"> 
 			<input type="hidden" name="currency" 	value="CHF"> 
 			<input type="hidden" name="language" 	value="$txtLang"> 
-			<input type="hidden" name="SHASign" 	value="$txtHash"> 
+			<input type="hidden" name="SHASign" 	value="$send_hash">
 
 			<input type="hidden" name="CN" 			value="$args{FirstName} $args{LastName}"> 
 			<input type="hidden" name="EMAIL" 		value="$args{Email}"> 

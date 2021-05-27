@@ -20,7 +20,7 @@ use Digest::MD5 qw(md5_hex);
 use Digest::SHA1 ;
 
 use strict;
-use vars qw( $dbh $DEBUG $su_list $logfile $rc4key $errmsg $YellowPaySrv $demfond $codeTVA
+use vars qw( $dbh $DEBUG $su_list $logfile $rc4key $errmsg $demfond $codeTVA
             $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
             $su_list $ges_list $SHAsalt $mode $postURL $redirectURL
             );
@@ -32,28 +32,10 @@ my $pi 		= $ENV {PATH_INFO};
 my @days 	= (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 my $resp 	= 'ion.cionca@epfl.ch';
 
-# - change on postfinance
-   $SHAsalt	= {
-   	test => {
-   		in  => './TzwrtGs*;6E=-tw!rE_nsg',
-   		out	=> './TzwrtrE_nsgGs*;6E=-tw!',
-   	},
-   	prod => {
-   		in  => './TzwrtGs*;6E=-tw!rE_nsg',
-   		out	=> './TzwrtrE_nsgGs*;6E=-tw!',
-   	},
-   };
-
-$YellowPayTstSrv= 'yellowpaytest.postfinance.ch';
-$YellowPayPrdSrv= 'yellowpay.postfinance.ch';
-
-$YPServersIP	= '185.8.54.254,185.8.52.254,194.41.152.138,194.41.152.139,194.41.216.138,194.41.216.139,212.23.45.96,212.23.45.97,212.23.45.98,212.23.45.99,212.23.45.100,212.23.45.101,212.23.45.102,212.23.45.103,212.23.45.104,212.23.45.105,212.23.45.106,212.23.45.107,212.23.45.108,212.23.45.109,212.23.45.110,212.23.45.111 ,213.254.248.96,213.254.248.97,213.254.248.98,213.254.248.99,213.254.248.100,213.254.248.101,213.254.248.102,213.254.248.103,213.254.248.104,213.254.248.105,213.254.248.106,213.254.248.107,213.254.248.108,213.254.248.109,213.254.248.110,213.254.248.111 ,212.35.124.160,212.35.124.161,212.35.124.162,212.35.124.163,212.35.124.164,212.35.124.165,212.35.124.166,212.35.124.167,212.35.124.168,212.35.124.169,212.35.124.170,212.35.124.171,212.35.124.172,212.35.124.173,212.35.124.174,212.35.124.175';
-
 $su_list	= '104782';	# - ic,
 
 $DEBUG 		= '0';
 $mode   	= $DEBUG ? 'test' : 'prod';	# - test | prod
-$ShopID 	= $DEBUG ? 'unilepflTEST' : 'unilepfl';	# - test | prod
 
 
 warn "formcont :: DEBUG=$DEBUG\n";
@@ -75,27 +57,6 @@ sub getcrtdate {
     $year += 1900;
     $days[2] = 29 if (($year % 400 == 0) || ($year % 4 == 0 && $year % 100 != 0)) ;
     return sprintf "%4d-%02d-%02d %02d:%02d",$year,$mon,$mday,$hour,$min;
-}
-
-#-------------
-sub makeHash {
-  my ($data, $flag) = @_;
-
-  my $ctx = Digest::SHA1->new;
-  my $txt;
-  if ($flag eq 'in') {
-  	$txt = $data->{orderID}.$data->{amount}.'CHF'.$data->{PSPID};
-  } else {
-  	$txt = $data->{orderID}.'CHF'.$data->{amount}.$data->{PM}.$data->{ACCEPTANCE}.$data->{STATUS}.$data->{CARDNO}.$data->{PAYID}.$data->{NCERROR}.$data->{BRAND}
-  }
-  
-  my $sha_salt = $SHAsalt->{$mode}->{$flag};
-  $txt .= $sha_salt;
-warn "formcont makeHash : txt=$txt, sha_salt=$sha_salt\n";
-  $ctx->add($txt);
-  my $hexdigest = uc($ctx->hexdigest);
-warn "formcont makeHash : digest=$hexdigest\n";
-  return ($hexdigest);
 }
 
 #--------
@@ -132,7 +93,6 @@ sub get_time {
   $days[2] = 29 if ($year % 400 == 0) || ($year % 4 == 0 && $year % 100 != 0) ;
   return sprintf "%4d-%02d-%02d %02d:%02d:00",$year,$mon,$mday,$hour,$min;
 }
-
 #--------
 sub gentablekey {
  my ($userdata) = @_;
@@ -184,24 +144,6 @@ warn "formcont :: gentablekey : key=$key\n";
       return $key if $sth;
     }
  }
-}
-
-#--------
-sub setYellowPaySrv {
-
-  die "formcont :: payonline : ** FATAL : no mode" unless $mode;
-  
-  if ($mode eq 'test') {
-	$YellowPaySrv = 'https://e-payment.postfinance.ch/ncol/test/orderstandard.asp';
-  } else {
-	$YellowPaySrv = 'https://e-payment.postfinance.ch/ncol/prod/orderstandard.asp'
-  }
-
-}
-#--------
-sub setDEBUG {
-  $DEBUG = shift;
-#  warn "payonline_tools :: DEBUG=$DEBUG";
 }
 #--------
 sub setLog {

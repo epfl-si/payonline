@@ -87,11 +87,6 @@ WORKDIR /var/www/vhosts/payonline.epfl.ch
 RUN mkdir -p /var/www/vhosts/payonline.epfl.ch/private/lib && \
     mkdir -p /var/www/vhosts/payonline.epfl.ch/private/lib/lib/perl5
 
-COPY ./conf/params /var/www/vhosts/payonline.epfl.ch/private/params
-
-RUN echo '0123456789abcdef0123456789abcdef' > /var/www/vhosts/payonline.epfl.ch/private/csrfkey
-RUN echo '0123456789ABCDEFGHIJKLMNOPQRSTUV' > /var/www/vhosts/payonline.epfl.ch/private/pwdkey
-
 ################################################################################
 # Apache
 ################################################################################

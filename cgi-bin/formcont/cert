@@ -96,7 +96,7 @@ warn "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO ** : res
 	BRAND 		=> $args{BRAND},	
 	};
 
-	my $hash 	= payonline_tools::makeHash ($hashdata, 'out');
+	my $check_hash 	= YellowPayFlow::FormCont->current->makeHash ($hashdata);
 
 	# - check hash --------
 warn "formcont :: done cert: ... 4 hash=$hash, arghash=$args{SHASIGN}\n";

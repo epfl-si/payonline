@@ -137,7 +137,6 @@ warn "payonline cert: ... 3 query OK\n";
 warn "payonline cert: etat=$etat\n";
 
 # - check hash --------
-  $payonline_tools::SHAsalt	= $payonline_tools::SHAsaltTest if $etat eq 'test';
   my $hashdata = {
 	orderID 	=> $args{orderID},
 	currency 	=> $args{currency},
@@ -148,11 +147,11 @@ warn "payonline cert: etat=$etat\n";
 	CARDNO 		=> $args{CARDNO},
 	PAYID 		=> $args{PAYID},
 	NCERROR 	=> $args{NCERROR},
-	BRAND 		=> $args{BRAND},	
+	BRAND 		=> $args{BRAND},
   };
-  my $hash 		= payonline_tools::makeHash ($hashdata, 'out');
-	unless ($hash eq $args{SHASIGN}) {
-		warn "** ERR : payonline :: cert FAILED : $id_trans\n$hash\n$args{SHASIGN}\n";
+  my $check_hash = YellowPayFlow::Payonline->by_instance($inst)->makeHash($hashdata);
+  unless ($check_hash eq $args{SHASIGN}) {
+		warn "** ERR : payonline :: cert FAILED : $id_trans\n$check_hash\n$args{SHASIGN}\n";
 		return;
 	}
 	
