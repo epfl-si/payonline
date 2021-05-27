@@ -13,6 +13,7 @@
 
 use strict;
 use payonline_tools;
+use formcont_templates;
 
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
 
@@ -84,11 +85,11 @@ my %errmsgs	= (
   
 warn "--> formcont payment : $payonline_tools::mode\n";
 
-  payonline_tools::header ();
+  print formcont_templates::header ();
 
   main ();
 
-  payonline_tools::footer ();
+  print formcont_templates::footer ();
 
   exit;
 

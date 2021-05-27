@@ -16,6 +16,7 @@ use lib '/opt/dinfo/lib/perl';
 use strict;
 use Tequila::Client;
 use payonline_tools;
+use formcont_templates;
 
 use vars qw(%args $lang $errmsg $crtdate $sciper $key $tequila);
 
@@ -39,7 +40,7 @@ $payonline_tools::DEBUG	 = $DEBUG;
 init();
 authenticate ();
 
-payonline_tools::header ();
+print formcont_templates::header ();
   
 error ('Accès réservé', 1) unless $accesslist =~ /$sciper/;
 

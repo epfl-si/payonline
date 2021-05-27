@@ -12,6 +12,7 @@
 
 use strict;
 use payonline_tools;
+use formcont_templates;
 
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
 
@@ -45,12 +46,12 @@ $lang			= 'en' unless $lang;
 
 warn "--> lang=$lang, args=$args{lang}\n";
 
-payonline_tools::header ();
+print formcont_templates::header ();
 
-$payonline_tools::formContent->{$lang} =~ s/NUM_PART/$args{numpart}/;
-$payonline_tools::formContent->{$lang} =~ s/NUM_FACTURE/$args{numfacture}/;
-
-print $payonline_tools::formContent->{$lang};
+print formcont_templates::forms(
+  $payonline_tools::DEBUG, $lang,
+  { NUM_PART => $args{numpart},
+    NUM_FACTURE => $args{numfacture} });
 
 if ( $args{total} ) {
 	print qq{
@@ -94,7 +95,7 @@ print qq{
 	</form>
 };
 
-payonline_tools::footer ();
+print formcont_templates::footer ();
 
 exit;
 

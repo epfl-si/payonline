@@ -120,14 +120,13 @@ RUN echo "umask 0002" >> /etc/apache2/envvars && \
 COPY ./cadi-libs/Cadi/. /opt/dinfo/lib/perl/Cadi/
 COPY ./accred-libs/Accred/. /opt/dinfo/lib/perl/Accred/
 COPY ./tequila-perl-client/Tequila/Client.pm /opt/dinfo/lib/perl/Tequila/Client.pm
-COPY ./cgi-bin/payonline_tools.pm /opt/dinfo/lib/perl/payonline_tools.pm
+COPY ./perllib/*.pm /opt/dinfo/lib/perl/
 COPY ./cgi-bin/messages.txt /opt/dinfo/lib/perl/messages.txt
 
 ################################################################################
 # App
 ################################################################################
 COPY ./cgi-bin/. /var/www/vhosts/payonline.epfl.ch/cgi-bin/
-RUN find cgi-bin/ -name "*.pm" -delete
 COPY ./htdocs/. /var/www/vhosts/payonline.epfl.ch/htdocs/
 COPY ./private/tmpl/. /var/www/vhosts/payonline.epfl.ch/private/tmpl/
 

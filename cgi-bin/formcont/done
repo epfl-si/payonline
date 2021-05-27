@@ -12,6 +12,7 @@
 
 use strict;
 use payonline_tools;
+use formcont_templates;
 
 use vars qw(%args $lang $errmsg $crtdate $usessl $lang	);
 
@@ -50,11 +51,11 @@ my %msgs	= (
 		'Please contact Postfinance\'s support at : shopperhelp@postfinance.ch and provide all details of the transaction',
 	],
 	);
-payonline_tools::header ();
+print formcont_templates::header ();
   
 main ();
 
-payonline_tools::footer ();
+print formcont_templates::footer ();
 
 exit;
   
