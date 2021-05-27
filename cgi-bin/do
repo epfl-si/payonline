@@ -92,7 +92,7 @@ warn "payonline cert: ** CERT from YellowPay **\n";
   my $YPSrv = $ENV{REMOTE_ADDR};
   return unless $YPSrv;
 warn "payonline cert: ... 1 YPSrv=$YPSrv\n";
-  unless ($payonline_tools::YPServersIP =~ /$YPSrv/) {
+  unless (payonline_tools::is_known_postfinance_ip($YPSrv)) {
 warn "payonline cert: $YPSrv : unknown server in static list\n";
 		if (payonline_tools::is_ip_in_postfinance_ranges($YPSrv)) {
 warn "payonline cert: OK :: $YPSrv in range\n";

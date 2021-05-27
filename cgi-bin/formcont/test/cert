@@ -62,7 +62,7 @@ warn "formcont :: done cert: ** CERT from YellowPay **\n";
 	my $YPSrv = $ENV{REMOTE_ADDR};
 	return unless $YPSrv;
 warn "formcont :: done cert: ... 1 YPSrv=$YPSrv\n";
-	return unless ($payonline_tools::YPServersIP =~ /$YPSrv/);
+	return unless (payonline_tools::is_known_postfinance_ip($YPSrv));
 
 	foreach my $item (keys %args) {
 warn "formcont :: done .. cert args : $item=$args{$item}\n";
