@@ -35,7 +35,6 @@ my $masterIP	= '128.178.1.146';
 
 #	- inst id qui contournent les Conditions Générales de payonline
 my $bypassCondGen = 'y8xou4juffbh586ua1astocwsnmuh1y4,cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
-my $noHeaderPage  = 'maintrans-noheader.tmpl';
 my $noHeaderInsts = 'cyhcwjm0podw3bcnlgu1r0u01s6f0zbc';
 
 my %errmsgs	= (
