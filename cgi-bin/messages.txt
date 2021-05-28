@@ -78,8 +78,8 @@ $messages = {
 				contact the Financial service.
 				<p>Bold labeled fields below are mandatory.</p>},
 		},
-		fond_label => {
-			fr => q{Fond},
+		fonds_label => {
+			fr => q{Fonds},
 			en => q{Fund},
 		},
 		descr_note_label => {
