@@ -30,9 +30,6 @@ my $masterIP	= '128.178.1.146';
 my $accesslist	= '104782,213338,273001,242631,293099';
 my $URL			= '/cgi-bin/formcont/admin';
 
-my $DEBUG 				 = '1';
-$payonline_tools::DEBUG	 = $DEBUG;
-
 init();
 authenticate ();
 

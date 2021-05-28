@@ -1,0 +1,141 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg">
+<TMPL_ELSE>
+
+<div  class="editbox">
+<h3>Détails de l'instance</h3>
+<form id="form1" name="form1" method="post" action="<TMPL_VAR NAME=sFormaction>">
+  <input name="id" type="hidden" id="id" value="<TMPL_VAR NAME=id>">
+  <input type="hidden" name="mod" >
+  <input type="hidden" name="del" >
+  <input type="hidden" name="valid" >
+  <input type="hidden" name="activate" >
+  <input type="hidden" name="inactivate" >
+  <input type="hidden" name="etat" value="<TMPL_VAR NAME=etat>" >
+<!--
+  <input type="hidden" name="monnaie" value="<TMPL_VAR NAME=sMonnaie>" >
+-->
+
+  <table width="98%" border="0">
+    <TMPL_IF NAME=sSuperUser>
+	   <tr>
+		 <td width="30%" align="right">Responsable </td>
+		 <td><TMPL_VAR NAME=respPrenom> <TMPL_VAR NAME=respNom></td>
+	   </tr>
+    </TMPL_IF>
+    <tr>
+      <td align="right" valign="top">Identificateur de l'instance </td>
+      <td><b><TMPL_VAR NAME=id></b></td>
+    </tr>
+    <tr>
+      <td align="right">Fonds </td>
+      <td><TMPL_VAR NAME=sFonds></td>
+    </tr>
+    
+    <tr>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td valign="top" align="right">OIS<br>(Ordre Interne Statistique)
+      </td>
+      <td><input name="ois" size="48" value="<TMPL_VAR NAME=OIS>"></td>
+    </tr>
+
+    <tr>
+      <td align="right" valign="top">Description 
+      <br><i>(Vous êtes priés de préciser les dates de la manifestation)</i>
+      </td>
+      <td><textarea name="descr" cols="48" rows="2" id="descr"><TMPL_VAR NAME=Descr></textarea></td>
+    </tr>
+	<tr>
+	  <td align="right">Compte budgétaire </td>
+	  <td><TMPL_VAR NAME=sNCTxt></td>
+	</tr>
+	
+	<TMPL_IF NAME=sValid>
+	  <TMPL_IF NAME=sCodeTVA>
+		<tr>
+		  <td align="right">Code TVA </td>
+		  <td><TMPL_VAR NAME=sCodeTVA></td>
+		</tr>
+	  </TMPL_IF>
+	</TMPL_IF>
+	
+	<tr>
+      <td align="right">Date d&eacute;but </td>
+      <td><input name="datedeb" type="text" size="12" id="datedeb" value="<TMPL_VAR NAME=datedeb>" />
+        <A HREF="#" onClick="cal.select(document.forms['form1'].datedeb,'anchor1','dd-MM-yyyy'); return false;"
+        	NAME="anchor1" ID="anchor1"><img src="/images/cal.gif" border="0"></A>
+      </td>
+    </tr>
+    <tr>
+      <td align="right">Date fin  </td>
+      <td><input name="datefin" type="text" size="12" id="datefin"  value="<TMPL_VAR NAME=datefin>" />
+        <A HREF="#" onClick="cal.select(document.forms['form1'].datefin,'anchor2','dd-MM-yyyy'); return false;"
+        	NAME="anchor2" ID="anchor2"><img src="/images/cal.gif" border="0"></A>
+      </td>
+    </tr>
+	<tr>
+	  <td align="right">Monnaie </td>
+	  <td><TMPL_VAR NAME=sMonnaie></td>
+	</tr>
+	<tr>
+      <td align="right" valign="top">Contact mail </td>
+      <td><input name="contact" value="<TMPL_VAR NAME=contact>" size="48">
+      <br><i>(si autre contact que l'adresse du responsable)</i>      
+      </td>
+    </tr>
+	<tr>
+	  <td align="right">URL Manifestation </td>
+	  <td><input name="urlconf"  size="48" value="<TMPL_VAR NAME=urlconf>"></td>
+	</tr>
+    <tr>
+      <td align="right" valign="top">URL Retour  </td>
+      <td><input name="url" type="text" id="url" size="48"  value="<TMPL_VAR NAME=URL>" />
+      <br><i>(veuillez consulter l'aide en ligne pour plus de détails à ce sujet)</i></td>
+    </tr>
+    <tr>
+	  <td align="right" valign="top">Mail de confirmation des transactions </td>
+      <td><input name="mailinst" type="text" id="mailinst" size="48"  value="<TMPL_VAR NAME=mailinst>" /> <i><br>(si présent, déclenche un message de confirmation pour les transactions réussies)</i></td>
+	  </td>
+    </tr>
+    <tr>
+	  <td align="right">Etat de l'instance </td>
+	  <td><TMPL_VAR NAME=Etat></td>
+	  </td>
+    </tr>
+  </table>
+<hr>
+<br><b>Actions :</b>
+ <TMPL_IF NAME=sValid>
+ [ <a href="#" OnClick="document.form1.valid.value=1;form1.submit();">sauver et valider</a> ]
+ <TMPL_ELSE>
+ [ <a href="#" OnClick="document.form1.mod.value=1;form1.submit();">sauver</a> ]
+ </TMPL_IF>
+
+ <TMPL_IF NAME=sDelValid>
+ [ <a href="#" OnClick="<TMPL_VAR NAME=sDelPath>">effacer</a> ]
+ </TMPL_IF>
+ [ <a href="<TMPL_VAR NAME=sPathMe>/listtrans?lang=fr&id=<TMPL_VAR NAME=id>">consulter les transactions</a> ]
+ <TMPL_IF NAME=sDelValid>
+ [ <a href="<TMPL_VAR NAME=sPathMe>/demvalid?lang=fr&id=<TMPL_VAR NAME=id>">demande de validation</a> ]
+ </TMPL_IF>
+ <TMPL_IF NAME=sActivate>
+ [ <a href="#" OnClick="document.form1.activate.value=1;form1.submit();">activer</a> ]
+ </TMPL_IF>
+ <TMPL_IF NAME=sInactivate>
+ [ <a href="#" OnClick="document.form1.inactivate.value=1;form1.submit();">désactiver</a> ]
+ </TMPL_IF>
+</form>
+</div>
+
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">

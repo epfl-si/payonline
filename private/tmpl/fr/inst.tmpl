@@ -1,0 +1,43 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+
+    <h3>Instances</h3>
+
+    <form id="form1" name="form1" method="post" action="<TMPL_VAR NAME=sPathMe>/listinst">
+      <p>Recherche des instances par </p>
+      <table width="100%" border="0">
+	<tr>
+	  <td width="30%" align="right">Num&eacute;ro :</td>
+	  <td width="70%"><input name="no_inst" type="text" id="no_inst" /></td>
+	</tr>
+	<tr>
+	  <td width="30%" align="right">CF :</td>
+	  <td width="70%"><input name="cf" type="text" id="cf" /></td>
+	</tr>
+	<TMPL_IF NAME=sSuperUser>
+	<tr>
+	  <td align="right">Responsable : </td>
+	  <td><input name="resp_sciper" type="text" id="resp_sciper" /></td>
+	</tr>
+	</TMPL_IF>
+	<tr>
+	  <td align="right">du : </td>
+	  <td><input name="datedeb" type="text" id="datedeb" size="10" /> 
+            au : 
+            <input name="datefin" type="text" id="datefin" size="10" /> 
+            (jj-mm-aaaa) </td>
+	</tr>
+      </table>
+      <input name="search" type="submit" id="search" value="afficher" />
+    </form>
+
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">

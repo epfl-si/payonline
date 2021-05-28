@@ -1,0 +1,91 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+	<div  class="editbox">
+	<h3>New instance</h3>
+	
+	A payment instance corresponds to an event or conference for which you wish to organise
+	an on line payment service. You may create a new payment instance only if you have a financial account. Otherwise, please 
+	<a href=http://payonline.epfl.ch/cgi-bin/payonline/demfnd?lang=en>apply</a>. 
+	<p>Bold labeled fields below are compulsory.</p>
+	
+	<form id="form1" name="form1" method="post" action="<TMPL_VAR NAME=sFormaction>">
+	  <input type="hidden" name="add" >
+	  <table width="98%" border="0">
+		<tr height="30" valign="top">
+		  <td align="right"><B>Fonds</B></td>
+		  <td><TMPL_VAR NAME=sFonds></td>
+		</tr>
+		<tr>
+		  <td valign="top" align="right">OIS<br>(Ordre Interne Statistique)
+		  </td>
+		  <td><input name="ois"" size="48"></td>
+		</tr>
+		<tr>
+		  <td valign="top" align="right"><B>Description</B>
+		  <br><i>(Please provide the dates of the event)</i>
+		  </td>
+		  <td><textarea name="descr" cols="48" rows="2" id="descr"></textarea></td>
+		</tr>
+		<tr>
+		  <td align="right"><b>Budgetary Account </b></td>
+		  <td><TMPL_VAR NAME=sNCTxt></td>
+		</tr>
+		<tr>
+		  <td align="right"><B>Instance Start Date</B></td>
+		  <td><input name="datedeb" type="text" size="12" id="datedeb" value="<TMPL_VAR NAME=sdatedeb>" />
+			<A HREF="#" onClick="cal.select(document.forms['form1'].datedeb,'anchor1','dd-MM-yyyy'); return false;"
+				NAME="anchor1" ID="anchor1"><img src="/images/cal.gif" border="0"></A>
+		  </td>
+		</tr>
+		<tr>
+		  <td align="right"><B>Instance End Date</B></td>
+		  <td><input name="datefin" type="text" id="datefin"  size="12"/>
+			<A HREF="#" onClick="cal.select(document.forms['form1'].datefin,'anchor2','dd-MM-yyyy'); return false;"
+				NAME="anchor2" ID="anchor2"><img src="/images/cal.gif" border="0"></A>
+		  </td>
+		</tr>
+		<tr>
+		  <td align="right"><B>Currency</B> </td>
+		  <td><TMPL_VAR NAME=sMonnaie></td>
+		</tr>
+		<tr>
+		  <td align="right" valign="top">Contact mail </td>
+		  <td><input name="contact" value="<TMPL_VAR NAME=contact>" size="48">
+		  <br><i>(contact mail if not the manager's address)</i>      
+		  </td>
+		</tr>
+		<tr>
+		  <td align="right">URL Event : </td>
+		  <td><input name="urlconf"  size="48"></td>
+		</tr>
+		<tr>
+		  <td align="right">Return URL </td>
+		  <td><input name="url" type="text" id="url" size="48" />
+		  <br><i>(please check the on line help for more details)</i>
+		  </td>
+		</tr>
+		<tr>
+		  <td align="right">Confirmation Mail for Valid transactions</td>
+		  <td><input name="mailinst" type="text" size="48" />
+		  <br><i>(if present, valid transactions will trigger a confirmation mail)</i>
+		  </td>
+		</tr>
+	  </table>
+	
+	<hr>
+	<br><b>Actions :</b>
+	 [ <a href="#" OnClick="document.form1.add.value=1;form1.submit();">save</a> ]
+	</form>
+	
+	</div>
+
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">

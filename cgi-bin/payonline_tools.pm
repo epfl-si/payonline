@@ -11,7 +11,6 @@
 #
 #
 
-use lib '/opt/dinfo/lib/perl';
 use lib '/var/www/vhosts/payonline.epfl.ch/private/perl-mods/';
 
 package payonline_tools;
@@ -25,6 +24,7 @@ use MIME::Base64 ;
 use Net::CIDR;
 use Net::CIDR ':all';
 
+use lib '/opt/dinfo/lib/perl';
 use Tequila::Client;
 use Cadi::CadiDB;
 use Cadi::Accreds;
@@ -139,7 +139,7 @@ $rejectIP = ('128.178.109.243','157.55.39.166');	#	crawlers
 
 $epflLOGO	= 'https://web2018.epfl.ch/2.0.0/icons/epfl-logo.svg';
 $demfond 	= 'bertold.walther@epfl.ch,ion.cionca@epfl.ch';
-$su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490,254724,229454,268229';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
+$su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490,254724,229454,268229,161014,160218';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
 $codeTVA	= 'Q7';
 $mailFrom	= 'noreply@epfl.ch';
 
@@ -757,7 +757,6 @@ sub inMaintenance {
 warn "maintenance $crtdate : $startdate, $enddate, IN maintenance\n";
 		return qq{$startdate,$enddate};
 	}
-warn "maintenance $crtdate : NO maintenance\n";
 	return 0;	
 }
 

@@ -24,9 +24,10 @@ a:hover {
 </head>
 
 <body>
-<p><a href="http://www.formation-continue-unil-epfl.ch/" target="_blank"><img src=http://www.formation-continue-unil-epfl.ch/images/logo.png></a>
+<p><a href="http://www.formation-continue-unil-epfl.ch/" target="_blank"><img src="/images/formcont-logo.png"></a>
+<h2>--- test instance ---</h2>
 <p>Please fill in all the fields here below : </p>
-<form id="form1" name="cmd" method="post" action="/cgi-bin/formcont/payment"
+<form id="form1" name="cmd" method="post" action="/cgi-bin/formcont/test/payment"
 OnSubmit=" 
 		 if (document.cmd.condgen.checked) {
 			document.cmd.submit();
@@ -35,7 +36,8 @@ OnSubmit="
 			return false; 
 		 }
 		 ">
-  <input type=hidden name=lang value=en>
+  <input type=hidden name=lang 	 value=en>
+  <input type=hidden name=origin value=formcont>
   <table width="100%" border="0" cellpadding="5">
     <tr>
       <td width="30%"><div align="right"><strong>Lastname</strong></div></td>

@@ -1,0 +1,510 @@
+#!/usr/bin/perl
+#
+##############################################################################
+#
+# Service Name  payonline 
+#	File Name			do
+# Author:       Ion CIONCA (Ion.Cionca@epfl.ch) - 2005-2019
+#
+#########################################################################
+#####
+#
+#
+
+use strict;
+use HTML::Template;
+use LWP::UserAgent; 
+use Data::Dumper;
+
+use payonline_tools;
+
+use vars qw(%args $tmpldir $lang $errmsg $crtdate $usessl $messages	);
+
+require 'messages.txt';
+
+my $me 		= $ENV {SCRIPT_NAME};
+my $us 		= $ENV {SERVER_NAME};
+my $qs 		= $ENV {QUERY_STRING};
+my $pi 		= $ENV {PATH_INFO};
+my $lang 	= 'en';
+my $tmpldir = '/var/www/vhosts/payonline.epfl.ch/private/tmpl/';
+
+my $logfile	= '/var/log/httpd/payonline.log';
+
+my %errmsgs	= (
+	fr => [
+		' *** Attention : version de test. Ne pas utiliser, svp ! ***',	
+		'Confirmation de paiement',
+		'Transaction :',
+		'PostFinance ID :',
+		'Méthode de paiement :',
+		'Total :',
+		'Au nom de :',
+		'Paiement refusé',
+		'Changement de statut de la transaction',
+	      ],
+	en => [
+		' *** Warning : test version. Not for public usage ! ***',	# 15
+		'Payment Confirmation',
+		'Transaction :',
+		'PostFinance ID :',
+		'Payement method:',
+		'Total :',
+		'Paid for :',
+		'Payment refused',
+		'Transaction status changed',
+	      ],
+	);
+
+my $verbose = '1';
+
+$| = 1;
+
+  payonline_tools::setLog($logfile);
+  %args			= payonline_tools::loadargs ();
+  $crtdate 	= payonline_tools::getcrtdate();
+
+  payonline_tools::init ();
+ 
+  dispatch ();
+  exit;
+
+#------
+sub dispatch {
+
+   if      ($pi =~  /^\/cert/) {
+   	$args{fail}    = 1 if   ($pi =~ /fail/);
+   	$args{offline} = 1 if   ($pi =~ /offline/);
+   	cert ();
+   } elsif ($pi =~  /^\/result/) {
+   	result ();
+   } 
+}
+
+#------
+sub cert {
+
+  print "Content-Type: text/html; charset=utf-8\n\n";
+warn "payonline cert: ** CERT from YellowPay **\n";
+  my $YPSrv = $ENV{REMOTE_ADDR};
+  return unless $YPSrv;
+warn "payonline cert: ... 1 YPSrv=$YPSrv\n";
+  unless ($payonline_tools::YPServersIP =~ /$YPSrv/) {
+warn "payonline cert: $YPSrv : unknown server in static list\n";
+		if (payonline_tools::IPinRange($YPSrv)) {
+warn "payonline cert: OK :: $YPSrv in range\n";
+		} else {
+			my $msg = qq{error :: id_trans=$args{orderID} illegal access from server IP=$YPSrv};
+			payonline_tools::send_mail ('payonline\@epfl.ch', 'payonline ERROR :: unknown Postfinance server', $msg);
+#			return;  
+		}
+  }
+
+  foreach my $item (keys %args) {
+	warn "payonline .. cert ARGS : $item=$args{$item}\n";
+  }  
+
+  my $id_trans = $args{orderID};
+warn "payonline cert: ... 2 id_trans=$id_trans\n";
+  return unless $id_trans;
+  return if  $id_trans =~ /select/i;
+  return if  $id_trans =~ /insert/i;
+  return if  $id_trans =~ /update/i;
+
+  if ($args{fail}) {
+warn "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: CANCEL\n";
+	return;
+  }
+  if ($args{offline}) {
+warn "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: OFFLINE\n";
+
+	my $msg = "
+payonline offline status change
+
+	orderID 	=> $args{orderID},
+	currency 	=> $args{currency},
+	amount 		=> $args{amount},
+	PM 			=> $args{PM},
+	ACCEPTANCE 	=> $args{ACCEPTANCE},
+	STATUS 		=> $args{STATUS},
+	CARDNO 		=> $args{CARDNO},
+	PAYID 		=> $args{PAYID},
+	NCERROR 	=> $args{NCERROR},
+	BRAND 		=> $args{BRAND},	
+	
+	";
+
+	payonline_tools::send_mail ('payonline\@epfl.ch', "payonline OFFLINE STATUS CHANGE : status=$args{STATUS}", $msg);
+
+	return;
+  }
+ 
+  my $query	= payonline_tools::getQuery ($id_trans);
+  return unless $query;
+warn "payonline cert: ... 3 query OK\n";
+
+  # - get transaction data
+  my $trans= payonline_tools::getTrans ($id_trans,'');
+  unless ($trans) {
+  	warn "payonline process_response: id_trans=$id_trans not found\n";
+  	return;
+  }
+  
+  # - get instance data
+  my $sql  = qq{select * from instances where id=?};
+  my $sth  = payonline_tools::dbquery ($sql, ($trans->{id_inst}));
+  my $inst = $sth->fetchrow_hashref();
+  unless ($inst) {
+  	warn "payonline process_response: instance: not found for id_trans=$id_trans\n";
+  	return;
+  }
+  my $etat = $inst->{etat};
+warn "payonline cert: etat=$etat\n";
+  $payonline_tools::SHAsalt	= $payonline_tools::SHAsaltTest if $etat eq 'test';
+
+  my $hashdata = {
+	orderID 	=> $args{orderID},
+	currency 	=> $args{currency},
+	amount 		=> $args{amount},
+	PM 			=> $args{PM},
+	ACCEPTANCE 	=> $args{ACCEPTANCE},
+	STATUS 		=> $args{STATUS},
+	CARDNO 		=> $args{CARDNO},
+	PAYID 		=> $args{PAYID},
+	NCERROR 	=> $args{NCERROR},
+	BRAND 		=> $args{BRAND},	
+  };
+  my $hash 		= payonline_tools::makeHash ($hashdata, 'out');
+# - check hash --------
+  unless ($hash eq $args{SHASIGN}) {
+  	warn "** ERR : payonline :: cert FAILED : $id_trans\n$hash\n$args{SHASIGN}\n";
+  	return;
+  }
+
+  if ($trans->{etat} eq 'payé') {
+  	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction already payed: status=$args{STATUS}\n";
+		my $msg = qq{error :: id_trans=$id_trans :: transaction already payed, status=$args{STATUS}	};
+		if ($args{STATUS} eq '2') {
+			my $sql = qq{update transact set etat='' where id=?};
+			my $sth = payonline_tools::dbquery ($sql, ($id_trans));
+			$sth->finish ();
+			warn "payonline cert id_trans=$id_trans :: ** TRANSACTION REFUSED **, status updated\n ";
+			$msg .= qq{
+			transaction refused : status updated
+			};
+		}
+		payonline_tools::send_mail ('payonline\@epfl.ch', "payonline WARNING :: transaction payed: status=$args{STATUS}", $msg);
+  	return;
+  } else {
+		if ($args{STATUS} eq '2') {
+			warn "** ERR : payonline :: transaction refused : $id_trans ";
+			return;
+		}
+  }
+
+  my $sql = qq{update transact set
+  	 etat='payé',
+	 datecr=Now(),
+	 paymode=?, 
+	 PaymentID=? 
+	 where id=?};
+  my $sth = payonline_tools::dbquery ($sql, ("$args{PM} $args{BRAND}", $args{PAYID}, $id_trans));
+warn " ==>> payonline cert: OK : $id_trans\n";
+  $sth->finish ();
+
+warn " ==>> payonline cert: : query Email=$query->{Email}\n";
+ my $email = $etat eq 'prod' 
+ 					 ? $query->{Email}
+ 					 : 'payonline@epfl.ch';
+  $lang		 = $query->{lang} ? $query->{lang} : 'en';
+  my $msg  = qq{
+	$errmsgs{$lang}->[1]
+
+		$inst->{descr}
+
+	$errmsgs{$lang}->[2] $id_trans
+	$errmsgs{$lang}->[3] $args{PAYID}
+	$errmsgs{$lang}->[4] $args{PM} $args{BRAND}
+	Date : $trans->{datecr}
+	$errmsgs{$lang}->[5] $query->{Total} $query->{Currency}
+	
+	$errmsgs{$lang}->[6]
+	$query->{FirstName} $query->{LastName}
+	$query->{Addr}
+	$query->{Country}, $query->{ZipCode} $query->{City}
+	};
+	if ( $payonline_tools::exceptions->{$inst->{id}}) {
+		$payonline_tools::mailFrom = $payonline_tools::exceptions->{$inst->{id}}->{mailFrom};
+		if ($query->{anonymous}) {
+			$msg .= qq{
+	Anonymous donation
+			};
+			$email = '';
+		} else {
+			my $date = substr ($trans->{datecr}, 0, 10);
+			$msg = qq{
+Madame, Monsieur,
+ 
+Par la présente, nous vous confirmons la réception de votre donation de $query->{Total} $query->{Currency} pour le $query->{purpose} faite le $date.  Nous vous en sommes très reconnaissants.
+ 
+L'Ecole Polytechnique Fédérale de Lausanne (ci-après EPFL) est un établissement de droit public doté de la personnalité juridique.  Notre établissement est considéré d'utilité publique, exempté des impôts fédéraux, cantonaux, et communaux.
+ 
+Les donations faites à l'EPFL peuvent être déduites fiscalement selon les normes cantonales et fédérales en vigueur. L'EPFL vous enverra une attestation à cet effet dans les meilleurs délais.
+ 
+En vous remerciant à nouveau de votre soutien, nous vous envoyons nos sincères salutations,
+ 
+Nathalie Fontana
+Directrice de la Philanthropie
+ 
+ 
+Dear $query->{FirstName} $query->{LastName},
+ 
+We hereby acknowledge receipt of your donation of $query->{Total} $query->{Currency} on $date for the $query->{purpose}.  We are extremely grateful for your generous contribution.
+ 
+EPFL is a public institution and benefits from a non-profit status meaning that donations are tax deductible in accordance with cantonal and federal norms. EPFL will send you an official receipt as soon as possible.
+ 
+Once again, please accept our sincere gratitude for your donation.
+ 
+Best wishes,
+ 
+Nathalie Fontana
+Director of Philanthropy
+			};
+		}
+		if ($query->{Total} >= $payonline_tools::exceptions->{$inst->{id}}->{alertOn} &&
+				$payonline_tools::exceptions->{$inst->{id}}->{alertTo}) 
+		{
+warn "==> cert $payonline_tools::exceptions->{$inst->{id}} : mailBcc=$payonline_tools::mailBcc\n";
+			$payonline_tools::mailBcc = $payonline_tools::exceptions->{$inst->{id}}->{alertTo};
+		}
+	}
+
+  postResult ($id_trans, 1, );
+
+	payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL payonline :: payment confirmation', $msg);
+#    payonline_tools::send_mail ($email, 'EPFL payonline :: payment confirmation', $msg);
+	warn " ==>> payonline cert: confirmation email to : $email, $inst->{mailinst}\n";    
+
+warn " ==>> payonline cert: args dump <<==\n";
+ foreach my $item (keys %args) {
+    warn "$item=$args{$item}\n";
+ }
+ exit;
+
+}
+
+#------
+sub result {
+
+  my $id_trans 	 = $args{orderID};
+  my $resultcode = $args{code};
+  my $errmsg;
+
+warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
+  
+  unless ($id_trans) {
+	  $errmsg 	= qq{no transaction id};
+#	  $tmpldir 	=~ s/XX/$lang/;
+	  my $template	= initTempl('result.tmpl');
+	  $template->param(sErrMsg 		=> $errmsg);
+	  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
+	  exit;
+  }
+  
+  my $trans= payonline_tools::getTrans ($id_trans,'');
+  unless ($trans) {
+	  $errmsg 	= qq{unknown transaction : $id_trans};
+	  $tmpldir 	=~ s/XX/$lang/;
+	  my $template	= initTempl('result.tmpl');
+	  $template->param(sErrMsg 		=> $errmsg);
+	  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
+	  exit;
+  }
+
+  my $sql  = qq{select * from instances where id=?};
+  my $sth  = payonline_tools::dbquery ($sql, ($trans->{id_inst}));
+  my $inst = $sth->fetchrow_hashref();
+  unless ($inst) {
+	  postResult ($id_trans, 0, );
+	  $errmsg  = qq{<br>no such instance : $trans->{id_inst} }  ;
+#	  $tmpldir 	=~ s/XX/$lang/;
+	  my $template	= initTempl('result.tmpl');
+	  $template->param(txtOrderIDShop => $id_trans);
+	  $template->param(sErrMsg 		=> $errmsg);
+	  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
+	  exit;
+  }
+  
+  $resultcode 	= '' if $trans->{etat} ne 'payé';
+  my $resp  		= payonline_tools::getPersonInfos ($inst->{sciper});
+  my $query			= payonline_tools::getQuery ($id_trans);
+  my $email 		= $query->{Email};
+  $lang 				= $query->{lang} ? $query->{lang} : 'en';
+ # $tmpldir 			=~ s/XX/$lang/;
+
+  my $tmpl_file = $inst->{bypass_return} ? 'result-noheader.tmpl' : 'result.tmpl';
+  my $template	= initTempl($tmpl_file);
+
+  $template->param(OrderIDShop 	=> $id_trans);
+  $template->param(Currency 		=> $query->{Currency});
+  $template->param(Total 				=> $query->{Total});
+  $template->param(LastName 		=> payonline_tools::utf8tolatin1($query->{LastName}));
+  $template->param(FirstName 		=> payonline_tools::utf8tolatin1($query->{FirstName}));
+  $template->param(Email 				=> $email);
+  $template->param(Tel 					=> $query->{Phone});
+  $template->param(Fax 					=> $query->{Fax});
+  $template->param(Addr 				=> payonline_tools::utf8tolatin1($query->{Addr}));
+  $template->param(ZipCode 			=> $query->{ZipCode});
+  $template->param(City 				=> $query->{City});
+  $template->param(Country 			=> $query->{Country});
+  $template->param(ResultCode		=> $resultcode);
+  $template->param(TransactionID=> $trans->{PaymentID});
+
+  if ($inst->{contact}) {
+	  $template->param(Resp 		=> $inst->{contact});
+	  $template->param(RespMail 	=> $inst->{contact});
+  } else {
+	  $template->param(Resp 		=> "$resp->{prenom} $resp->{nom}");
+	  $template->param(RespMail 	=> $resp->{mail});
+  }
+
+
+  my $queryArgs   = payonline_tools::getArgs($trans->{query});
+  my $id_transact = $queryArgs->{id_transact};
+
+  my $urlconf = $inst->{urlconf};
+  unless ($urlconf =~ /^http\:\/\// or $urlconf =~ /^https\:\/\//) {
+  	$urlconf  = 'http://'.$urlconf ;
+  }
+  
+  if ($id_transact) {
+warn "==> result : id_transact=$id_transact\n";
+	  if ($urlconf =~ /\?/) {
+		$urlconf =~ s/&$//;
+		$urlconf .= qq(&id_transact=$id_transact);
+	  } else {
+		$urlconf =~ s/\?$//;
+		$urlconf .= qq(?id_transact=$id_transact);
+	  }
+  }  
+#  my $sOnLoad 	= qq{onload="window.location.href='$inst->{urlconf}';"} if $inst->{bypass_return} && $resultcode;
+  my $sOnLoad 	= qq{onload="window.location.href='$urlconf';"} if $inst->{bypass_return} && $resultcode;
+  $template->param(sOnLoad	=> $sOnLoad);
+
+warn "==> result : urlconf=$urlconf\n";
+  $template->param(URL 			=> $urlconf);
+  $template->param(Descr 		=> $inst->{descr});
+  $template->param(Date			=> $trans->{datecr});
+  $template->param(PayMode		=> $trans->{paymode});
+warn "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultcode\n";
+
+  if ($trans->{etat} ne 'payé' or $resultcode ne '1') {
+    $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{échec paiement};
+    postResult ($id_trans, 0, );
+    $template->param(sErrMsg 		=> $errmsg);
+    print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
+    exit;
+  }
+  
+  # - Send email
+  #...
+  
+#  postResult ($id_trans, $resultcode, $trans);
+
+  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
+  exit;
+}
+
+#------
+sub initTempl {
+   my ($tmplpath) = @_;
+
+warn "initTempl: $tmpldir$tmplpath\n";
+   my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
+	   strict => 0,
+	   cache => 1,
+	   die_on_bad_params => 0) or die "err : $!";
+
+   my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+   $year += 1900;
+   $template->param(sCrtYear 	=> $year);
+   $template->param(sPathMe 	=> $me);
+   $template->param(sDebug 	=> $payonline_tools::DEBUG ? $errmsgs{$lang}->[0] : '');
+   $template->param(sLangFR		=> 1) if $lang eq 'fr';
+
+	 foreach my $msg (keys %{$messages}) {
+	 	next unless $msg;
+   	$template->param($msg	=> $messages->{$msg}->{$lang}) if $messages->{$msg}->{$lang};
+	 }
+
+   return $template;
+}
+
+#------
+sub postResult {
+	my $id_trans= shift;
+	my $result  = shift;
+	my $trans		= shift;
+	
+	warn "payonline :: do :postResult 1 : $id_trans, $result, $trans\n";  
+	return unless $id_trans;  
+	warn "payonline :: do :postResult 2 \n";  
+	$trans = payonline_tools::getTrans ($id_trans, '');
+	return unless $trans;
+	my $id_inst	  = $trans->{id_inst};
+	return unless $id_inst;
+	warn "payonline :: do :postResult 3 result:$result\n";  
+	$result	  = $trans->{etat} eq 'payé' ? 1 : 0;
+	warn "payonline :: do :postResult 4 result:$result\n";  
+	my $sql = qq{select url from instances where id=?};
+	my $sth = payonline_tools::dbquery ($sql, ($id_inst));
+	my $inst = $sth->fetchrow_hashref ();
+	return unless $inst;
+	my $url	  = $inst->{url};
+	my $queryArgs   = payonline_tools::getArgs($trans->{query});
+	my $id_transact = $queryArgs->{id_transact};
+	my $informreturnaddress = $queryArgs->{informreturnaddress};
+	warn "payonline :: do :postResult 5 url:$url,informreturnaddress:$informreturnaddress,id_transact=$id_transact\n";  
+
+	do_post ($id_transact, $result, $trans, $url, $queryArgs) 	  	 if $url and $id_transact;
+	do_post ($id_transact, $result, $trans, $informreturnaddress,'') if $informreturnaddress and $id_transact;
+
+}
+
+#____________
+sub do_post {
+  my ($id_transact, $result, $trans, $url, $queryArgs) = @_;
+
+  my $ua = new LWP::UserAgent;
+  push @{ $ua->requests_redirectable }, 'POST';
+
+warn "do_post a : $url, $id_transact, $result\n";
+	#	- confirmation token if URL Return - but not to inform
+	my $token = payonline_tools::makeToken ($id_transact, $trans) if $queryArgs && !$queryArgs->{informreturnaddress};
+  my $postdata    = {
+  	id_transact	=> $id_transact,
+  	id_trans		=> $trans->{id},
+  	id_inst			=> $trans->{id_inst},
+  	token				=> $token,
+  	result			=> $result,
+  	datecr			=> $trans->{datecr},
+  	PaymentID		=> $trans->{PaymentID},
+  	paymode			=> $trans->{paymode},
+  };
+
+warn "do_post postdata\n".Dumper($postdata);  
+  
+  if ($queryArgs) {
+		foreach my $key (keys %$queryArgs) {
+			next if $key eq 'id_transact';
+			my $elem = $queryArgs->{$key};
+			$postdata->{$key} = $elem ;
+		}
+  }
+
+  my $response = $ua->post($url, $postdata);
+
+  my $content  = $response->decoded_content();
+warn "do_post done : $content\n";
+
+}
