@@ -1,0 +1,28 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <p class=redborder align=center>  <TMPL_VAR NAME="sErrMsg"></p>
+</TMPL_IF>
+
+	<h3>Payonline</h3>
+	<h3>Demande de fonds pour une instance de paiement en ligne</h3>
+	Vous ne disposez pas d'un fonds pour ce type d'opération : veuillez
+	<ul>
+	<li>ouvrir la <a href="http://www.epfl.ch/administration/sf/fichiers/Ouverture_fonds.pdf"
+	target="_blank">demande
+	d'ouverture de fonds</a>
+	<li>la compléter et l'imprimer
+	<li>la transmettre par courrier interne au Service Financier
+	</ul>
+	
+	
+	<p>Vous serez informés dès qu'une décision à ce sujet a été prise. 
+	Le fonds créé sera ensuite disponible dans la liste du Centre financier respectif.</p>
+	<li>tout sur le <a href="http://www.epfl.ch/administration/sf/" target="_blank">Service Financier</a></li>
+
+  
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">

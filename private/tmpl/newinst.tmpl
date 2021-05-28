@@ -33,11 +33,11 @@
 		<div class="col-md-12 pb5" >
 		  <div class="col-md-4 txt_right_pr5"><b><TMPL_VAR NAME=date_deb_label></b></div>
 		  <div class="col-md-8">
-			<input name="datedeb" type="date" size="12" value="<TMPL_VAR NAME=sdatedeb>">		  </div>
+			<input name="datedeb" type="date" size="12" value="<TMPL_VAR NAME=sdatedeb>"  placeholder="yyyy-mm-dd">		  </div>
 		</div>
 		<div class="col-md-12 pb5" >
 		  <div class="col-md-4 txt_right_pr5"><b><TMPL_VAR NAME=date_fin_label></b></div>
-		  <div class="col-md-8"><input name="datefin"  type="date" size="12">		  </div>
+		  <div class="col-md-8"><input name="datefin"  type="date" placeholder="yyyy-mm-dd" size="12">		  </div>
 		</div>
 		<div class="col-md-12 pb5" >
 		  <div class="col-md-4 txt_right_pr5"><b><TMPL_VAR NAME=cur_label></b> </div>
@@ -65,6 +65,28 @@
 		  <br><i><TMPL_VAR NAME=confirm_mail_note_label></i>
 		  </div>
 		</div>
+
+		<div class="col-md-12 pb5 <TMPL_VAR NAME=style>" >
+			<div class="col-md-4 txt_right_pr5" ><TMPL_VAR NAME=bypass_cg_label> </div>
+			<div class="col-md-8">
+				<TMPL_IF NAME=IsSuperUser>
+					<input type="checkbox" name="bypass_cg" value="1" <TMPL_VAR NAME=bypass_cg>> <em>(<TMPL_VAR NAME=bypass_cg_txt_label>)</em>
+				<TMPL_ELSE>
+					<input type="checkbox" name="bypass_cg" value="1" <TMPL_VAR NAME=bypass_cg> disabled> <em>(<TMPL_VAR NAME=bypass_cg_txt_label>)<br>
+					<TMPL_VAR NAME=bypass_txt_label>)</em>
+					<input name="bypass_cg" type="hidden" value="<TMPL_VAR NAME=bypass_cg>">
+				</TMPL_IF>
+			</div>
+
+		</div>
+
+		<div class="col-md-12 pb5 <TMPL_VAR NAME=style>" >
+			<div class="col-md-4 txt_right_pr5" ><TMPL_VAR NAME=bypass_return_label> </div>
+			<div class="col-md-8">
+					<input type="checkbox" name="bypass_return" value="1" <TMPL_VAR NAME=bypass_return>> </div>
+		</div>
+
+
 	  </div>
 	
 	 <hr>
