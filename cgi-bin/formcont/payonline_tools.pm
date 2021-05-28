@@ -20,9 +20,9 @@ use Digest::MD5 qw(md5_hex);
 use Digest::SHA1 ;
 
 use strict;
-use vars qw( $dbh $DEBUG $su_list $errmsg $demfond $codeTVA
-            $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
-            $ges_list $SHAsalt $postURL $redirectURL
+use vars qw( $su_list $errmsg $demfond $codeTVA
+            $tmpldir
+            $ges_list
             );
 
 my $me 		= $ENV {SCRIPT_NAME};
@@ -32,10 +32,6 @@ my $pi 		= $ENV {PATH_INFO};
 my @days 	= (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 my $resp 	= 'ion.cionca@epfl.ch';
 
-$DEBUG 		= '0';
-
-
-warn "formcont :: DEBUG=$DEBUG\n";
 
 #--------
 sub uniq {

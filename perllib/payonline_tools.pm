@@ -50,8 +50,6 @@ my %HashID	= (
    	'USD',	qq{3406},
    	'EUR',	qq{3405},
 	);
-$YellowPayTstSrv= 'yellowpaytest.postfinance.ch';
-$YellowPayPrdSrv= 'yellowpay.postfinance.ch';
 
 #	- maintenance files : $MAINT_DIR/maint_<startdate><enddate>
 my $MAINT_DIR = '/var/www/vhosts/payonline.epfl.ch/private/maintenaces';

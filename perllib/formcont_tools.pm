@@ -44,9 +44,6 @@ sub send_mail {
   return unless is_prod;
   my ($dest, $subj, $msg) = @_;
 
-warn "formcont DEBUG=$DEBUG  : send_mail : $dest, $subj\n";
-  return if $DEBUG;
-
   my %mail;
   $mail{From} = 'noreply@epfl.ch';
   $mail{Bcc}  = 'formcont@epfl.ch';
