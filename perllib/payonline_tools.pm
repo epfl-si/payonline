@@ -622,7 +622,7 @@ sub _makeHash {
 
 sub _postfinance_srv {
   my ($test_or_prod) = @_;
-  return 'https://e-payment.postfinance.ch/ncol/$test_or_prod/orderstandard.asp';
+  return "https://e-payment.postfinance.ch/ncol/$test_or_prod/orderstandard.asp";
 };
 
 sub get_server_url { shift->{srv} }
