@@ -18,6 +18,11 @@ use CGI qw(-utf8);
 use Cadi::CadiDB;
 use Cadi::WSUtils;
 
+# Use *everything* so as to block k8s rollouts in case of syntax errors in the libs:
+use payonline_tools;
+use formcont_tools;
+use formcont_templates;
+
 use utf8::all;
 binmode(STDOUT, ":utf8");
 
