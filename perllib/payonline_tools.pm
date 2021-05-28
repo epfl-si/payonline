@@ -45,7 +45,7 @@ my $us 		= $ENV {SERVER_NAME};
 my $qs 		= $ENV {QUERY_STRING};
 my $pi 		= $ENV {PATH_INFO};
 my @days 	= (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
-my $resp 	= 'ion.cionca@epfl.ch';
+my $resp 	= 'payonline-ops@groupes.epfl.ch';
 my %HashID	= (
    	'CHF', 	qq{2543},
    	'USD',	qq{3406},
@@ -58,7 +58,7 @@ my $MAINT_DIR = '/var/www/vhosts/payonline.epfl.ch/private/maintenaces';
 $rejectIP = ('128.178.109.243','157.55.39.166');	#	crawlers 
 
 $epflLOGO	= 'https://web2018.epfl.ch/2.0.0/icons/epfl-logo.svg';
-$demfond 	= 'bertold.walther@epfl.ch,ion.cionca@epfl.ch';
+$demfond 	= 'bertold.walther@epfl.ch,payonline-ops@groupes.epfl.ch';
 $su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490,254724,229454,268229';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
 $codeTVA	= 'Q7';
 $mailFrom	= 'noreply@epfl.ch';
@@ -76,7 +76,7 @@ $exceptions = {
 };
 
 my $alertTo = 'campaign@epfl.ch';
-my $alertTo = 'ion.cionca@epfl.ch';
+my $alertTo = 'payonline-ops@groupes.epfl.ch';
 
 $exceptions = {
 	'g0svljq62cqs64t1lnje0pt266gm82e6' => {
@@ -182,7 +182,7 @@ sub send_mail {
   my ($dest, $subj, $msg) = @_;
 
 say STDERR "payonline :: send_mail : $dest, $subj\n";
-  $dest			 ='ion.cionca@epfl.ch' if $DEBUG;
+  $dest			 ='payonline-ops@groupes.epfl.ch' if $DEBUG;
 
   my %mail;
   $mail{From} 	 = 'noreply@epfl.ch'; 
@@ -214,7 +214,7 @@ say STDERR "payonline :: send_mail_bc : dest=$dest, mailFrom=$mailFrom, mailBcc=
 
   return unless $dest or $mailBcc;
   
-  $dest = 'ion.cionca@epfl.ch' if $DEBUG;
+  $dest = 'payonline-ops@groupes.epfl.ch' if $DEBUG;
 
   my %mail;
   $mail{From} = $mailFrom; 

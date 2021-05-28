@@ -35,7 +35,7 @@ my $tmpldir 	= '/var/www/vhosts/payonline.epfl.ch/private/tmpl/';
 my $logfile		= '/var/log/httpd/payonline.log';
 my $lockfile	= '/tmp/payonline.lock';
 my @languages = ('fr','en');
-my $mailresp	= 'ion.cionca@epfl.ch';
+my $mailresp	= 'payonline-ops@groupes.epfl.ch';
 my $masterIP	= '128.178.1.146';
 
 #	- inst id qui contournent les Conditions Générales de payonline

@@ -100,7 +100,7 @@ say STDERR "payonline cert: $YPSrv : unknown server in static list\n";
 say STDERR "payonline cert: OK :: $YPSrv in range\n";
 		} else {
 			my $msg = qq{error :: id_trans=$args{orderID} illegal access from server IP=$YPSrv};
-			payonline_tools::send_mail ('payonline@epfl.ch', 'payonline ERROR :: unknown Postfinance server', $msg);
+			payonline_tools::send_mail ('payonline-ops@groupes.epfl.ch', 'payonline ERROR :: unknown Postfinance server', $msg);
 #			return;  
 		}
   }
@@ -173,7 +173,7 @@ say STDERR "payonline cert: etat=$etat\n";
   if ($args{fail}) {
 say STDERR "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: CANCEL\n";
 		$msg = qq{PAYONLINE FAILED TRANSACTION}.$msg;
-		payonline_tools::send_mail ('payonline@epfl.ch', "payonline FAILED TRANSACTION : status=$args{STATUS}", $msg);
+		payonline_tools::send_mail ('payonline-ops@groupes.epfl.ch', "payonline FAILED TRANSACTION : status=$args{STATUS}", $msg);
 		return;
   }
 
@@ -183,7 +183,7 @@ say STDERR "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: CANCEL\n";
 say STDERR "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STATUS}\n";
 		#	- notify payonline
 		$msg = qq{OFFLINE STATUS CHANGE}.$msg;
-		payonline_tools::send_mail ('payonline@epfl.ch', "payonline OFFLINE STATUS CHANGE : status=$args{STATUS}", $msg);
+		payonline_tools::send_mail ('payonline-ops@groupes.epfl.ch', "payonline OFFLINE STATUS CHANGE : status=$args{STATUS}", $msg);
 
 		if ($args{STATUS} eq '93') {
 		#	- TRANSACTION REFUSED
@@ -214,7 +214,7 @@ say STDERR "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$arg
 		$query->{Country}, $query->{ZipCode} $query->{City}
 				
 				};
-			my $dest = 'payonline@epfl.ch,'.$contact_sf ;
+			my $dest = 'payonline-ops@groupes.epfl.ch,'.$contact_sf ;
 				 $dest .= ','.$inst->{mailinst} if $inst->{mailinst};
 				 $dest .= ','.$inst->{contact}  if $inst->{contact};
 				 $dest .= ','.$query->{Email} 	if $query->{Email};
@@ -243,7 +243,7 @@ say STDERR ">> send_mail to : $dest\n";
 			transaction refused : status updated
 			};
 		}
-		payonline_tools::send_mail ('payonline@epfl.ch', "payonline WARNING :: transaction paid: status=$args{STATUS}", $msg);
+		payonline_tools::send_mail ('payonline-ops@groupes.epfl.ch', "payonline WARNING :: transaction paid: status=$args{STATUS}", $msg);
   	return;
   } else {
 		if ($args{STATUS} eq '2') {
@@ -265,7 +265,7 @@ say STDERR " ==>> payonline cert: OK : $id_trans\n";
 say STDERR " ==>> payonline cert: : query Email=$query->{Email}\n";
  my $email = $etat eq 'prod' 
  					 ? $query->{Email}
- 					 : 'payonline@epfl.ch';
+ 					 : 'payonline-ops@groupes.epfl.ch';
   $lang		 = $query->{lang} ? $query->{lang} : 'en';
   my $msg  = qq{
 	$errmsgs{$lang}->[1]
@@ -476,7 +476,7 @@ say STDERR "update failed failed transact $id_trans\n";
 			};
 
 			#	- notify 
-			my $dest = 'payonline@epfl.ch,'.$contact_sf ;
+			my $dest = 'payonline-ops@groupes.epfl.ch,'.$contact_sf ;
 				 $dest .= ','.$inst->{mailinst} if $inst->{mailinst};
 				 $dest .= ','.$inst->{contact}  if $inst->{contact};
 				 $dest .= ','.$query->{Email} 	if $query->{Email};

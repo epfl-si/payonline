@@ -44,7 +44,7 @@ my $date = sprintf "%4d-%02d-%02d", $year, $mon, $mday;
 
 #---------------------
 #my $date   = '2021-03-28' ;
-#my $mailSF = 'ion.cionca@epfl.ch';
+#my $mailSF = 'payonline-ops@groupes.epfl.ch';
 
 say STDERR "date=$date, mailSF=$mailSF\n";
 #---------------------

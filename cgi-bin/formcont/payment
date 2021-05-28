@@ -27,7 +27,7 @@ my $me 			= $ENV {SCRIPT_NAME};
 my $us 			= $ENV {SERVER_NAME};
 my $qs 			= $ENV {QUERY_STRING};
 my $pi 			= $ENV {PATH_INFO};
-my $mailresp	= 'ion.cionca@epfl.ch';
+my $mailresp	= 'payonline-ops@groupes.epfl.ch';
 my $masterIP	= '128.178.1.146';
 
 my %errmsgs	= (
