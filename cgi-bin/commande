@@ -275,7 +275,7 @@ say STDERR "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\
   $template->param(sErrMsg 				=> $errmsg);
   $template->param(YellowPaySrv		=> $flow->get_server_url());
   $template->param(epflLOGO				=> $payonline_tools::epflLOGO);
-  $template->param(txtShopId 			=> $flow->get-shop_id());
+  $template->param(txtShopId 			=> $flow->get_shop_id());
   $template->param(txtOrderIDShop => $id_trans);
   $template->param(txtInstDescr 	=> $COM);
   $template->param(txtArtCurrency => $args{Currency});
