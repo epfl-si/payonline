@@ -1,3 +1,5 @@
+package formcont_templates;
+
 sub header {
 	return qq{Content-Type: text/html; charset=UTF-8
 
