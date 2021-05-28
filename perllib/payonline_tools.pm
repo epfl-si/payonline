@@ -108,7 +108,6 @@ sub init {
 	}
 
 	$DEBUG  = 0;
-#	$absdbh = dbconnect ('payonline');
 	$absdbh = new Cadi::CadiDB (
 	  dbname => 'payonline',
           utf8 => 1

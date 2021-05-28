@@ -354,7 +354,6 @@ say STDERR "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
   
   unless ($id_trans) {
 	  $errmsg 	= qq{no transaction id};
-#	  $tmpldir 	=~ s/XX/$lang/;
 	  my $template	= initTempl('result.tmpl');
 	  $template->param(sErrMsg 		=> $errmsg);
 	  print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
@@ -377,7 +376,6 @@ say STDERR "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
   unless ($inst) {
 	  postResult ($id_trans, 0, );
 	  $errmsg  = qq{<br>no such instance : $trans->{id_inst} }  ;
-#	  $tmpldir 	=~ s/XX/$lang/;
 	  my $template	= initTempl('result.tmpl');
 	  $template->param(txtOrderIDShop => $id_trans);
 	  $template->param(sErrMsg 		=> $errmsg);
@@ -390,7 +388,6 @@ say STDERR "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
   my $query			= payonline_tools::getQuery ($id_trans);
   my $email 		= $query->{Email};
   $lang 				= $query->{lang} ? $query->{lang} : 'en';
- # $tmpldir 			=~ s/XX/$lang/;
 
   my $tmpl_file = $inst->{bypass_return} ? 'result-noheader.tmpl' : 'result.tmpl';
   my $template	= initTempl($tmpl_file);
@@ -448,15 +445,6 @@ say STDERR "==> result : urlconf=$urlconf\n";
   $template->param(Date			=> $trans->{datecr});
   $template->param(PayMode	=> $trans->{paymode});
 say STDERR "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultcode\n";
-
-# 
-#   if ($trans->{etat} ne 'payé' or $resultcode ne '1') {
-#     $errmsg = ($lang eq 'en') ? qq{payment failed} : qq{échec paiement};
-#     postResult ($id_trans, 0, );
-#     $template->param(sErrMsg 		=> $errmsg);
-#     print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
-#     exit;
-#   }
 
   unless ( $resultcode ) {
 		if ($trans->{etat} eq 'payé') {
