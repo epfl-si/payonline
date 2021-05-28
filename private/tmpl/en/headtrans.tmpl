@@ -23,13 +23,12 @@
 
 <div id="main-content"> 
 
-<!-- breadcrumbs -->
-<ul id="breadcrumbs" title="Navigation dans l'arborescence de l'EPFL">
-  <li><a href="https://www.epfl.ch/" title="EPFL Page d'accueil">EPFL</a></li>
-  <li><a href="http://dit.epfl.ch/" title="DIT">DIT</a></li>
-  <li class="last">Payonline</li>
-</ul>
-
-<h1>Payonline</h1>
+<h1>Online payment</h1>
 
 
+<TMPL_IF NAME=sTestInst>
+<div style="width: 95%; padding: 20px; border: solid 2px #ff0000;">
+<b>Note</b> this procedure is test mode : financial transactions will only be simulated by Postfinance.<br>
+Please contact <a href="mailto:1234@epfl.ch">1234@epfl.ch</a>for more details.
+</div>
+</TMPL_IF>

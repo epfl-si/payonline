@@ -1,0 +1,14 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+	<p><TMPL_VAR NAME=sErrMsg></p>
+<TMPL_ELSE>
+	<TMPL_VAR NAME="default_label">
+	
+	<p><a href="<TMPL_VAR NAME=spathMe>/priv?lang=<TMPL_VAR NAME=slang>">Connexion</a> </p>
+
+</TMPL_IF>
+
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+
+<TMPL_INCLUDE NAME="footer.tmpl">

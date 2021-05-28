@@ -1,0 +1,47 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+    <h3>Instances</h3>
+    
+    <p style="text-align:justify;">
+    Instances : 
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&etat=prod">en production</a> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&etat=test">en test</a> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&etat=inact">inactives</a> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&etat=archive">archivées</a> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>">toutes</a> ]
+    </p>
+   
+    <div class="col-md-12 table_header">
+			<div class="col-md-4"><a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&orderby=descr">Description</a></div>
+			<TMPL_IF NAME=sIsSuperUSer>
+			<div class="col-md-2">Responsable</div>
+			</TMPL_IF>
+			<div class="col-md-1"><a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&orderby=etat">Etat</a></div>
+			<div class="col-md-1">Fonds</div>
+			<div class="col-md-2""><a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&orderby=datedeb">Date début</a></div>
+			<div class="col-md-2">Date fin</div>
+    </div>
+    <TMPL_LOOP NAME=sLoop>
+			 <div class="col-md-12  <TMPL_VAR NAME=style>">
+				 <div class="col-md-4">
+				 <a href="<TMPL_VAR NAME=sEdit>"><TMPL_VAR NAME="descr"></a>
+				 </div>
+				 <TMPL_IF NAME=sIsSuperUSer>
+				 <div class="col-md-2" style="height: auto; vertical-align: top;"><TMPL_VAR NAME=respPrenom> <TMPL_VAR NAME=respNom></div>
+				 </TMPL_IF>
+				 <div div class="col-md-1"><TMPL_VAR NAME="etat"></div>
+				 <div div class="col-md-1"><TMPL_VAR NAME="fonds"></div>
+				 <div div class="col-md-2"><TMPL_VAR NAME="datedeb"></div>
+				 <div div class="col-md-2"><TMPL_VAR NAME="datefin"></div>
+			</div>
+    </TMPL_LOOP>
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">

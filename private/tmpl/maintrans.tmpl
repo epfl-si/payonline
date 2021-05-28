@@ -1,0 +1,151 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<noscript>
+
+<div class=redborder>
+<h2>Attention</h2>
+La configuration de votre navigateur bloque l'exécution des scripts JavaScript. Le service de paiement en ligne ne peut pas fonctionner dans ces conditions<br>
+Veuillez activer JavaScript sur votre navigateur et ensuite "<b>recharger</b>" cette page. 
+
+</div>
+</noscript>
+
+<TMPL_IF NAME=redirectToHTTP>
+	<TMPL_VAR NAME=redirectToHTTP>
+</TMPL_IF>
+
+<TMPL_IF NAME=sErrMsg>
+	<div class="error">
+	<p><TMPL_VAR NAME=sErrMsg></p>
+	</div>
+<TMPL_ELSE>
+
+  <TMPL_IF NAME=sOnLoad>
+  	<TMPL_VAR NAME=redirect_label>
+    <div style="display:none;">
+  <TMPL_ELSE>
+    <div style="display:block;">
+  </TMPL_IF>
+
+  <TMPL_IF NAME=sLangFR>
+  
+		   <b>Les informations vous concernant sont enregistrées.</b>
+		   <br>
+		   <br>
+		   <b>Pour conclure le paiement du montant de <TMPL_VAR NAME=txtUserTotal>&nbsp;<TMPL_VAR NAME=txtArtCurrency>, veuillez suivre les &eacute;tapes suivantes :</b>
+		   <div class="col-md-12" style="padding: 10px 0 10px 20px;">
+				 <li>lire les <b>Conditions G&eacute;n&eacute;rales</b> ci-dessous
+				 <li>cocher la case <b>J'ai lu et j'accepte...</b>
+				 <li>cliquer sur le bouton <b>Effectuer le paiement</b> pour acc&eacute;der au service
+				 de paiement en ligne de PostFinance et finaliser le paiement
+		   </div>
+
+		   <div class="col-md-12">
+				 Les moyens de paiement disponibles sont :
+				 <div class="col-md-12" style="padding: 0 0 10px 20px;">
+						<li>PostFinance Card (pour des sommes en CHF)</li>
+						<li>EUROCARD/MasterCard</li>
+						<li>Visa  </li>
+						<li>PayPal  </li>
+					</div>
+				</div>
+				
+				<div class="col-md-12 redborder">
+				 <b>Attention : </b>
+					<div class="col-md-12" style="padding: 10px 0 10px 20px;">
+						<li>vous allez quitter le site payonline@epfl
+						<li>pour garantir le processus de paiement en ligne, vous devez suivre chaque étape comme proposé, sans fermer explicitement les fenêtres du navigateur
+						<li>la saisie de données qui suit a lieu à travers une connexion sécurisée qui encrypte les informations transmises ; vous pouvez cliquer sur le cadenas affiché par le navigater pour vérifier l'encryption de la communication
+					</div>
+				</div>
+		<TMPL_ELSE>
+		
+				<b> The information you provided has been saved.</b>
+				<br>
+				<br>
+				<b>In order to pay the bill of <TMPL_VAR NAME=txtUserTotal>&nbsp;<TMPL_VAR NAME=txtArtCurrency>
+				you have to :</b>
+		   	<div class="col-md-12" style="padding: 10px 0 10px 20px;">
+					<li>read the <b>General Terms and Conditions</b>
+					<li>check the box "I read and accept..."
+					<li>click on <b>Proceed to payment</b> button to access PostFinance's online payment service for 
+					effective payment process
+				</div>
+				
+		    <div class="col-md-12">
+				You may pay by:
+				 <div class="col-md-12" style="padding: 0 0 10px 20px;">
+					<li>PostFinance Card</li>
+					<li>EUROCARD/MasterCard</li>
+					<li>Visa  </li>
+					<li>Twint  </li>
+					<li>PayPal  </li>
+				</div>		
+
+				<div class="col-md-12 redborder">
+					<b>Notes : </b>
+					<div class="col-md-12" style="padding: 10px 0 10px 20px;">
+						<li>you are going to leave now payonline@epfl site
+						<li>do observe the steps proposed by the payment procedure
+						<li>the connection to PostFinance is secured ; you may check the locker icon which guarantees the secure transaction
+					</div>		
+				</div>
+		</TMPL_IF>
+
+<!-- 
+				<a href="http://www.postfinance.ch/index.html.en" target="_blank"><img src="/images/postfinance.gif" width="150" height="54" border="0" align=right></a>
+ -->
+
+				<form action="<TMPL_VAR NAME=YellowPaySrv>" method="POST" name="cmd" OnSubmit="
+				if (document.cmd.condgen.checked) {
+					document.cmd.submit();
+				} else {
+					var txt;
+					<TMPL_IF NAME=sLangFR>
+						 txt = 'Veuillez consulter et cocher la case des conditions générales pour continuer';
+					<TMPL_ELSE>
+						txt = 'Please read the General Terms page and check the appropriate checkbox';
+					</TMPL_IF>
+					alert (txt);
+					return false; 
+				}
+				">
+				<input type="hidden" name="PSPID" 		value="<TMPL_VAR NAME=txtShopId>"> 
+				<input type="hidden" name="orderID" 	value="<TMPL_VAR NAME=txtOrderIDShop>"> 
+				<input type="hidden" name="amount" 		value="<TMPL_VAR NAME=txtParamTotal>"> 
+				<input type="hidden" name="currency" 	value="<TMPL_VAR NAME=txtArtCurrency>"> 
+				<input type="hidden" name="language"	value="<TMPL_VAR NAME=txtLang>"> 
+				<input type="hidden" name="SHASign" 	value="<TMPL_VAR NAME=txtHash>"> 
+				<input type="hidden" name="CN" 				value="<TMPL_VAR NAME=txtBFirstName> <TMPL_VAR NAME=txtBLastName>"> 
+				<input type="hidden" name="EMAIL" 		value="<TMPL_VAR NAME=txtBEmail>"> 
+				<input type="hidden" name="ownerZIP" 	value="<TMPL_VAR NAME=txtBZipCode>"> 
+				<input type="hidden" name="owneraddress" value="<TMPL_VAR NAME=txtBAddr1>"> 
+				<input type="hidden" name="ownercty" 	value="<TMPL_VAR NAME=txtBCountry>"> 
+				<input type="hidden" name="ownertown" value="<TMPL_VAR NAME=txtBCity>"> 
+				<input type="hidden" name="ownertelno" value="<TMPL_VAR NAME=txtBTel>"> 
+				<input type="hidden" name="COM" 			value="<TMPL_VAR NAME=txtInstDescr>"> 
+				<input type="hidden" name="LOGO" value="https://web2018.epfl.ch/2.0.0/icons/epfl-logo.svg"> 
+
+				<input type="hidden" name="PM" 		value="<TMPL_VAR NAME=txtPM>"> 
+				<input type="hidden" name="BRAND" value="<TMPL_VAR NAME=txtBRAND>"> 
+
+				<div class="col-md-12">
+				<br>
+				<input type="checkbox" name="condgen" id="condgen" <TMPL_VAR NAME=CGchecked>>
+				  <TMPL_IF NAME=sLangFR>
+				   J'ai lu et j'accepte les <a href="http://wiki.epfl.ch/payonline-aide/documents/CGpayonlineFR.pdf" target="_blank">Conditions G&eacute;n&eacute;rales</a><br>
+   				<input type="submit" name="go" value="Effectuer le paiement"> sur le site de Postfinance
+
+				  <TMPL_ELSE>
+				  	I read and accept the  <a href="http://wiki.epfl.ch/payonline-aide/documents/CGpayonlineEN.pdf" target="_blank">General Terms and Conditions</a><br>
+				  	<input type="submit" name="go" value="Proceed to payment"> on Postfinance site
+				  </TMPL_IF>
+				</div>
+
+				</form>
+
+				</div>
+  
+</TMPL_IF>
+
+<TMPL_INCLUDE NAME="footer.tmpl">

@@ -24,6 +24,18 @@
 
 <div id="main-content"> 
 
+<!-- breadcrumbs -->
+<ul id="breadcrumbs" title="Navigation dans l'arborescence de l'EPFL">
+  <li><a href="https://www.epfl.ch/" title="EPFL Page d'accueil">EPFL</a></li>
+  <li ><a href="http://dit.epfl.ch/" title="DIT">DIT</a></li>
+  <li class="last">payonline</li>
+</ul>
+
+<ul id="languages" title="Language">
+  <li><a href="<TMPL_VAR NAME="sPathMe">/priv?lang=en&id=<TMPL_VAR NAME="sId">">English</a></li>
+  <li class="current">Français</a></li>
+</ul>
+
 <h1>Paiement en ligne</h1>
 
 <div id="main-navigation" class="navigation-bar">
@@ -31,7 +43,7 @@
 
       <TMPL_IF NAME=sAuthstr>
           <TMPL_IF NAME=sRespAdmin>
-			<li><a href="http://sf.epfl.ch/files/content/sites/sf/files/shared/Doc-Xls/Ouverture_fds.docx">Demande de fonds</a></li>      
+			<li><a href="<TMPL_VAR NAME=sPathMe>/demfnd?lang=fr">Demande de fonds</a></li>      
         </TMPL_IF>
 		<li><a href="<TMPL_VAR NAME=sPathMe>/newinst?lang=fr">Nouvelle instance</a></li>  
 	  	<li><a href="<TMPL_VAR NAME=sPathMe>/listinst?lang=fr&etat=prod">Mes instances</a></li>
@@ -43,4 +55,3 @@
 	<div style="clear:both"></div>
 </div>
 
-<div  id="content" class="content">

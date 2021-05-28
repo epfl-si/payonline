@@ -1,6 +1,7 @@
 <TMPL_INCLUDE NAME="headtrans.tmpl">
 
 <noscript>
+
 <div class=redborder>
 <h2>Attention</h2>
 La configuration de votre navigateur bloque l'exécution des scripts JavaScript. Le service de paiement en ligne ne peut pas fonctionner dans ces conditions<br>
@@ -20,6 +21,13 @@ Veuillez activer JavaScript sur votre navigateur et ensuite "<b>recharger</b>" c
 <TMPL_ELSE>
 	<p></p>
 
+  <TMPL_IF NAME=sOnLoad>
+  	Redirection vers le site de Postfinance...
+    <div style="display:none;">
+  <TMPL_ELSE>
+    <div style="display:block;">
+  </TMPL_IF>
+  
 	<form action="<TMPL_VAR NAME=YellowPaySrv>" method="POST" name="cmd" OnSubmit="
 	 if (document.cmd.condgen.checked) {
 		document.cmd.submit();
@@ -44,14 +52,17 @@ Veuillez activer JavaScript sur votre navigateur et ensuite "<b>recharger</b>" c
 		<input type="hidden" name="ownertown" value="<TMPL_VAR NAME=txtBCity>"> 
 		<input type="hidden" name="ownertelno" value="<TMPL_VAR NAME=txtBTel>"> 
 		<input type="hidden" name="COM" value="<TMPL_VAR NAME=txtInstDescr>"> 
-		<input type="hidden" name="LOGO" value="https://www.epfl.ch/img/epfl.png"> 
+		<input type="hidden" name="LOGO" value="<TMPL_VAR NAME=epflLOGO>"> 
+
+		<input type="hidden" name="PM" 		value="<TMPL_VAR NAME=txtPM>"> 
+		<input type="hidden" name="BRAND" value="<TMPL_VAR NAME=txtBRAND>"> 
 
 <!--		<input type="hidden" name="PMLIST" value="CreditCard;PostFinance e-finance"> -->
 
 		   <b>Les informations vous concernant sont enregistrées.</b>
 		   <p><b>Pour conclure le paiement du montant de <TMPL_VAR NAME=txtUserTotal>&nbsp;<TMPL_VAR NAME=txtArtCurrency>, veuillez suivre les &eacute;tapes suivantes :</b>
 		   <blockquote>
-		   <li>lire les <b>Conditions G&eacute;n&eacute;rales</b> ci-contre
+		   <li>lire les <b>Conditions G&eacute;n&eacute;rales</b> ci-dessous
 		   <li>cocher la case <b>J'ai lu et j'accepte...</b>
 		   <li>cliquer sur le bouton <b>Effectuer le paiement</b> pour acc&eacute;der au service
 		   de paiement en ligne de PostFinance et finaliser le paiement
@@ -61,6 +72,8 @@ Veuillez activer JavaScript sur votre navigateur et ensuite "<b>recharger</b>" c
 			<li>PostFinance Card (pour des sommes en CHF)</li>
 			<li>EUROCARD/MasterCard</li>
 			<li>Visa  </li>
+			<li>Twint  </li>
+			<li>PayPal  </li>
 		   </blockquote>		
 	   <p></p>
 		   <div class="redborder">
@@ -75,7 +88,7 @@ Veuillez activer JavaScript sur votre navigateur et ensuite "<b>recharger</b>" c
 
 	<p>
 
-	<a href="http://www.postfinance.ch/index.html.en" target="_blank"><img src="/images/postfinance.gif" width="150" height="54" border="0" align=right></a>
+	<img src="/images/postfinance.gif" width="150" height="54" border="0" align=right>
 
 	<input type="checkbox" name="condgen" id="condgen" <TMPL_VAR NAME=CGchecked>> J'ai lu et j'accepte les <a href="http://wiki.epfl.ch/payonline-aide/documents/CGpayonlineFR.pdf" target="_blank">Conditions G&eacute;n&eacute;rales</a>
 	</p>
@@ -83,6 +96,8 @@ Veuillez activer JavaScript sur votre navigateur et ensuite "<b>recharger</b>" c
 	<input type="submit" name="go" value="Effectuer le paiement"> sur le site de Postfinance
 
 	</form>
+  </div>
+  
 </TMPL_IF>
 
 <TMPL_INCLUDE NAME="footer.tmpl">
