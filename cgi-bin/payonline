@@ -673,6 +673,7 @@ sub detinst {
   $template->param(IsSuperUser => payonline_tools::IsSuperUser($sciper));
 #  $template->param(IsSuperUser => 0);
   
+  $template->param(IsSuperUser => payonline_tools::IsSuperUser($sciper));
   $template->param(sMonnaie		=> $monnaietxt );
   $template->param(id 				=> $result->{id});
   $template->param(sDelValid	=> ($result->{etat} eq 'test'));
