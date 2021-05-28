@@ -305,11 +305,6 @@ warn "setYellowPaySrv : DEBUG=$DEBUG, etat=$etat\n";
 
 }
 #--------
-sub setDEBUG {
-  $DEBUG = shift;
-#  warn "payonline_tools :: DEBUG=$DEBUG";
-}
-#--------
 sub setLog {
   $logfile = shift;
 }
