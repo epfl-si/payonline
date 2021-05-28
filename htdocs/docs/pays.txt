@@ -175,6 +175,7 @@
 
 <option value="MC" >Monaco</option>
 <option value="MN" >Mongolia</option>
+<option value="ME" >Montenegro</option>
 <option value="MS" >Montserrat</option>
 <option value="MA" >Morocco</option>
 <option value="MZ" >Mozambique</option>
@@ -227,7 +228,7 @@
 <option value="ST" >Sao Tome and Principe</option>
 <option value="SA" >Saudi Arabia</option>
 <option value="SN" >Senegal</option>
-
+<option value="RS" >Serbia</option>
 <option value="SC" >Seychelles</option>
 <option value="SL" >Sierra Leone</option>
 <option value="SG" >Singapore</option>

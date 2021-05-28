@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" href="style/epfl.css">
+<link rel="stylesheet" href="style/fundraising.css">
+<title>Payonline : en cas de probl&egrave;mes</title>
+</head>
+
+<div id="header_left">
+	<div class="logo"><a href="http://www.epfl.ch"><img src="http://www.epfl.ch/images/epfl_logo.gif" alt="" height="34" width="120" border="0"></a></div>
+
+	<div class="logo"><a href="http://www.epfl.ch"><img src="http://www.epfl.ch/images/epfl_text.gif" alt="" height="28" width="120" border="0"></a></div>
+	<div id="language" class="path" nowrap></div>
+
+</div>
+
+<div id="header_center"></div>
+	<div id="header_title1" class="headercolor_admin1"><img src="images/txt_m_fundraising.gif" alt="Fundraising" height="34" width="360" border="0"/></div>
+	<div id="header_title2" class="headercolor_admin2"><img src="images/txt_sm_dons.gif" alt="Dons" height="28" width="250" border="0"/></div>
+	<div id="tracking" class="path" nowrap><a href="http://www.epfl.ch/place.html" class="path">Place centrale</a> &gt; <a href="http://direction.epfl.ch/page3247-fr.html" class="path">Fundraising</a> &gt; Formulaire de dons</div>
+
+<div id="header_graph"><img src="http://www.epfl.ch/images/graph_adm.gif" alt="" height="34" width="270" border="0"/></div>
+
+    <h2>Formulaire de collecte de dons</h2>
+    <h3>En cas de probl&egrave;me </h3>
+    <p>En cas de probl&egrave;me avec l'interface de collecte de dons, veuillez
+      nous transmettre les informations suivantes:</p>
+    <ul>
+      <li><strong>description du probl&egrave;me</strong>: quelle phase de la proc&eacute;dure, le <strong>message
+        d'erreur</strong> ou, mieux, la copie d'&eacute;cran</li>
+
+      <li>votre <strong>environnement de travail</strong>: syst&egrave;me et version
+        (Windows, MacOS, Linux, etc), navigateur et version (Internet Explorer,
+        Mozilla, etc)</li>
+      <li><strong>date et heure</strong> du probl&egrave;me  </li>
+    </ul>
+    <p>Transmettre toutes ces informations &agrave; <a href="mailto:fundarising@epfl.ch">fundarising@epfl.ch</a>.
+      Nous allons ensuite analyser le probl&egrave;me et prendrons contact avec vous
+    dans les plus brefs d&eacute;lais. </p>
+
+    <p>&nbsp;</p>
+    <p>Merci d'avance.</p>
+    <p>&nbsp;</p>
+    <p>[ <a href=# onclick="window.close();">fermer la fen&ecirc;tre</a> ] </p>
+</body>
+</html>

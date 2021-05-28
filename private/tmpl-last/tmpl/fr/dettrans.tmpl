@@ -1,0 +1,84 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+
+    <h3><TMPL_VAR NAME=sDescrInst></h3>
+    <div class="redborder"><b>l'instance est en état <TMPL_VAR NAME=etatinst></b></div>
+
+    <b>responsable : <TMPL_VAR NAME=respPrenom> <TMPL_VAR NAME=respNom></b><br>
+    <b>fonds : <TMPL_VAR NAME=fonds></b><br>
+    <b>compte budgétaire : <TMPL_VAR NAME=naturecomptable></b><br>
+    <b>numéro d'instance : <a href="<TMPL_VAR NAME=sPathMe>/listtrans?id=<TMPL_VAR NAME=sIDInst>"><TMPL_VAR NAME=sIDInst></a></b><br>
+    <b>transaction no. : <TMPL_VAR NAME=idtrans></b>
+    <p></p>
+	<TMPL_IF NAME=etat>
+		<div class="greenborder">
+	<TMPL_ELSE>
+		<div class="redborder">
+	</TMPL_IF>
+	<table width="100%" border="0" cellspacing="2" cellpadding="0">
+	   <tr>
+		  <td width="20%" align="right"><strong>Nom Prénom</strong></td>
+		  <td><TMPL_VAR NAME="LastName"> <TMPL_VAR NAME="FirstName"></td>
+	   </tr>
+	   <tr>
+		  <td width="20%" align="right"><strong>Email</strong></td>
+		  <td><TMPL_VAR NAME=Email></td>
+	   </tr>
+	   <tr>
+		  <td width="20%" align="right"><strong>Tél.</strong></td>
+		  <td><TMPL_VAR NAME=Phone></td>
+	   </tr>
+	   <tr>
+		  <td width="20%" align="right"><strong>Fax</strong></td>
+		  <td><TMPL_VAR NAME=Fax></td>
+	   </tr>
+	   <tr>
+		  <td width="20%" align="right" valign="top"><strong>Adresse</strong></td>
+		  <td>
+		   <TMPL_VAR NAME=Addr><br>
+		   <TMPL_VAR NAME=Country>, <TMPL_VAR NAME=ZipCode> - <TMPL_VAR NAME=City>	     </td>
+	   </tr>
+	   <tr>
+		  <td width="20%" align="right"><strong>Montant</strong></td>
+		  <td><TMPL_VAR NAME=Total> <TMPL_VAR NAME=Currency></td>
+	   </tr>
+	   <TMPL_IF NAME=etat>
+		  <tr>
+			 <td width="20%" align="right"><strong>Etat</strong></td>
+			 <td> payé  <img src=/images/ok.gif align=middle></td>
+		  </tr>
+		  <tr>
+			 <td width="20%" align="right"><strong>Date paiement</strong></td>
+			 <td><TMPL_VAR NAME="datecr"></td>
+		  </tr>
+		  <tr>
+			 <td width="20%" align="right"><strong>Identification PostFinance</strong></td>
+			 <td><TMPL_VAR NAME=PaymentID></td>
+		  </tr>
+		  <tr>
+			 <td width="20%" align="right"><strong>Payé par</strong></td>
+			 <td><TMPL_VAR NAME=paymode></td>
+		  </tr>
+		<TMPL_ELSE>
+		  <tr>
+			 <td width="20%" align="right"><strong>Etat</strong></td>
+			 <td> non payé  <img src=/images/ko.gif align=middle></td>
+		  </tr>
+		  <tr>
+			 <td width="20%" align="right"><strong>Date accès</strong></td>
+			 <td><TMPL_VAR NAME="datecr"></td>
+		  </tr>
+		</TMPL_IF>
+    </table>
+    </div>
+
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">

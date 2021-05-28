@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<title>PayOnLine</title>
+
+<!-- web2010 EPFL -->
+<link rel="stylesheet" href="https://www.epfl.ch/css/epfl.css">
+<script type="text/javascript" src="https://www.epfl.ch/js/jquery-epfl.min.js"></script>
+<script type="text/javascript">jQuery.noConflict();</script>
+<script type="text/javascript" src="https://www.epfl.ch/js/globalnav.js"></script>
+
+<link rel="stylesheet" href="/payonline.css">
+<script src="/payonline.js" type="text/javascript"></script>
+
+</head>
+
+<body style="padding: 50px;">
+
+	<h3><TMPL_VAR NAME=sErrMsg></h3>
+
+	<h2 style="margin-top: 50px;">On line payment</h2>
+
+	<TMPL_IF NAME=ResultCode>
+		 <h3>Transaction succeeded <img src="/images/ok.gif"></h3>
+		 Print this page and save it as a transaction proof.
+	<TMPL_ELSE>
+		 <h3>Transaction failed</h3>
+		 Please return on the previous page and redo the payment procedure.
+	</TMPL_IF>
+
+	<TMPL_IF NAME=URL>
+		<br>
+		<a href="<TMPL_VAR NAME=URL>">Return</a> to the main site
+	</TMPL_IF>
+
+	<div style="margin-top: 20px;">
+	  <TMPL_IF NAME=Descr>
+		 <h3><TMPL_VAR NAME=Descr></h3>
+		 <b>Contact :</b> <a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a><br>
+		 <b>Transaction nb. : </b><TMPL_VAR NAME=OrderIDShop><br>
+		 <b>PostFinance ID : </b><TMPL_VAR NAME=TransactionID><br>
+		 <b>Payment date : </b><TMPL_VAR NAME=Date><br>
+		 <b>Payment method : </b><TMPL_VAR NAME=PayMode><br>
+		 <b>Client Data</b>
+		 <blockquote>
+		 <TMPL_VAR NAME=LastName> <TMPL_VAR NAME=FirstName><br>
+		 <TMPL_VAR NAME=Addr><br>
+		 <TMPL_VAR NAME=Country>, <TMPL_VAR NAME=ZipCode>, <TMPL_VAR NAME=City><br>
+		 <TMPL_VAR NAME=Email><br>
+		 </blockquote>
+		 <b>Total : </b><TMPL_VAR NAME=Total> <TMPL_VAR NAME=Currency>
+		 <hr>
+	 </TMPL_IF>
+	</div>
+
+	  <p>In case of repeating failures, please check the <a href=https://payonline.epfl.ch/docs/troubleshooting-en.html><b>troubleshooting online help</b></a> and send this information and the error message to Postfinance's support [<a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>], to
+	  the person in charge of the instance [<a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a>]
+	  or to <a href="mailto:payonline@epfl.ch">payonline@epfl.ch</a>, according to the point of failure.
+	  </p>
+</body>
+</html>

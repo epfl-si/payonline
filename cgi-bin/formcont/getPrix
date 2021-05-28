@@ -12,12 +12,12 @@
 
 
 use strict;
-use lib '/var/www/vhosts/payonline.epfl.ch/cgi-bin/formcont/test';
+use lib '/var/www/vhosts/payonline.epfl.ch/cgi-bin/formcont';
 use payonline_tools;
 
-$payonline_tools::DEBUG	 = 1;
+$payonline_tools::DEBUG	 = 0;
 
-warn "getPrix..\n";
+#warn "getPrix..\n";
 
 print qq{Content-Type: text/plain; charset=iso-8859-1
 Access-Control-Allow-Origin: *\n\n};
@@ -32,7 +32,9 @@ print qq{
 
 while (my ($montant) = $sth->fetchrow) {
 	print qq{<option value="cours:$montant">$montant CHF</option>};
+
 #warn " >> $montant\n";
+
 }
 print qq{
 </select >

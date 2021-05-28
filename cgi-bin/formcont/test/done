@@ -25,8 +25,6 @@ use vars qw( %args $lang $errmsg $crtdate );
 	$crtdate 	= payonline_tools::getcrtdate();
 	$lang 		= $args{lang} ? $args{lang} : 'en' ;
 
-warn "==> done test \n";
-
 	cert() 		if ($pi =~  /^\/cert/);
 	redirect();
 

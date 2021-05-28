@@ -77,9 +77,9 @@ my %nat_comptable = (
 			'740055', '740055 : Vente, Formation continue',
 			'740060', '740060 : Congrès, Séminaires, Conférences',
 			'741070', '741070 : Produits de manifestations',
-			'746020', '746020 : Dons, donations, legs reçus',
 			'747040', '747040 : Cotisations et abonnements divers',
 			'783120', '783120 : Contrat de service suisse',
+			'786030', '786030 : Autres dons',
 			},
 		en => {
 			'', '---select---',
@@ -94,9 +94,9 @@ my %nat_comptable = (
 			'740055', '740055 : Sales, Continuing Education',
 			'740060', '740060 : Congres, Seminaires, Conferences',
 			'741070', '741070 : Produits de manifestations',
-			'746020', '746020 : Dons, donations, legs reçus',
 			'747040', '747040 : Cotisations et abonnements divers',
 			'783120', '783120 : Contrat de service suisse',
+			'786030', '786030 : Gift',
 			},
 );
 			
@@ -666,13 +666,10 @@ sub detinst {
   	$monnaietxt = qq{<input type="hidden" name="monnaie" value="$result->{monnaie}"> $result->{monnaie}};
   }
   $template->param(IsSuperUser => payonline_tools::IsSuperUser($sciper));
-#  $template->param(IsSuperUser => 0);
-  
   $template->param(sMonnaie		=> $monnaietxt );
   $template->param(id 				=> $result->{id});
   $template->param(sDelValid	=> ($result->{etat} eq 'test'));
   $template->param(sValid			=> ($result->{etat} eq 'validation') && payonline_tools::IsSuperUser($sciper));
-
   $template->param(sActivate	=> $result->{etat} =~ /^inactive/);
   $template->param(sInactivate=> $result->{etat} =~ /^test|^prod/);
   $template->param(respNom 		=> $resp->{nom});
@@ -756,9 +753,14 @@ sub newinst {
   $template->param(sEtat		=> 'inactive' );
   $template->param(sNCTxt		=> $nat_comptable_txt );
   $template->param(sMonnaie		=> $monnaietxt );
-  $template->param(sdatedeb		=> payonline_tools::prdate($crtdate,'date') );
+#  $template->param(sdatedeb		=> payonline_tools::prdate($crtdate,'date') );
+	my $yy = substr ($crtdate,0,4);
+	my $mm = substr ($crtdate,5,2);
+	my $dd = substr ($crtdate,8,2);
+	my $sdatedeb = sprintf "%04d-%02d-%02d", $yy, $mm, $dd;
+  $template->param(sdatedeb		=> $sdatedeb);
   $template->param(sFormaction	=> "$me/doneinst?lang=$lang"		);
- 
+
   $template->param(sErrMsg => $errmsg);
   print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
@@ -856,7 +858,7 @@ sub doneinst {
   my $etat				= $args{etat};
   my $monnaie			= $args{monnaie};
   my $url					= $args{url};
-  my $mailinst			= $args{mailinst};
+  my $mailinst		= $args{mailinst};
   my $contact			= $args{contact};
   my $bypass_cg		= $args{bypass_cg};
   my $bypass_return= $args{bypass_return};
@@ -1028,7 +1030,7 @@ Date début: $datedeb
 Date fin : $datefin
 Monnaie : $monnaie
 CG gérées par la manifestation : $bypass_cg
-Retour sur sit manifestation : $bypass_return
+Retour sur site manifestation : $bypass_return
 
 L'instance a été validée par le Service Financier de l'EPFL et est passée en mode *production*.
 Toutes les transactions de test ont été effacées.
@@ -1359,14 +1361,11 @@ sub authenticate {
     exit;
   }
 
-use Data::Dumper;
-warn ">> fonds\n".Dumper($fonds);
-  
+#warn "payonline :: respunits=$respunits";
   my ($n1, $n2) = split(/,/, $nom)    if ($nom =~ /,/);
   $nom = utf8tolatin1($n1) if $n2;
   my ($n1, $n2) = split(/,/, $prenom) if ($prenom =~ /,/);
   $prenom = utf8tolatin1($n1) if $n2;
-warn "authenticate $sciper, $nom $prenom :: respunits=$respunits";
 
 }
 

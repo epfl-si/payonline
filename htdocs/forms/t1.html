@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>ma Conf&eactute;rence</title>
+<style type="text/css">
+<!--
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+-->
+</style>
+</head>
+
+<body>
+<h3>Test Form - new API </h3>
+<b>paiement en ligne</b> <br>
+<form id="form1" name="form1" method="post" action="https://payonline.epfl.ch/cgi-bin/commande">
+
+<!-- 
+<input type="hidden" name="PM" value="TWINT ">
+<input type="hidden" name="BRAND" value="">
+ -->
+
+  <table width="100%" border="0">
+    <tr>
+      <td width="18%"><div align="right">Nom</div></td>
+      <td width="82%"><input name="LastName" type="text" id="LastName" size="32" /></td>
+    </tr>
+    <tr>
+      <td><div align="right">Pr&eacute;nom</div></td>
+      <td><input name="FirstName" type="text" id="FirstName" size="32" /></td>
+    </tr>
+    <tr>
+      <td><div align="right">Adresse</div></td>
+      <td><textarea name="Addr" cols="32" id="Addr"></textarea></td>
+    </tr>
+    <tr>
+      <td><div align="right">Code postal </div></td>
+      <td><input name="ZipCode" type="text" id="ZipCode" size="32" /></td>
+    </tr>
+    <tr>
+      <td><div align="right">Ville</div></td>
+      <td><input name="City" type="text" id="City" size="32" /></td>
+    </tr>
+    <tr>
+      <td><div align="right">Pays</div></td>
+      <td><select name="Country" id="Country">
+        <option value="CH" selected="selected">Suisse</option>
+        <option value="FR">France</option>
+        <option value="DE">Allemagne</option>
+        <option value="GB">Grande-Bretagne</option>
+      </select>
+      </td>
+    </tr>
+    <tr>
+      <td><div align="right">Email</div></td>
+      <td><input name="Email" type="text" id="Email" size="32" /></td>
+    </tr>
+    <tr>
+      <td><div align="right">Participation</div></td>
+      <td>
+        <select name="Total" >
+	  <option value="100.00">100.00</option>
+	  <option value="200.00">200.00</option>
+	  <option value="300.00">300.00</option>
+	</select> CHF
+      </td>
+    </tr>
+    <tr>
+      <td height="133">&nbsp;</td>
+      <td><input type="submit" name="Submit" value="Enregistrer" />
+
+      <input name="id_transact" type="hidden" id="id_transact" value="11223344556677889900" />
+
+      <input name="lang" type="hidden" id="lang" value="en" />
+      <input name="Currency" type="hidden" id="Currency" value="CHF" />
+      <input name="id_inst" type="hidden" id="id_inst" value="1234567890" /></td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

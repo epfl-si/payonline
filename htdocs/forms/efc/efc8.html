@@ -1,0 +1,1025 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//Dtd HTML 4.01 Transitional//EN">
+<html><head>
+
+
+<meta http-equiv="content-type" content="text/html;charset=ISO-8859-1"><title>REGISTRATION FORM</title>
+
+<link rel="stylesheet" href="./style.css">
+<script type="text/javascript" src="./general.js"></script>
+</head><body onLoad="window.focus();">
+
+<style>
+body  { font-size: 0.6em; font-family: Verdana, Helvetica, Arial, Geneva, Swiss, SunSans-Regular, sans-serif; margin-top: 15px; }
+
+/*Header*/
+#header_graph	{ position: absolute; top: 15px; right: 10px; float: right; }
+#header_left    { width: 155px; float: left; }
+#header_title1  { margin-right: 30px; margin-bottom: 1px; margin-left: 159px; height: 34px; }
+#header_title1 img { margin-top: 3px; }
+#header_title2  { margin-bottom: 1px; padding-left: 3px; margin-left: 159px; height: 28px; }
+#header_title2 img { margin-top: 3px; }
+#tracking       { margin-left: 159px; padding-left: 10px; height: 14px; background-color: #cccccc; }
+#language       { background-color: #cccccc; padding-left: 35px; height: 14px; }
+.logo   		{ margin-bottom: 1px; margin-left: 35px; }
+
+/*Colors*/
+.headercolor_1_epfl	{background-color:#99cccc;}
+.headercolor_2_epfl	{background-color:#339999;}
+.headercolor_1_EPFL	{background-color:#99cccc;}
+.headercolor_2_EPFL	{background-color:#339999;}
+.headercolor_1_adm	{background-color:#cccccc;}
+.headercolor_2_adm	{background-color:#999999;}
+.headercolor_1_form	{background-color:#CCCC66;}
+.headercolor_2_form	{background-color:#999933;}
+.headercolor_1_asso	{background-color:#CC99CC;}
+.headercolor_2_asso	{background-color:#660066;}
+.headercolor_1_enac	{background-color:#FF9966;}
+.headercolor_2_enac	{background-color:#CC6633;}
+.headercolor_1_sb	{background-color:#6699CC;}
+.headercolor_2_sb	{background-color:#336699;}
+.headercolor_1_ic	{background-color:#669999;}
+.headercolor_2_ic	{background-color:#336666;}
+.headercolor_1_sti	{background-color:#9999CC;}
+.headercolor_2_sti	{background-color:#333366;}
+.headercolor_1_cdh	{background-color:#CC9999;}
+.headercolor_2_cdh	{background-color:#990000;}
+.headercolor_1_cdm	{background-color:#CC9999;}
+.headercolor_2_cdm	{background-color:#990000;}
+.headercolor_1_sv	{background-color:#99CC99;}
+.headercolor_2_sv	{background-color:#669933;}
+
+#main {
+  position: absolute;
+  top: 100px;
+  left: 4px;
+  right: 4px;
+
+}
+
+div.tabs {
+    /* Navigational Tabs */
+    background: transparent;
+    border-collapse: collapse;
+    border-bottom-color: #8CACBB;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    padding: 0.5em 0em 0em 2em;
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+div.tabs a.plain{
+    /* The normal, unselected tabs. They are all links */
+    background: transparent;
+    border-color: #8CACBB;
+    border-width: 1px; 
+    border-style: solid solid none solid;
+    color: #436976;
+    font-size: 14px;
+    font-weight: bold;
+    height: 1.2em;
+    margin-right: 0.5em;
+    padding: 0em 2em;
+}
+
+div.tabs a.selected {
+    /* The selected tab. There's only one of this */
+    background: #DEE7EC;
+    border: 1px solid #8CACBB;
+    border-bottom: #DEE7EC 1px solid;
+    color: #436976;
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 0.5em;
+    padding: 0em 2em;
+}
+
+div.tabs a:hover {
+    background: #DEE7EC;
+    border-color: #8CACBB;
+    border-bottom-color: #DEE7EC;
+    color: #436976;
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 0.5em;
+    padding: 0em 2em;
+}
+
+div.tabs a:hover.nohover {
+    background: transparent;
+    border-color: #8CACBB;
+    color: #436976;
+}
+
+#menu {
+	position:absolute;
+	top:5px;
+	left:5px;
+	width:140px;
+	padding:5px;
+	background-color:#eee;
+	border:1px dashed #999;
+	line-height:17px;
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	width:140px;
+	}
+	
+#formular {
+  position: absolute;
+  top: 100px;
+  left: 4px;
+  right: 4px;
+}
+
+#debug {
+  position: absolute;
+  bottom: 0px;
+  left: 4px;
+  right: 4px;
+}
+
+
+.spacer {
+  height : 0px;
+  width: 0px;
+  display: inline;
+  float: right;
+}
+
+#logoepfl {
+  position : absolute;
+  top : 9px;
+  left: 39px;
+  width : 120px;
+  height: 34px;
+  background-color : #FFFFFF;
+}
+
+#textepfl {
+  position : absolute;
+  top : 44px;
+  left : 39px;
+  width: 120px;
+  height: 28px;
+}
+
+#titleline {
+  font-size: 18px;
+  position : absolute;
+  top : 9px;
+  left : 163px;
+  right : 4px;
+
+  height : 34px;
+  min-width : 630px;
+}
+
+#title {
+  position : absolute;
+  top : 0px;
+  left : 0px;
+  padding-left: 0px;
+  line-height:34px;
+  padding-top: 2px;
+}
+
+#graph {
+  float : right;
+  width: 270px;
+  height: 34px;
+}
+
+#subtitleline {
+  position: absolute;
+  top: 44px;
+  left: 163px;
+  right: 4px;
+  height: 28px;
+  max-height: 28px;
+  padding-top: 4px;
+  padding-left: 2px;
+  line-height:27px;
+  color: #FFFFFF;
+  font-family: 'trade gothic', 'Arial Narrow', helvetica, verdana, sans-serif, sans;
+  font-size: 14px;
+  font-stretch: narrower;
+  font-weight: bold;
+  min-width : 630px;
+}
+
+
+#langage {
+  position: absolute;
+  top: 75px;
+  left: 4px;
+  /*height: 14px;*/
+  height: 1.3em;
+  width: 155px;
+  background-color: #CCCCCC;
+  color: #666666;
+  font-family: 'trade gothic', 'Arial Narrow', helvetica, verdana, sans-serif, sans;
+  font-size: 10px;
+  text-align: center;
+  line-height:11px;
+}
+
+#path {
+  position: absolute;
+  top: 75px;
+  left: 163px;
+  right: 4px;
+  padding-top: 0px;
+  padding-left: 1px;
+  /*height: 14px;*/
+  height: 1.3em;
+  background-color: #CCCCCC;
+  color: #666666;
+  font-family: 'trade gothic', 'Arial Narrow', helvetica, verdana, sans-serif, sans;
+  font-size: 10px;
+  font-weight: bold;
+  line-height:14px;
+  min-width : 630px;
+}
+
+#edit {
+	position: absolute;
+	top: 75px;
+	left: 629px;
+	right: 4px;
+	text-align: right;
+	padding-top: 0px;
+	padding-right: 4px;
+	height: 1.2em;
+	background-color: #CCCCCC;
+	color: #666666;
+	font-family: 'trade gothic', 'Arial Narrow', helvetica, verdana, sans-serif, sans;
+	font-size: 10px;
+	font-weight: bold;
+	line-height:11px;
+}
+p {
+ font-family: verdana, arial, "ms sans serif", sans-serif;
+ font-size: 12px;
+ margin: 10px;
+ line-height: 18px;
+ padding-left: 8px;
+ color: #333333;
+ }
+
+.small
+ {
+ font-family: verdana, arial, "ms sans serif", sans-serif;
+ font-size: 10px;
+ font-weight: normal;
+ line-height: 14px;
+ padding-left: 5px;
+ color: #333333;
+ }
+
+ .path
+ {
+ font-family: verdana, arial, "ms sans serif", sans-serif;
+ font-size: 10px;
+ font-weight: normal;
+ line-height: 14px;
+ padding-left: 10px;
+ color: #333333;
+ }
+.comment
+ {
+ font-family: verdana, arial, "ms sans serif", sans-serif;
+ color: #777777;
+ font-size: 10px;
+ font-weight: normal;
+ line-height: 14px;
+ }
+.big {
+ font-family: verdana, arial, "ms sans serif", sans-serif;
+ font-size: 14px;
+ line-height: 14px;
+ padding-left: 10px;
+ color: #333333;
+ }
+
+.title-red {
+ font-family: verdana, arial, "ms sans serif", sans-serif;
+ font-size: 14px;
+ line-height: 14px;
+ font-weight: bold;
+ color: #ff0000;
+ }
+
+.title {
+ font-family: verdana, arial, "ms sans serif", sans-serif;
+ font-size: 14px;
+ line-height: 14px;
+ font-weight: bold;
+ color: #999999;
+ }
+
+td {
+ font-family: verdana, arial, "ms sans serif", sans-serif;
+ font-size: 10px;
+ color: #333333;
+}
+
+A:link {
+  background-color: transparent;
+  color: #003366;
+  font-family: Verdana, Helvetica, Arial, Geneva, Swiss, SunSans-Regular, sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+A:visited {
+  background-color: transparent;
+  color: #336699;
+  font-family: Verdana, Helvetica, Arial, Geneva, Swiss, SunSans-Regular, sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  text-decoration: none;
+}
+A:hover {
+  background-color: transparent;
+  color: #336699;
+  font-family: Verdana, Helvetica, Arial, Geneva, Swiss, SunSans-Regular, sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  text-decoration: none
+}
+A:active {
+  background-color: transparent;
+  color: #000000;
+  font-family: Verdana, Helvetica, Arial, Geneva, Swiss, SunSans-Regular, sans-serif;
+  font-size: 10px;
+  text-decoration: none;
+}
+INPUT.button {
+  background-color: transparent;
+  border-color: #000000;
+  border-left-width: 1px;
+  border-right-width: 2px;
+  border-top-width: 1px;
+  border-bottom-width: 2px;
+  border-style: solid;
+  color: #000000;
+  font-family: Verdana, Helvetica, Arial, Geneva, Swiss, SunSans-Regular, sans-serif;
+  font-size: 10px;
+  font-weight: normal;
+  text-indent: 2px;
+  margin: 1px;
+}
+
+INPUT.select {
+  background-color: #FFFFFF;
+  border-color: #000000;
+  border-left-width: 1px;
+  border-right-width: 1px;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-style: solid;
+  color: #000000;
+  font-family: Verdana, Helvetica, Arial, Geneva, Swiss, SunSans-Regular, sans-serif;
+  font-size: 8px;
+  font-weight: normal;
+  margin: 1px;
+}
+
+TEXTAREA {
+  border-bottom-width: 1px;
+  border-color: #000000;
+  border-left-width: 1px;
+  border-right-width: 1px;
+  border-style: solid;
+  border-top-width: 1px;
+  font-family: Verdana, Helvetica, Arial, Geneva, Swiss, SunSans-Regular, sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  text-indent: 0px;
+  margin: 1px;
+}
+INPUT {
+  background-color: #FFFFFF;
+  border-color: #000000;
+  border-left-width: 1px;
+  border-right-width: 1px;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  color: #000000;
+  font-family: Verdana, Helvetica, Arial, Geneva, Swiss, SunSans-Regular, sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  text-indent: 2px;
+  margin: 1px;
+}
+
+/* Uncomment these for the old style
+ a:link {
+ color: #333333;
+ font-weight: bold;
+ text-decoration: none;
+ }
+a:visited {
+ color: #333333;
+ font-weight: bold;
+ text-decoration: none;
+ }
+a:active {
+ color: #333333;
+ font-weight: bold;
+ text-decoration: none;
+ }
+a:hover {
+ color:#666666;
+ font-weight: bold;
+ text-decoration: overline;
+ }
+
+input, textarea, select {
+ background-color: #dddddd;
+ font-family: verdana, arial, sans-serif;
+ font-size: 10px;
+ color: #333;
+ padding: 0px;
+}
+
+input.button {
+ border:2px outset #999; background-color: #CCC;
+}
+
+End uncomment this */
+
+.userValue {
+	background-color: #abcdef;
+	margin: 3px;
+	padding: 3px;
+	display: block;
+}
+
+.userValuePublic {
+	border: 1px solid #abcdef;
+	margin: 3px;
+	padding: 3px;
+	display: block;
+	min-width: 150px;
+}
+
+.redbox {
+	background-color: #F3AEA2;
+	border: 1px solid #FF5959;
+}
+
+.sendbox {
+	background-color: #F3AEA2;
+	border: 1px solid #FF5959;
+	width:250px;
+	height:250px;
+}
+
+.bluebox {
+	background-color: #d7e9ec;
+	border: 1px solid #339999;
+}
+
+.greybox {
+	background-color: #eeeeee;
+	border: 1px solid #666666;
+}
+.greenbox {
+	background-color: #DBF3A2;
+	border: 1px solid #678E00;
+}	
+
+.headercolor_1_inform 	{ background-color: #39a6d1;}
+.headercolor_2_inform 	{ background-color: #abcdef;}
+.headercolor_1_inform 	{ background-color: #39a6d1;}
+.headercolor_2_inform 	{ background-color: #abcdef;}
+
+.invalidinput {
+	background-color: #F3AEA2;
+}
+
+</style>
+
+<!-- ################### START HEADER ###################### -->
+
+<div id="header_left">
+	<div class="logo"><a href="https://www.epfl.ch/"><img src="http://www.epfl.ch/images/epfl_logo.gif" alt="" border="0" height="34" width="120"></a></div>
+	<div class="logo"><a href="https://www.epfl.ch/"><img src="http://www.epfl.ch/images/epfl_text.gif" alt="" border="0" height="28" width="120"></a></div>
+	<div id="language" class="path" nowrap="">
+			&nbsp;
+  </div>
+</div>
+
+	<div id="header_title1" class="headercolor_1_epfl">
+		       	<img src="http://www.epfl.ch/tools/label.php?s=22&BG=99cccc&FG=ffffff&label=Risk-Based+Regulation+and+Certification">
+       		
+	</div>
+	<div id="header_title2" class="headercolor_2_epfl">
+						<img src="./label_002.png" border="0">
+					
+	</div>
+	<div id="tracking" class="path" nowrap="">
+			    	      	        <a class="trackerpath" href="http://continuing-education.epfl.ch/">
+	      	        EFC	      </a>
+	    	    &gt;
+	  		  	<a class="trackerpath" href="">Risk-Based Regulation and Certification  -
+  	Nov. 6&amp;7, 2006 - Macolin</a></div>
+	
+	<div id="header_graph"><img src="./graph_epfl.gif" alt="" border="0" height="34" width="270"></div>
+<div id="main">
+<form action="http://payonline.epfl.ch/cgi-bin/commande" method="post" name="myForm" >
+<br>
+<table align="center" border="0" cellpadding="5" cellspacing="0" width="90%">
+
+ <tbody><tr valign="middle">
+   <td colspan="4" class="small" align="right">
+     <table border="0" cellpadding="0" cellspacing="0" width="100%">
+       <tbody>
+	<tr valign="bottom">
+         <td>
+           <div class="title">REGISTRATION AND PAY-ON-LINE FORM</div>
+           <br>
+           <div class="normal">Registration and payment deadline : November 7,
+             2006<br>
+           </div>
+          </td>
+          <td class="small" align="right">
+           <nobr></nobr>
+          </td>
+	 </tr>
+        </tbody>
+      </table>
+   </td>
+ </tr>
+ <tr valign="middle">
+ <td colspan="4" align="center" background="./btnline.gif">
+ 	 </td>
+ </tr>
+ <tr><td colspan="3" background="./btnline.gif"></td></tr>
+ 
+ <tr bgcolor="#eeeeee" valign="top">
+
+ 	<td nowrap="nowrap" width="2%">
+ 		<!----></td>
+ 	<td wrap="" width="30%">
+ 	<b>IDENTITY</b>
+	 	 <br> 
+	  	</td>
+ 	<td>
+	<table border="0" cellpadding="2" cellspacing="0">
+        <tbody><tr valign="top">
+	<td class="small" nowrap="nowrap" width="200">
+        <b>Gender</b>
+        </td>
+        <td>
+	<input name="gender" value="" size="5" maxlength="" type="text">
+	</td>
+        <td>&nbsp;</td>
+        </tr>
+	<tr valign="top">
+	<td class="small" nowrap="nowrap" width="200">
+        <b>Last Name</b>				<b>* </b></td>
+        <td><input name="LastName" type="text" id="LastName" value="" size="40" maxlength=""></td>
+        <td>&nbsp;</td>
+        </tr>
+	<tr valign="top">
+	<td class="small" nowrap="nowrap" width="200">
+        <b>First Name</b>				<b>* </b></td>
+        <td>
+	<input name="FirstName" type="text" id="FirstName" value="" size="40" maxlength="">
+	</td>
+        <td>&nbsp;</td>
+	</tr>
+	</tbody>
+	</table>
+       </td>
+       <td class="small">
+       <!---->&nbsp;
+       </td>
+       </tr>
+       <tr><td colspan="7" background="./btnline.gif"></td></tr>
+       <tr bgcolor="#ffffff" valign="top">
+       <td nowrap="nowrap" width="2%">
+       <!----></td>
+       <td wrap="" width="30%">
+       <b>COMPANY</b>
+       <br> 
+       </td>
+       <td>
+       <table border="0" cellpadding="2" cellspacing="0">
+       <tbody><tr valign="top">
+       <td class="small" nowrap="nowrap" width="200">
+       <b>Name *</b>
+       </td>
+       <td><input name="company" value="" size="50" maxlength="" type="text">
+       </td>
+       <td>&nbsp;</td>
+       </tr>
+       <tr valign="top">
+       <td class="small" nowrap="nowrap" width="200">
+       <b>Function *</b>
+       </td>
+       <td>
+       <input name="function" value="" size="50" maxlength="" type="text">
+       </td>
+       <td>&nbsp;</td>
+       </tr>
+       <tr valign="top">
+       <td class="small" nowrap="nowrap" width="200">
+       <b>Street</b>				<b>* </b></td>
+       <td><input name="Addr" type="text" id="Addr" value="" size="40" maxlength="">
+       </td>
+       <td>&nbsp;</td>
+       </tr>
+       <tr valign="top">
+       <td class="small" nowrap="nowrap" width="200">
+       <b>Zip code</b>				<b>* </b></td>
+       <td><input name="ZipCode" type="text" id="ZipCode" value="" size="15" maxlength="">
+       </td>
+       <td>&nbsp;</td></tr>
+       <tr valign="top">
+       <td class="small" nowrap="nowrap" width="200">
+       <b>City</b>				<b>* </b></td>
+       <td><input name="City" type="text" id="City" value="" size="50" maxlength=""></td>
+       <td>&nbsp;</td>
+       </tr>
+       <tr valign="top">
+       <td class="small" nowrap="nowrap" width="200">
+       <b>Country</b>				<b>* </b></td>
+       <td>
+       <select name="Country" id="Country">
+<option value="" selected>choose...</option>											
+<option value="AF" >Afghanistan</option> 
+<option value="AL" >Albania</option> 
+<option value="DZ" >Algeria</option> 
+<option value="AS" >American Samoa</option> 
+<option value="AD" >Andorra</option>
+<option value="AO" >Angola</option> 
+<option value="AI" >Anguilla</option> 
+
+<option value="AQ" >Antarctica</option> 
+<option value="AG" >Antigua and Barbuda</option> 
+<option value="AR" >Argentina</option> 
+<option value="AM" >Armenia</option> 
+<option value="AW" >Aruba</option> 
+<option value="AU" >Australia</option> 
+<option value="AT" >Austria</option> 
+<option value="AZ" >Azerbaijan</option> 
+<option value="BS" >Bahamas</option> 
+
+<option value="BH" >Bahrain</option> 
+<option value="BD" >Bangladesh</option> 
+<option value="BB" >Barbados</option> 
+<option value="BY" >Belarus</option> 
+<option value="BE" >Belgium</option> 
+<option value="BZ" >Belize</option> 
+<option value="BJ" >Benin</option> 
+<option value="BM" >Bermuda</option> 
+<option value="BT" >Bhutan</option> 
+
+<option value="BO" >Bolivia</option> 
+<option value="BA" >Bosnia and Herzegowina</option> 
+<option value="BW" >Botswana</option> 
+<option value="BV" >Bouvet Island</option> 
+<option value="BR" >Brazil</option> 
+<option value="IO" >British Indian Ocean Territory</option> 
+<option value="BN" >Brunei Darussalam</option> 
+<option value="BG" >Bulgaria</option> 
+<option value="BF" >Burkina Faso</option> 
+
+<option value="BI" >Burundi</option> 
+<option value="KH" >Cambodia</option> 
+<option value="CM" >Cameroon</option> 
+<option value="CA" >Canada</option> 
+<option value="CV" >Cape Verde</option> 
+<option value="KY" >Cayman Islands</option> 
+<option value="CF" >Central African Republic</option> 
+<option value="TD" >Chad</option> 
+<option value="CL" >Chile</option> 
+
+<option value="CN" >China</option> 
+<option value="CX" >Christmas Island</option> 
+<option value="CC" >Cocos (Keeling) Islands</option> 
+<option value="CO" >Colombia</option> 
+<option value="KM" >Comoros</option> 
+<option value="CG" >Congo</option> 
+<option value="CD" >Congo, The Democratic Republic of the</option> 
+<option value="CK" >Cook Islands</option> 
+<option value="CR" >Costa Rica</option> 
+
+<option value="CI" >Cote d'Ivoire</option> 
+<option value="HR" >Croatia (Hrvatska)</option> 
+<option value="CU" >Cuba</option> 
+<option value="CY" >Cyprus</option> 
+<option value="CZ" >Czech Republic</option> 
+<option value="DK" >Denmark</option> 
+<option value="DJ" >Djibouti</option> 
+<option value="DM" >Dominica</option> 
+<option value="DO" >Dominican Republic</option> 
+
+<option value="TP" >East Timor</option> 
+<option value="EC" >Ecuador</option> 
+<option value="EG" >Egypt</option> 
+<option value="SV" >El Salvador</option> 
+<option value="GQ" >Equatorial Guinea</option> 
+<option value="ER" >Eritrea</option> 
+<option value="EE" >Estonia</option> 
+<option value="ET" >Ethiopia</option> 
+<option value="FK" >Falkland Islands (Malvinas)</option> 
+
+<option value="FO" >Faroe Islands</option> 
+<option value="FJ" >Fiji</option> 
+<option value="FI" >Finland</option> 
+<option value="FR" >France</option> 
+<option value="FX" >France, Metropolitan</option> 
+<option value="GF" >French Guiana</option> 
+<option value="PF" >French Polynesia</option> 
+<option value="TF" >French Southern Territories</option> 
+<option value="GA" >Gabon</option> 
+
+<option value="GM" >Gambia</option> 
+<option value="GE" >Georgia</option> 
+<option value="DE" >Germany</option> 
+<option value="GH" >Ghana</option> 
+<option value="GI" >Gibraltar</option> 
+<option value="GR" >Greece</option> 
+<option value="GL" >Greenland</option>
+<option value="GD" >Grenada</option>
+<option value="GP" >Guadeloupe</option>
+
+<option value="GU" >Guam</option>
+<option value="GT" >Guatemala</option>
+<option value="GN" >Guinea</option>
+<option value="GW" >Guinea-Bissau</option>
+<option value="GY" >Guyana</option>
+<option value="HT" >Haiti</option>
+<option value="HM" >Heard and Mc Donald Islands</option>
+<option value="VA" >Holy See (Vatican City State)</option>
+<option value="HN" >Honduras</option>
+
+<option value="HK" >Hong Kong</option>
+<option value="HU" >Hungary</option>
+<option value="IS" >Iceland</option>
+<option value="IN" >India</option>
+<option value="ID" >Indonesia</option>
+<option value="IR" >Iran (Islamic Republic of)</option>
+<option value="IQ" >Iraq</option>
+<option value="IE" >Ireland</option>
+<option value="IL" >Israel</option>
+
+<option value="IT" >Italy</option>
+<option value="JM" >Jamaica</option>
+<option value="JP" >Japan</option>
+<option value="JO" >Jordan</option>
+<option value="KZ" >Kazakhstan</option>
+<option value="KE" >Kenya</option>
+<option value="KI" >Kiribati</option>
+<option value="KP" >Korea, Democratic People's Republic of</option>
+<option value="KR" >Korea, Republic of</option>
+
+<option value="KW" >Kuwait</option>
+<option value="KG" >Kyrgyzstan</option>
+<option value="LA" >Lao People's Democratic Republic</option>
+<option value="LV" >Latvia</option>
+<option value="LB" >Lebanon</option>
+<option value="LS" >Lesotho</option>
+<option value="LR" >Liberia</option>
+<option value="LY" >Libyan Arab Jamahiriya</option>
+<option value="LI" >Liechtenstein</option>
+
+<option value="LT" >Lithuania</option>
+<option value="LU" >Luxembourg</option>
+<option value="MO" >Macau</option>
+<option value="MK" >Macedonia, The Former Yugoslav Republic of</option>
+<option value="MG" >Madagascar</option>
+<option value="MW" >Malawi</option>
+<option value="MY" >Malaysia</option>
+<option value="MV" >Maldives</option>
+<option value="ML" >Mali</option>
+
+<option value="MT" >Malta</option>
+<option value="MH" >Marshall Islands</option>
+<option value="MQ" >Martinique</option>
+<option value="MR" >Mauritania</option>
+<option value="MU" >Mauritius</option>
+<option value="YT" >Mayotte</option>
+<option value="MX" >Mexico</option>
+<option value="FM" >Micronesia, Federated States of</option>
+<option value="MD" >Moldova, Republic of</option>
+
+<option value="MC" >Monaco</option>
+<option value="MN" >Mongolia</option>
+<option value="MS" >Montserrat</option>
+<option value="MA" >Morocco</option>
+<option value="MZ" >Mozambique</option>
+<option value="MM" >Myanmar</option>
+<option value="NA" >Namibia</option>
+<option value="NR" >Nauru</option>
+<option value="NP" >Nepal</option>
+
+<option value="NL" >Netherlands</option>
+<option value="AN" >Netherlands Antilles</option>
+<option value="NC" >New Caledonia</option>
+<option value="NZ" >New Zealand</option>
+<option value="NI" >Nicaragua</option>
+<option value="NE" >Niger</option>
+<option value="NG" >Nigeria</option>
+<option value="NU" >Niue</option>
+<option value="NF" >Norfolk Island</option>
+
+<option value="MP" >Northern Mariana Islands</option>
+<option value="NO" >Norway</option>
+<option value="OM" >Oman</option>
+<option value="PK" >Pakistan</option>
+<option value="PW" >Palau</option>
+<option value="PA" >Panama</option>
+<option value="PG" >Papua New Guinea</option>
+<option value="PY" >Paraguay</option>
+<option value="PE" >Peru</option>
+
+<option value="PH" >Philippines</option>
+<option value="PN" >Pitcairn</option>
+<option value="PL" >Poland</option>
+<option value="PT" >Portugal</option>
+<option value="PR" >Puerto Rico</option>
+<option value="QA" >Qatar</option>
+<option value="RE" >Reunion</option>
+<option value="RO" >Romania</option>
+<option value="RU" >Russian Federation</option>
+
+<option value="RW" >Rwanda</option>
+<option value="KN" >Saint Kitts and Nevis</option>
+<option value="LC" >Saint Lucia</option>
+<option value="VC" >Saint Vincent and the Grenadines</option>
+<option value="WS" >Samoa</option>
+<option value="SM" >San Marino</option>
+<option value="ST" >Sao Tome and Principe</option>
+<option value="SA" >Saudi Arabia</option>
+<option value="SN" >Senegal</option>
+
+<option value="SC" >Seychelles</option>
+<option value="SL" >Sierra Leone</option>
+<option value="SG" >Singapore</option>
+<option value="SK" >Slovakia (Slovak Republic)</option>
+<option value="SI" >Slovenia</option>
+<option value="SB" >Solomon Islands</option>
+<option value="SO" >Somalia</option>
+<option value="ZA" >South Africa</option>
+<option value="GS" >South Georgia and the South Sandwich Islands</option>
+
+<option value="ES" >Spain</option>
+<option value="LK" >Sri Lanka</option>
+<option value="SH" >St. Helena</option>
+<option value="PM" >St. Pierre and Miquelon</option>
+<option value="SD" >Sudan</option>
+<option value="SR" >Suriname</option>
+<option value="SJ" >Svalbard and Jan Mayen Islands</option>
+<option value="SZ" >Swaziland</option>
+<option value="SE" >Sweden</option>
+
+<option value="CH" >Switzerland</option>
+<option value="SY" >Syrian Arab Republic</option>
+<option value="TW" >Taiwan, Province of China</option>
+<option value="TJ" >Tajikistan</option>
+<option value="TZ" >Tanzania, United Republic of</option>
+<option value="TH" >Thailand</option>
+<option value="TG" >Togo</option>
+<option value="TK" >Tokelau</option>
+<option value="TO" >Tonga</option>
+
+<option value="TT" >Trinidad and Tobago</option>
+<option value="TN" >Tunisia</option>
+<option value="TR" >Turkey</option>
+<option value="TM" >Turkmenistan</option>
+<option value="TC" >Turks and Caicos Islands</option>
+<option value="TV" >Tuvalu</option>
+<option value="UG" >Uganda</option>
+<option value="UA" >Ukraine</option>
+<option value="AE" >United Arab Emirates</option>
+
+<option value="GB" >United Kingdom</option>
+<option value="US" >United States</option>
+<option value="UM" >United States Minor Outlying Islands</option>
+<option value="UY" >Uruguay</option>
+<option value="UZ" >Uzbekistan</option>
+<option value="VU" >Vanuatu</option>
+<option value="VE" >Venezuela</option>
+<option value="VN" >Viet Nam</option>
+<option value="VG" >Virgin Islands (British)</option>
+
+<option value="VI" >Virgin Islands (U.S.)</option>
+<option value="WF" >Wallis and Futuna Islands</option>
+<option value="EH" >Western Sahara</option>
+<option value="YE" >Yemen</option>
+<option value="YU" >Yugoslavia</option>
+<option value="ZM" >Zambia</option>
+<option value="ZW" >Zimbabwe</option>
+                </select>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr valign="top">
+	   <td class="small" nowrap="nowrap" width="200">
+	   <b>Phone Number</b>
+	   </td>
+	   <td>
+	   <input name="Phone" type="text" id="Phone" value="" size="50" maxlength="">
+	   </td>
+	   <td>&nbsp;</td>
+	   </tr>
+	   <tr valign="top">
+	     <td class="small" nowrap="nowrap" width="200">
+	   <b>Email *</b>
+	   </td>
+	   <td>
+	     <input name="Email" type="text" id="Email" value="" size="50" maxlength="">
+	   </td>
+	   <td>&nbsp;</td>
+	   </tr>
+	  </tbody>
+	  </table>
+ 	</td>
+ 	<td class="small">
+ 	<!---->&nbsp;
+ 	</td>
+ </tr>
+ <tr><td colspan="7" background="./btnline.gif"></td></tr>
+ <tr bgcolor="#eeeeee" valign="top">
+ 	<td nowrap="nowrap" width="2%"></td>
+ 	<td wrap="" width="30%">
+ 	<b>PRICE AND PAYMENT</b>
+	 	 <br>Visa, Eurocard and Postcard are accepted.
+	  	</td>
+ 	<td>
+	  <p><strong>OPTION A : CHF 30.-</strong></p>
+	  <ul>
+		<li>Attendance to the seminar</li>
+	  </ul>
+	  <p><strong>OPTION B : CHF 70.-</strong></p>
+	  <ul>
+		<li>Attendance to the seminar (Nov. 6 half-day / Nov. 7 half-day)</li>
+		<li> Evening dinner organised on Nov. 6 in the evening</li>
+	  </ul>
+	  <p><strong>OPTION C : CHF 200.-</strong></p>
+	  <ul>
+		<li>Attendance to the seminar (Nov. 6 half-day / Nov. 7 half-day)</li>
+		<li> Evening dinner organised on Nov. 6 in the evening</li>
+		<li>1 night at the Post Forum Hotel </li>
+	  </ul>
+	  <p><strong>Select</strong> : 
+		<select name="Total" size="1" id="select">
+		  <option value="30.00" selected>OPTION A, CHF 30.-</option>
+		  <option value="70.00">OPTION B, CHF 70.-</option>
+		  <option value="200.00">OPTION C, CHF 200.-</option>
+		</select>
+	  </p>
+
+ 	</td>
+ 	<td class="small">
+ 	<!---->&nbsp;
+ 	</td>
+ </tr>
+
+ <tr><td colspan="7" background="./btnline.gif"></td></tr>
+
+<!-- <tr><td colspan="7" >* required</td></tr> -->
+<tr><td colspan="7" align="right">
+<input name="Currency" type="hidden" id="Currency" value="CHF">
+<input name="id_inst" type="hidden" id="id_inst" value="m2lvp5d5a50jog28v7cxius7axte6v1z">
+<input name="submit" value="Send" type="submit">
+</td></tr>
+ <tr><td colspan="7"><br></td></tr>
+ <tr colspan="4" background="./btnline.gif">
+ <td colspan="4" align="center" background="./btnline.gif">
+ 	 </td>
+ </tr>
+
+</tbody></table>
+</form>
+
+<!-- ################### END DISPLAY FORM ###################### -->
+
+<!-- begin footer -->
+
+<table align="center" width="100%">
+	<tbody><tr>
+		<td class="small" align="center">
+			<hr noshade="noshade" size="1" width="80%">
+          	  EPFL - EFC, 1015 Lausanne, +41 21 693 00 93, <a href="mailto:%65%66%63%40%65%70%66%6c%2e%63%68">efc@epfl.ch</a><br>
+          
+		</td>
+	</tr>
+	<tr>
+		<td class="small" align="center">&nbsp;</td>
+	</tr>
+</tbody></table>
+
+<!-- end footer -->
+
+</div>
+</body></html>
+

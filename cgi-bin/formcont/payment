@@ -134,6 +134,7 @@ sub main {
   	nofacture 	=> $args{num_facture},
   	nocours	  	=> $args{nocours},
 	id_transact => $args{id_transact},
+	origin		=> $args{origin},
   };
   
   my $id_trans 	= payonline_tools::gentablekey($userdata);

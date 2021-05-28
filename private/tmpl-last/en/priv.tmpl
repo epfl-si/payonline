@@ -1,0 +1,33 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+      <TMPL_VAR NAME=sErrMsg>
+<TMPL_ELSE>
+      <p><strong>payonline.epfl.ch</strong> offers the infrastructure for electronic payments in collaboration with a dedicated service from Postfinance.</p>
+
+<!--
+      <div class="redborder">
+		<p align="center"><strong>Attention : le serveur de test de Postfinance est hors sevice !</strong> 
+		</p>
+      </div>
+-->
+		<h3 align="left">Follow these steps to set your payonline infrastructure :</h3>
+		<blockquote>
+		
+		<ol>
+		  <li> <strong>apply for a fonds</strong> which will collect the fees due if not yet available </li>
+		  <li>create a <strong>payment instance </strong> via this interface</li>
+		  <li>create the <strong> registration form </strong>  </li>
+		  <li><strong>test</strong> the e-payments</li>
+		  <li><strong>validate</strong> the payment instance by the Financial service of EPFL</li>
+		  <li> <strong>publish the</strong> registration form on your web site </li>
+		</ol>
+		</blockquote>
+
+</TMPL_IF>
+
+  <!-- start menu column -->
+  <TMPL_INCLUDE NAME="leftmenu.tmpl">
+  <!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">
