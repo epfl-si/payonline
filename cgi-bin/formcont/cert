@@ -102,8 +102,8 @@ say STDERR "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO **
 	my $check_hash 	= YellowPayFlow::FormCont->current->makeHash ($hashdata);
 
 	# - check hash --------
-say STDERR "formcont :: done cert: ... 4 hash=$hash, arghash=$args{SHASIGN}\n";
-	unless ($hash eq $args{SHASIGN}) {
+say STDERR "formcont :: done cert: ... 4 hash=$check_hash, arghash=$args{SHASIGN}\n";
+	unless ($check_hash eq $args{SHASIGN}) {
 say STDERR "** ERR : formcont :: cert SHASIGN FAILED : $id_trans ";
 		return;
 	}
