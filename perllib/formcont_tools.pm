@@ -1,6 +1,12 @@
 package formcont_tools;
 use payonline_tools;
 
+use vars qw($postURL $redirectURL);
+
+$postURL	= 'https://isatest.epfl.ch/imoniteur_ISAT/!itf.formulaires.payonlineFCUE';
+$redirectURL= 'https://isatest.epfl.ch/imoniteur_ISAT/!itf.formulaires.redirectFCUE';
+
+
 sub is_prod {
   ! $ENV{FORMCONT_TEST_MODE}
 }

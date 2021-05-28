@@ -159,7 +159,7 @@ warn "formcont :: do_post : id_transact=$id_transact, result=$result\n";
 
 	return unless $id_transact;
 
-	my $url 	  = $payonline_tools::postURL;
+	my $url 	  = $formcont_tools::postURL;
 	my $datecr	  = $trans->{datecr};
 	   $datecr	  =~ s/ /+/g;
 	my $PaymentID = $trans->{PaymentID};

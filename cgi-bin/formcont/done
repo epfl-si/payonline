@@ -92,7 +92,7 @@ sub main {
 	
 	print qq{
 	<script language="javascript">
-		location.href='$payonline_tools::redirectURL';
+		location.href='$formcont_tools::redirectURL';
 	</script>
 	};
 

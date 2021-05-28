@@ -39,9 +39,6 @@ $DEBUG 		= '0';
 
 warn "formcont :: DEBUG=$DEBUG\n";
 
-$postURL	= 'https://isatest.epfl.ch/imoniteur_ISAT/!itf.formulaires.payonlineFCUE';
-$redirectURL= 'https://isatest.epfl.ch/imoniteur_ISAT/!itf.formulaires.redirectFCUE';
-
 #--------
 sub uniq {
   my (@myarr) = @_;
