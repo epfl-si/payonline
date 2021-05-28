@@ -53,6 +53,7 @@ if ( $pi =~ /usage/ ) {
 
 	my $metrics;
 	my $line = $DEBUG ? 'test' : 'prod';
+	$line = $ENV {E2EM_LINE} if $ENV {E2EM_LINE};
 
 	foreach my $key ( keys %$config_items ) {
 		my $item = $config_items->{$key};
