@@ -1,0 +1,82 @@
+<TMPL_INCLUDE NAME="headtrans.tmpl">
+
+<p></p>
+
+<TMPL_IF NAME=sErrMsg>
+	<h3><TMPL_VAR NAME=sErrMsg></h3>
+<TMPL_ELSE>
+
+		<TMPL_IF NAME=sLangFR>
+			<TMPL_IF NAME=ResultCode>
+				 <h3>Transaction réussie</h3>
+				 Merci pour votre paiement<br>
+				 Veuillez imprimer cette page en tant que preuve de votre transaction.
+			<TMPL_ELSE>
+				 <h3>Transaction échouée</h3>
+				 Veuillez retourner sur la page précédente pour refaire la procédure de paiement.
+			</TMPL_IF>
+		<TMPL_ELSE>
+			<TMPL_IF NAME=ResultCode>
+				 <h3>Transaction succeeded</h3>
+				 Thank you for your payment<br>
+				 Print this page and save it as a transaction proof.
+			<TMPL_ELSE>
+				 <h3>Transaction failed</h3>
+				 Please return on the previous page and redo the payment procedure.
+			</TMPL_IF>
+		</TMPL_IF>
+		<br>
+		<br>
+	
+</TMPL_IF>
+	  
+<TMPL_IF NAME=URL>
+	<TMPL_IF NAME=sLangFR>
+		<a href="<TMPL_VAR NAME=URL>">Retour</a> sur le site principal<br>
+	<TMPL_ELSE>
+		<a href="<TMPL_VAR NAME=URL>">Back</a> to the main site<br>
+	</TMPL_IF>
+</TMPL_IF>
+
+<hr>
+
+<TMPL_IF NAME=Descr>
+	 <h3><TMPL_VAR NAME=Descr></h3>
+	 <b>Responsable:</b> <a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a><br>
+	 <b>Transaction nb.: </b><TMPL_VAR NAME=OrderIDShop><br>
+	 <b>PostFinance ID: </b><TMPL_VAR NAME=TransactionID><br>
+	 <b><TMPL_VAR NAME=date_label>: </b><TMPL_VAR NAME=Date><br>
+	 <b><TMPL_VAR NAME=payed_by_label> : </b><TMPL_VAR NAME=PayMode><br>
+	 <b><TMPL_VAR NAME=amount_label> : </b><TMPL_VAR NAME=Total> <TMPL_VAR NAME=Currency><br>
+	 <b><TMPL_VAR NAME=cust_label></b>
+	 <div class="col-md-12" style="padding: 0 0 0 20px;">
+		 <TMPL_VAR NAME=LastName> <TMPL_VAR NAME=FirstName><br>
+		 <TMPL_VAR NAME=Addr><br>
+		 <TMPL_VAR NAME=Country>, <TMPL_VAR NAME=ZipCode>, <TMPL_VAR NAME=City><br>
+		 <TMPL_VAR NAME=Email><br>
+	 </div>
+	 <hr>
+</TMPL_IF>
+
+<TMPL_IF NAME=sLangFR>
+	<p>En cas de problème récurent, veuillez consulter <b><a href=http://payonline.epfl.ch/docs/troubleshooting-fr.html>l'aide en ligne</a></b> et transmettre ces informations ainsi que le message
+	d'erreur
+ 	<div class="col-md-12" style="padding: 0 0 10px 10px;">
+	<li>au support technique de Postfinance [<a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>], </li>
+	<li>au responsable de l'instance [<a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a>]</li>
+	<li>ou à <a href="mailto:payonline@epfl.ch">payonline@epfl.ch</a> </li>
+	selon l'étape où le problème est arrivé.
+	</div>
+	</p>
+<TMPL_ELSE>
+	<p>In case of repeating failures, please check the <a href=http://payonline.epfl.ch/docs/troubleshooting-en.html><b>troubleshooting online help</b></a> and send this information and the error message 
+ 	<div class="col-md-12" style="padding: 0 0 10px 10px;">
+ 	<li>to Postfinance's support [<a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>], </li>
+ 	<li>to the person in charge of the instance [<a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a>]</li>
+ 	<li>or to <a href="mailto:payonline@epfl.ch">payonline@epfl.ch</a>, </li>
+ 	according to the point of failure.
+	</div>
+	</p>
+</TMPL_IF>
+
+<TMPL_INCLUDE NAME="footer.tmpl">

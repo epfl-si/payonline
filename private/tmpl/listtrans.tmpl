@@ -1,0 +1,46 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+
+    <h3><TMPL_VAR NAME=sDescrInst></h3>
+    <div class="<TMPL_VAR NAME=etatinst>">
+    <b>Instance id : <TMPL_VAR NAME=sIDInst></b><br>
+    <b><TMPL_VAR NAME=status_label> : <TMPL_VAR NAME=etatinst></b><br>
+    <b>Responsable : <TMPL_VAR NAME=respPrenom> <TMPL_VAR NAME=respNom></b><br>
+    <b><TMPL_VAR NAME=fond_label> : <TMPL_VAR NAME=fonds></b><br>
+    <b><TMPL_VAR NAME=compte_label> : <TMPL_VAR NAME=naturecomptable></b><br>
+    </div>
+    
+    <p></p>
+    <h3><TMPL_VAR NAME=sTitle></h3>  
+    [ <TMPL_VAR NAME="sOtherTitle"> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/extrans?id=<TMPL_VAR NAME=sIDInst><TMPL_VAR NAME=sOp>"><TMPL_VAR NAME=csv_label></a> ] [ <a href="<TMPL_VAR NAME=sPathMe>/listtrans?id=<TMPL_VAR NAME=sIDInst>&listall=1<TMPL_VAR NAME="sOp">"><TMPL_VAR NAME=show_all_label></a> ]
+
+    <div class="col-md-12 table_header">
+			<div class="col-md-2"><TMPL_VAR NAME=name_label></div>
+			<div class="col-md-2"><TMPL_VAR NAME=addr1_label></div>
+			<div class="col-md-2"><TMPL_VAR NAME=addr2_label></div>
+			<div class="col-md-1">Total</div>
+			<div class="col-md-2"><TMPL_VAR NAME="sTitleDate"></div>
+			<div class="col-md-1">PostFinance ID</div>
+			<div class="col-md-2" style="text-align: center;"><TMPL_VAR NAME="payed_by_label"></div>
+    </div>
+    <TMPL_LOOP NAME=sLoop>
+     <div class="col-md-12" style="height: auto;">
+			 <div class="col-md-2"><a href="<TMPL_VAR NAME=sPathMe>/dettrans?id_trans=<TMPL_VAR NAME=id>&lang=<TMPL_VAR NAME=sLang>"><TMPL_VAR NAME="LastName"> <TMPL_VAR NAME="FirstName"></a></div>
+			 <div class="col-md-2"><TMPL_VAR NAME="Addr"></div>
+			 <div class="col-md-2"><TMPL_VAR NAME="ZipCode">, <TMPL_VAR NAME="City">, <TMPL_VAR NAME="Country"></div>
+			 <div class="col-md-1"><TMPL_VAR NAME="Total"> <TMPL_VAR NAME="Currency"></div>
+			 <div class="col-md-2"><TMPL_VAR NAME="datecr"></div>
+			 <div class="col-md-1"><TMPL_VAR NAME="PaymentID"></div>
+			 <div class="col-md-2" style="text-align: center;"><TMPL_VAR NAME="paymode"></div>
+	 	 </div>
+    </TMPL_LOOP>
+    </div>
+    <hr>
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listtrans?id=<TMPL_VAR NAME=sIDInst>&listall=1<TMPL_VAR NAME="sOp">"><TMPL_VAR NAME=show_all_label></a> ]
+</TMPL_IF>
+
+<TMPL_INCLUDE NAME="footer.tmpl">

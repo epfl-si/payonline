@@ -1,0 +1,106 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+
+<TMPL_IF NAME=sErrMsg>
+  <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
+<TMPL_ELSE>
+	<div  class="editbox">
+	<h3><TMPL_VAR NAME=new_head_label></h3>
+	<TMPL_VAR NAME=new_note_label>
+	
+	<form id="form1" name="form1" method="post" action="<TMPL_VAR NAME=sFormaction>">
+	  <input type="hidden" name="add" >
+
+	  <div class="row">
+	
+			<div class="col-md-12 pb5" >
+				<div class="col-md-4 txt_right_pr5 txt_right_pr5"><b><TMPL_VAR NAME=fond_label></b></div>
+				<div class="col-md-8"><TMPL_VAR NAME=sFonds></div>
+			</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5">OIS<br>(Ordre Interne Statistique) </div>
+		  <div class="col-md-8"><input name="ois"" size="48"></div>
+		</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5"><b>Description</b>
+		  <br><i><TMPL_VAR NAME=descr_note_label></i>
+		  </div>
+		  <div class="col-md-8"><textarea name="descr" cols="48" rows="2" id="descr"></textarea></div>
+		</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5"><b><TMPL_VAR NAME=compte_label></b></div>
+		  <div class="col-md-8"><TMPL_VAR NAME=sNCTxt></div>
+		</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5"><b><TMPL_VAR NAME=date_deb_label></b></div>
+		  <div class="col-md-8">
+			<input name="datedeb" type="date" size="12" value="<TMPL_VAR NAME=sdatedeb>"  placeholder="yyyy-mm-dd">		  </div>
+		</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5"><b><TMPL_VAR NAME=date_fin_label></b></div>
+		  <div class="col-md-8"><input name="datefin"  type="date" placeholder="yyyy-mm-dd" size="12">		  </div>
+		</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5"><b><TMPL_VAR NAME=cur_label></b> </div>
+		  <div class="col-md-8"><TMPL_VAR NAME=sMonnaie></div>
+		</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5" valign="top">Contact mail </div>
+		  <div class="col-md-8"><input name="contact" value="<TMPL_VAR NAME=contact>" size="48">
+		  <br><i><TMPL_VAR NAME=mail_note_label></i>      
+		  </div>
+		</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5">URL Manifestation </div>
+		  <div class="col-md-8"><input name="urlconf"  size="48"></div>
+		</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5">URL Retour </div>
+		  <div class="col-md-8"><input name="url" type="text" size="48" />
+		  <br><i><TMPL_VAR NAME=url_ret_label></i>
+		  </div>
+		</div>
+		<div class="col-md-12 pb5" >
+		  <div class="col-md-4 txt_right_pr5"><TMPL_VAR NAME=confirm_mail_label></div>
+		  <div class="col-md-8"><input name="mailinst" type="text" size="48" />
+		  <br><i><TMPL_VAR NAME=confirm_mail_note_label></i>
+		  </div>
+		</div>
+
+		<div class="col-md-12 pb5 <TMPL_VAR NAME=style>" >
+			<div class="col-md-4 txt_right_pr5" ><TMPL_VAR NAME=bypass_cg_label> </div>
+			<div class="col-md-8">
+				<TMPL_IF NAME=IsSuperUser>
+					<input type="checkbox" name="bypass_cg" value="1" <TMPL_VAR NAME=bypass_cg>> <em>(<TMPL_VAR NAME=bypass_cg_txt_label>)</em>
+				<TMPL_ELSE>
+					<input type="checkbox" name="bypass_cg" value="1" <TMPL_VAR NAME=bypass_cg> disabled> <em>(<TMPL_VAR NAME=bypass_cg_txt_label>)<br>
+					<TMPL_VAR NAME=bypass_txt_label>)</em>
+					<input name="bypass_cg" type="hidden" value="<TMPL_VAR NAME=bypass_cg>">
+				</TMPL_IF>	
+			</div>
+							
+		</div>
+
+		<div class="col-md-12 pb5 <TMPL_VAR NAME=style>" >
+			<div class="col-md-4 txt_right_pr5" ><TMPL_VAR NAME=bypass_return_label> </div>
+			<div class="col-md-8">
+					<input type="checkbox" name="bypass_return" value="1" <TMPL_VAR NAME=bypass_return>> </div>
+		</div>
+
+
+	  </div>
+	
+	 <hr>
+	 <div class="col-md-12 pb5"><b>Actions :</b>
+	 [ <a href="#" OnClick="document.form1.add.value=1;form1.submit();"><TMPL_VAR NAME=actions_save_label></a> ]
+	 </div>
+	</form>
+	
+	</div>
+
+</TMPL_IF>
+
+<!-- start menu column -->
+<TMPL_INCLUDE NAME="leftmenu.tmpl">
+<!-- end menu column -->
+
+<TMPL_INCLUDE NAME="footer.tmpl">
