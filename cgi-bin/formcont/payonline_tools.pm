@@ -171,29 +171,6 @@ sub debug_params {
 }
 
 #--------
-sub getSalt {
-   my ($size) = @_;
-   
-   my @bb64 = ('A'..'Z' ,'a'..'z', '0'..'9');
-   my $salt;
-   $size = 2 unless $size;
-#warn "getSalt size=$size";
-   do {
-    $salt .= $bb64[rand($#bb64)];$size--;
-#warn "getSalt salt=$salt";
-   } while ($size);
-   return ($salt);
-}
-#--------
-sub md5pwd {
-  my ($txt) = @_;
-
-  my @b64 = (".", "/", '0'..'9', 'A'..'Z' ,'a'..'z');
-#  my $salt = $b64[rand($#b64)].$b64[rand($#b64)].$b64[rand($#b64)].$b64[rand($#b64)] .
-# 	     $b64[rand($#b64)].$b64[rand($#b64)].$b64[rand($#b64)].$b64[rand($#b64)] ;
-  return unix_md5_crypt($txt, getSalt(8));
-}
-#--------
 sub write_log {
   my ($sciper, $code) = @_;
   
