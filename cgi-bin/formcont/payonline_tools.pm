@@ -22,7 +22,7 @@ use Digest::SHA1 ;
 use strict;
 use vars qw( $dbh $DEBUG $su_list $logfile $errmsg $demfond $codeTVA
             $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
-            $su_list $ges_list $SHAsalt $mode $postURL $redirectURL
+            $su_list $ges_list $SHAsalt $postURL $redirectURL
             );
 
 my $me 		= $ENV {SCRIPT_NAME};
@@ -59,32 +59,6 @@ sub getcrtdate {
     return sprintf "%4d-%02d-%02d %02d:%02d",$year,$mon,$mday,$hour,$min;
 }
 
-#--------
-sub send_mail {
-  my ($dest, $subj, $msg) = @_;
-
-warn "formcont DEBUG=$DEBUG  : send_mail : $dest, $subj\n";
-  return if $DEBUG;
-  
-  my %mail;
-  $mail{From} = 'noreply@epfl.ch'; 
-  $mail{Bcc}  = 'formcont@epfl.ch';
-  $mail{To}   = $dest;
-
-  $mail{Smtp} 	 = 'mail.epfl.ch';
-  $mail{Subject} = $subj;
-  $mail{Message} = $msg;	
-  if (sendmail (%mail)) {
-     if ($Mail::Sendmail::error) {
-		warn "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
-     } else {
-		$msg =~ s/\n/;/g;
-		warn "formcont :: send_mail : $mail{To}, SUBJ: $subj\n";
-     }
-  } else {
-		warn "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
-  }
-}
 #--------
 sub get_time {
   my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);

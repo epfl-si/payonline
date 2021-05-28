@@ -136,7 +136,7 @@ warn " ==>> formcont cert: OK : $id_trans\n";
 		};
 
 		#  payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL formcont :: payment confirmation', $msg);
-		payonline_tools::send_mail ($email, 'Formation continue UNIL/EPFL :: payment confirmation', $msg) if $payonline_tools::mode eq 'prod';
+		formcont_tools::send_mail ($email, 'Formation continue UNIL/EPFL :: payment confirmation', $msg);
 
 	warn " ==>> formcont cert: confirmation email to : $email $msg\n";    
 	}

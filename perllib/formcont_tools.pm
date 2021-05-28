@@ -33,7 +33,33 @@ sub dbquery {
 
   return $sth;
 }
+#--------
+sub send_mail {
+  return unless is_prod;
+  my ($dest, $subj, $msg) = @_;
 
+warn "formcont DEBUG=$DEBUG  : send_mail : $dest, $subj\n";
+  return if $DEBUG;
+
+  my %mail;
+  $mail{From} = 'noreply@epfl.ch';
+  $mail{Bcc}  = 'formcont@epfl.ch';
+  $mail{To}   = $dest;
+
+  $mail{Smtp} 	 = 'mail.epfl.ch';
+  $mail{Subject} = $subj;
+  $mail{Message} = $msg;
+  if (sendmail (%mail)) {
+     if ($Mail::Sendmail::error) {
+		warn "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+     } else {
+		$msg =~ s/\n/;/g;
+		warn "formcont :: send_mail : $mail{To}, SUBJ: $subj\n";
+     }
+  } else {
+		warn "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+  }
+}
 
 package YellowPayFlow::FormCont;
 
