@@ -95,5 +95,13 @@ print "Content-Type: text/html; charset=UTF-8\n\n";
 
 %args		= payonline_tools::loadargs ();
 warn "==== payonline :: tstscript ====";
- payonline_tools::debug_params (\%args);
+debug_params (\%args);
 warn "==== payonline :: tstscript ====";
+
+sub debug_params {
+  my ($params) = @_;
+
+  foreach my $item (sort keys %$params) {
+   warn "formcont : DEBUG::$item=$params->{$item}=\n";
+  }
+}

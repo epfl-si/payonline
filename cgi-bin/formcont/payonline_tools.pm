@@ -75,12 +75,5 @@ sub debug_ENV {
   };
 }
 #---------
-sub debug_params {
-  my ($params) = @_;
-  
-  foreach my $item (sort keys %$params) {
-   warn "formcont : DEBUG::$item=$params->{$item}=\n";
-  }
-}
 
 1;
