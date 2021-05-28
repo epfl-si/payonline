@@ -6,9 +6,9 @@
 	<div  class="editbox">
 	<h3>Nouvelle instance</h3>
 	
-	Une instance de paiement correspond à une manifestation pour laquelle vous désirez
-	pouvoir effectuer des encaissements en ligne. L'instance peut être créée seulement 
-	si vous disposez d'un fonds dédié. Autrement, vous devez effectuer la 
+	Une instance de paiement correspond Ã  une manifestation pour laquelle vous dÃ©sirez
+	pouvoir effectuer des encaissements en ligne. L'instance peut Ãªtre crÃ©Ã©e seulement 
+	si vous disposez d'un fonds dÃ©diÃ©. Autrement, vous devez effectuer la 
 	<a href=http://payonline.epfl.ch/cgi-bin/payonline/demfnd?lang=fr>demande de fonds</a>.
 	<p>Les champs en <b>gras</b> sont obligatoires.</p>
 	
@@ -26,16 +26,16 @@
 		</tr>
 		<tr>
 		  <td valign="top" align="right"><B>Description</B>
-		  <br><i>(Vous êtes priés de préciser les dates de la manifestation)</i>
+		  <br><i>(Vous Ãªtes priÃ©s de prÃ©ciser les dates de la manifestation)</i>
 		  </td>
 		  <td><textarea name="descr" cols="48" rows="2" id="descr"></textarea></td>
 		</tr>
 		<tr>
-		  <td align="right"><b>Compte budgétaire </b></td>
+		  <td align="right"><b>Compte budgÃ©taire </b></td>
 		  <td><TMPL_VAR NAME=sNCTxt></td>
 		</tr>
 		<tr>
-		  <td align="right"><B>D&eacute;but validité instance</B></td>
+		  <td align="right"><B>D&eacute;but validitÃ© instance</B></td>
 		  <td>
 			<input name="datedeb"  size="12" value="<TMPL_VAR NAME=sdatedeb>">
 			<A HREF="#" onClick="cal.select(document.forms['form1'].datedeb,'anchor1','dd-MM-yyyy'); return false;"
@@ -43,7 +43,7 @@
 		  </td>
 		</tr>
 		<tr>
-		  <td align="right"><B>Fin validité instance</B></td>
+		  <td align="right"><B>Fin validitÃ© instance</B></td>
 		  <td><input name="datefin"  size="12">
 			<A HREF="#" onClick="cal.select(document.forms['form1'].datefin,'anchor2','dd-MM-yyyy'); return false;"
 				NAME="anchor2" ID="anchor2"><img src="/images/cal.gif" border="0"></A>
@@ -66,13 +66,13 @@
 		<tr>
 		  <td align="right">URL Retour </td>
 		  <td><input name="url" type="text" size="48" />
-		  <br><i>(veuillez consulter l'aide en ligne pour plus de détails à ce sujet)</i>
+		  <br><i>(veuillez consulter l'aide en ligne pour plus de dÃ©tails Ã  ce sujet)</i>
 		  </td>
 		</tr>
 		<tr>
 		  <td align="right">Mail de confirmation des transactions </td>
 		  <td><input name="mailinst" type="text" size="48" />
-		  <br><i>(si présent, déclanche un message de confirmation pour les transactions réussies)</i>
+		  <br><i>(si prÃ©sent, dÃ©clanche un message de confirmation pour les transactions rÃ©ussies)</i>
 		  </td>
 		</tr>
 	  </table>

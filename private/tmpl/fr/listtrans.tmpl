@@ -5,18 +5,18 @@
 <TMPL_ELSE>
 
     <h3><TMPL_VAR NAME=sDescrInst></h3>
-    <div class="redborder"><b>l'instance est en état <TMPL_VAR NAME=etatinst></b></div>
+    <div class="redborder"><b>l'instance est en Ã©tat <TMPL_VAR NAME=etatinst></b></div>
 
     <b>responsable : <TMPL_VAR NAME=respPrenom> <TMPL_VAR NAME=respNom></b><br>
     <b>fonds : <TMPL_VAR NAME=fonds></b><br>
-    <b>compte budgétaire : <TMPL_VAR NAME=naturecomptable></b><br>
-    <b>numéro instance : <TMPL_VAR NAME=sIDInst></b><br>
+    <b>compte budgÃ©taire : <TMPL_VAR NAME=naturecomptable></b><br>
+    <b>numÃ©ro instance : <TMPL_VAR NAME=sIDInst></b><br>
     <p></p>
     <h3><TMPL_VAR NAME=sTitle></h3>  
     [ <TMPL_VAR NAME="sOtherTitle"> ]
     [ <a href="<TMPL_VAR NAME=sPathMe>/extrans?id=<TMPL_VAR NAME=sIDInst><TMPL_VAR NAME=sOp>">extraction CSV des transactions ci-dessous</a> ] [ <a href="<TMPL_VAR NAME=sPathMe>/listtrans?id=<TMPL_VAR NAME=sIDInst>&listall=1<TMPL_VAR NAME="sOp">">afficher toutes les transactions</a> ]
     <table width="100%" border="0" cellspacing="0" cellpadding="2">
-    <th>Nom Prénom</th>
+    <th>Nom PrÃ©nom</th>
     <th>Adresse</th>
     <th>Code Postal</th>
     <th>Ville</th>
@@ -24,7 +24,7 @@
     <th>Total</th>
     <th><TMPL_VAR NAME="sTitleDate"></th>
     <th>Identification<br>PostFinance</th>
-    <th>Payé par</th>
+    <th>PayÃ© par</th>
     <TMPL_LOOP NAME=sLoop>
    	 <tr>
 	   <td class="underlined"><a href="<TMPL_VAR NAME=sPathMe>/dettrans?id_trans=<TMPL_VAR NAME=id>"><TMPL_VAR NAME="LastName"> <TMPL_VAR NAME="FirstName"></a></td>

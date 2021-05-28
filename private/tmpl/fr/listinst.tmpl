@@ -4,15 +4,15 @@
   <div class=redborder>  <TMPL_VAR NAME="sErrMsg"></div>
 <TMPL_ELSE>
     <h3>Instances</h3>
-    Cliquer sur l'instance pour édition des paramètres ou consultation des transactions. Vous
-    pouvez trier la liste des instances par "Description", "Etat" et "Date début".
+    Cliquer sur l'instance pour Ã©dition des paramÃ¨tres ou consultation des transactions. Vous
+    pouvez trier la liste des instances par "Description", "Etat" et "Date dÃ©but".
     
     <p style="text-align:justify;">
     Instances : 
     [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&etat=prod">en production</a> ]
     [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&etat=test">en test</a> ]
     [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&etat=inact">inactives</a> ]
-    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&etat=archive">archivées</a> ]
+    [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&etat=archive">archivÃ©es</a> ]
     [ <a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>">toutes</a> ]
     </p>
     <table width="100%" border="0" cellspacing="0" cellpadding="2">
@@ -22,7 +22,7 @@
     </TMPL_IF>
     <th><a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&orderby=etat">Etat</a></th>
     <th>Fonds</th>
-    <th width=70><a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&orderby=datedeb">Date début</a></th>
+    <th width=70><a href="<TMPL_VAR NAME=sPathMe>/listinst?id=<TMPL_VAR NAME=id>&orderby=datedeb">Date dÃ©but</a></th>
     <th width=70>Date fin</th>
     <TMPL_LOOP NAME=sLoop>
    	 <tr>
