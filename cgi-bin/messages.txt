@@ -235,8 +235,8 @@ $messages = {
 		},
 
 		bypass_txt_label => {
-			fr => qq{Pour activer les options ci-dessous, veuillez contacter le support payonline (1234\@epfl.ch)},
-			en => qq{Contact payonline support (1234\@epfl.ch) to activate the following options},
+			fr => qq{Contacter le support payonline (1234\@epfl.ch) pour activation},
+			en => qq{Contact payonline support (1234\@epfl.ch) to activate this option},
 		},
 
 };
