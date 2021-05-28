@@ -421,26 +421,27 @@ warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
   my $id_transact = $queryArgs->{id_transact};
 
   my $urlconf = $inst->{urlconf};
-  unless ($urlconf =~ /^http\:\/\// or $urlconf =~ /^https\:\/\//) {
-  	$urlconf  = 'http://'.$urlconf ;
-  }
   
-  if ($id_transact) {
+  if ($urlconf) {
+		unless ($urlconf =~ /^http\:\/\// or $urlconf =~ /^https\:\/\//) {
+			$urlconf  = 'http://'.$urlconf ;
+		}
+		if ($id_transact) {
 warn "==> result : id_transact=$id_transact\n";
-	  if ($urlconf =~ /\?/) {
-		$urlconf =~ s/&$//;
-		$urlconf .= qq(&id_transact=$id_transact);
-	  } else {
-		$urlconf =~ s/\?$//;
-		$urlconf .= qq(?id_transact=$id_transact);
-	  }
-  }  
-#  my $sOnLoad 	= qq{onload="window.location.href='$inst->{urlconf}';"} if $inst->{bypass_return} && $resultcode;
-  my $sOnLoad 	= qq{onload="window.location.href='$urlconf';"} if $inst->{bypass_return} && $resultcode;
-  $template->param(sOnLoad	=> $sOnLoad);
-
+			if ($urlconf =~ /\?/) {
+				$urlconf =~ s/&$//;
+				$urlconf .= qq(&id_transact=$id_transact);
+			} else {
+				$urlconf =~ s/\?$//;
+				$urlconf .= qq(?id_transact=$id_transact);
+			}
+		}
+		my $sOnLoad 	= qq{onload="window.location.href='$urlconf';"} if $inst->{bypass_return} && $resultcode;
+		$template->param(sOnLoad	=> $sOnLoad);
 warn "==> result : urlconf=$urlconf\n";
-  $template->param(URL 			=> $urlconf);
+		$template->param(URL 			=> $urlconf);
+	}
+
   $template->param(Descr 		=> $inst->{descr});
   $template->param(Date			=> $trans->{datecr});
   $template->param(PayMode	=> $trans->{paymode});
