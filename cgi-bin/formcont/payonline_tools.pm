@@ -35,7 +35,6 @@ my $resp 	= 'ion.cionca@epfl.ch';
 $su_list	= '104782';	# - ic,
 
 $DEBUG 		= '0';
-$mode   	= $DEBUG ? 'test' : 'prod';	# - test | prod
 
 
 warn "formcont :: DEBUG=$DEBUG\n";

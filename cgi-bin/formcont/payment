@@ -84,8 +84,6 @@ my %errmsgs	= (
   $crtdate 	= payonline_tools::getcrtdate();
   $lang 	= $args{lang} ? $args{lang} : 'en' ;
   
-warn "--> formcont payment : $payonline_tools::mode\n";
-
   print formcont_templates::header ();
 
   main ();
