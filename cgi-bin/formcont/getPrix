@@ -12,7 +12,6 @@
 
 
 use strict;
-use lib '/var/www/vhosts/payonline.epfl.ch/cgi-bin/formcont/test';
 use payonline_tools;
 use formcont_tools;
 use v5.10;  # For say()

@@ -10,11 +10,6 @@
 #
 #
 
-use lib '/var/www/accred';
-use lib '/var/www/cgi-bin';
-use lib '/var/www/html/payonline/cgi-bin';
-#use lib '/var/www/html/payonline/cgi-bin/dev';
-
 use v5.10;  # For say()
 
 use strict;
