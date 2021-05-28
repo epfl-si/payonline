@@ -94,58 +94,6 @@ sub get_time {
   return sprintf "%4d-%02d-%02d %02d:%02d:00",$year,$mon,$mday,$hour,$min;
 }
 #--------
-sub gentablekey {
- my ($userdata) = @_;
-  
- return unless $userdata;
-
- my $size = 18;
- while (1) {
-#warn "payonline :: gentablekey ...";
-    srand (time ^ ($$ + ($$ << 15)));
-    my $key = "";
-    for (my $i = 0; $i < $size; $i++) {
-      my $car .= int rand (35);
-      $key .= ('a'..'z', '0'..'9')[$car];
-    }
-    my $sql = qq{select id from transact where id='$key'};
-    my $sth = dbquery ($sql);
-    
-    $userdata->{name} 		=~ s/'/''/g;
-    $userdata->{firstname} 	=~ s/'/''/g;
-    $userdata->{zip}		=~ s/'/''/g;
-    $userdata->{addr}		=~ s/'/''/g;
-    $userdata->{city} 		=~ s/'/''/g;
-    $userdata->{email} 		=~ s/'/''/g;
-    $userdata->{nopernum}	=~ s/'/''/g;
-    $userdata->{nofacture}	=~ s/'/''/g;
-    $userdata->{nocours}	=~ s/'/''/g;
-    $userdata->{id_transact}=~ s/'/''/g;
-    
-    unless (my ($id) = $sth->fetchrow_array ()) {
-      my $sql = qq{insert into transact set
-      	id='$key',
-      	name='$userdata->{name}',
-      	firstname='$userdata->{firstname}',
-      	addr='$userdata->{addr}',
-      	zip='$userdata->{zip}',
-      	city='$userdata->{city}',
-      	country='$userdata->{country}',
-      	nopernum='$userdata->{nopernum}',
-      	nofacture='$userdata->{nofacture}',
-      	nocours='$userdata->{nocours}',
-      	amount='$userdata->{amount}',
-      	raison='$userdata->{raison}',
-      	email='$userdata->{email}',
-      	id_transact='$userdata->{id_transact}'
-      };
-warn "formcont :: gentablekey : key=$key\n";
-      my $sth = dbquery ($sql);
-      return $key if $sth;
-    }
- }
-}
-#--------
 sub setLog {
   $logfile = shift;
 }
