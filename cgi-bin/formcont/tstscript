@@ -17,6 +17,7 @@ use lib '/var/www/html/payonline/cgi-bin';
 
 use strict;
 use payonline_tools;
+use formcont_tools;
 
 use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits 
 	$tmpldir $lang $errmsg %CFs $crtdate

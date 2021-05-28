@@ -14,6 +14,7 @@
 use strict;
 use lib '/var/www/vhosts/payonline.epfl.ch/cgi-bin/formcont/test';
 use payonline_tools;
+use formcont_tools;
 
 use utf8::all;
 binmode(STDOUT, ":utf8");
@@ -26,7 +27,7 @@ print qq{Content-Type: text/plain; charset=UTF-8
 Access-Control-Allow-Origin: *\n\n};
 
 my $sql = qq{select montant from prix order by montant + 0};
-my $sth = payonline_tools::dbquery ($sql);
+my $sth = formcont_tools::dbquery ($sql);
 
 print qq{
 <select name="Total">

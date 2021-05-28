@@ -12,6 +12,7 @@
 
 use strict;
 use payonline_tools;
+use formcont_tools;
 
 use vars qw(%args $lang $errmsg $crtdate $usessl
 	);
@@ -114,7 +115,7 @@ warn "** ERR : formcont :: cert SHASIGN FAILED : $id_trans ";
 		 paymode='$args{PM} $args{BRAND}', 
 		 PaymentID='$args{PAYID}' 
 		 where id='$id_trans'};
-		my $sth = payonline_tools::dbquery($sql);
+		my $sth = formcont_tools::dbquery($sql);
 warn " ==>> formcont cert: OK : $id_trans\n";
 		$sth->finish ();
 

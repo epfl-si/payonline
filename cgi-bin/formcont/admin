@@ -16,6 +16,7 @@ use lib '/opt/dinfo/lib/perl';
 use strict;
 use Tequila::Client;
 use payonline_tools;
+use formcont_tools;
 use formcont_templates;
 
 use vars qw(%args $lang $errmsg $crtdate $sciper $key $tequila);
@@ -77,7 +78,7 @@ sub prix {
 	};
 	
 	my $sql = qq{select montant from prix order by montant + 0};
-	my $sth = payonline_tools::dbquery ($sql);
+	my $sth = formcont_tools::dbquery ($sql);
 	my $prix;
 	while (my ($montant) = $sth->fetchrow) {
 		next unless $montant;
@@ -89,13 +90,13 @@ sub prix {
 		error ("prix déjà saisi") 	if defined $prix->{$args{prix}};
 
 		my $sql = qq{insert into prix set montant='$args{prix}'};
-		payonline_tools::dbquery ($sql);
+		formcont_tools::dbquery ($sql);
 		$prix->{$args{prix}} = 1;
 	}
 	if ($args{op} eq 'del') {
 		error ("prix absent") 		unless $args{prix};
 		my $sql = qq{delete from prix where montant='$args{prix}'};
-		my $sth = payonline_tools::dbquery ($sql);
+		my $sth = formcont_tools::dbquery ($sql);
 		delete $prix->{$args{prix}};
 	}
 
@@ -117,7 +118,7 @@ sub detail {
    <b>Détails transaction</b>
   };
 
-  my $sth = payonline_tools::dbquery ($sql);
+  my $sth = formcont_tools::dbquery ($sql);
   error (qq{erreur accès database}) unless $sth;
   my $data = $sth->fetchrow_hashref();
   error (qq{transaction inconnue}) unless $data->{id};
@@ -187,7 +188,7 @@ sub transact {
    <b>$txt</b>
   };
   $sql 	 .= qq{ order by datecr desc, name, firstname};
-  my $sth = payonline_tools::dbquery ($sql);
+  my $sth = formcont_tools::dbquery ($sql);
   error (qq{erreur accès database}) unless $sth;
   print qq{
   <table width="100%" cellpadding=0 border=0>

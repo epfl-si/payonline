@@ -11,6 +11,7 @@
 #
 
 package payonline_tools;
+use formcont_tools;
 
 use DBI;
 use Net::LDAP;
@@ -224,47 +225,6 @@ sub doLog {
 	descr='$msg'
   };
   dbquery ($sql) ;
-}
-#--------
-sub dbconnect {
-
-  my $dbname  = 'formcont';
-  my $dbuser  = 'formcont';
-  my $dbpwd   = $dbuser.'59';
-  my $dbhost  = $DEBUG ? 'test-cadidb.epfl.ch' : 'cadidb.epfl.ch';
-
-  die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
-  my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306}; 
-warn "dbconnect : $dsndb";
-  $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd, {mysql_enable_utf8 => 1});
-die "dbconnect : ERR DBI CONNECT : $dbhost, $dbname, $dbuser" unless $dbh;
-
-}
-#___________
-sub dbquery {
-  my ($sql) = @_;
-
-#warn "--> dbquery : $dbname, $sql, params=@params\n";
-
-  dbconnect () unless $dbh;
-  my $sth = $dbh->prepare( $sql) or die "database fatal erreur prepare\n$DBI::errstr\n$sql\n";
-  $sth->execute () or die "database fatal erreur : execute : $DBI::errstr\n$sql\n";
-
-  return $sth;
-}
-
-#--------
-sub dbquery_OLD {
-  my ($sql) = @_;
-  
-  my $dbname = 'formcont';
-  $dbh	  = dbconnect($dbname) unless $dbh;
-  my $sth = $dbh->query ($sql);
-  unless ($sth) {
-    warn "formcont :: dbquery: ** ERR ** $sql\n";  
-    $sth = $dbh->query ($sql);
-  }
-  return $sth;
 }
 #--------
 sub getTrans {

@@ -12,6 +12,7 @@
 
 use strict;
 use payonline_tools;
+use formcont_tools;
 use formcont_templates;
 
 use vars qw(%args $lang $errmsg $crtdate $usessl $lang	);

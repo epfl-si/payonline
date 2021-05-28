@@ -658,39 +658,4 @@ sub makeHash {
   return YellowPayFlow::_makeHash($struct, $self->{hmac});
 }
 
-package YellowPayFlow::FormCont;
-
-use base qw(YellowPayFlow);
-
-sub test {
-  bless {
-    shopID => 'unilepflTEST',
-    hmac_in => $payonline_tools::HMAC_salts->{unil}->{in},
-    hmac_out => $payonline_tools::HMAC_salts->{unil}->{out},
-    srv => YellowPayFlow::_postfinance_srv("test"),
-  }, shift
-}
-
-sub prod {
-  bless {
-    shopID => 'unilepfl',
-    hmac_in => $payonline_tools::HMAC_salts->{unil}->{in},
-    hmac_out => $payonline_tools::HMAC_salts->{unil}->{out},
-    srv => YellowPayFlow::_postfinance_srv("prod"),
-  }, shift
-}
-
-sub makeHash {
-  my ($self, $struct) = @_;
-  return YellowPayFlow::_makeHash($struct,
-                                  exists $struct->{PAYID} ?
-                                  $self->{hmac_out} :
-                                  $self->{hmac_in});
-}
-
-sub current {
-  my ($class, $mode) = @_;
-  $ENV{FORMCONT_TEST_MODE} ? $class->test : $class->prod;
-}
-
 1;
