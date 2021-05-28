@@ -1380,8 +1380,8 @@ sub authenticate {
     exit;
   }
 
-use Data::Dumper;
-warn ">> fonds\n".Dumper($fonds);
+use Data::Dmp;
+warn sprintf(">> fonds: %s\n", dmp($fonds));
 
   my ($n1, $n2) = split(/,/, $nom)    if ($nom =~ /,/);
   $nom = $n1 if $n2;

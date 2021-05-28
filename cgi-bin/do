@@ -14,7 +14,7 @@
 use strict;
 use HTML::Template;
 use LWP::UserAgent; 
-use Data::Dumper;
+use Data::Dmp;
 
 use payonline_tools;
 
@@ -576,7 +576,7 @@ warn "do_post a : $url, $id_transact, $result\n";
   	paymode			=> $trans->{paymode},
   };
 
-warn "do_post postdata\n".Dumper($postdata);  
+warn sprintf(">> do_post postdata: %s\n", dmp($postdata));
   
   if ($queryArgs) {
 		foreach my $key (keys %$queryArgs) {
