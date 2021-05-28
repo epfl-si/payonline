@@ -757,7 +757,11 @@ sub newinst {
   $template->param(sEtat		=> 'inactive' );
   $template->param(sNCTxt		=> $nat_comptable_txt );
   $template->param(sMonnaie		=> $monnaietxt );
-  $template->param(sdatedeb		=> payonline_tools::prdate($crtdate,'date') );
+	my $yy = substr ($crtdate,0,4);
+	my $mm = substr ($crtdate,5,2);
+	my $dd = substr ($crtdate,8,2);
+	my $sdatedeb = sprintf "%04d-%02d-%02d", $yy, $mm, $dd;
+  $template->param(sdatedeb		=> $sdatedeb);
   $template->param(sFormaction	=> "$me/doneinst?lang=$lang"		);
  
   $template->param(sErrMsg => $errmsg);
