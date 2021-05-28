@@ -61,19 +61,6 @@ sub get_time {
   $days[2] = 29 if ($year % 400 == 0) || ($year % 4 == 0 && $year % 100 != 0) ;
   return sprintf "%4d-%02d-%02d %02d:%02d:00",$year,$mon,$mday,$hour,$min;
 }
-#--------
-sub setTmplDir {
-  $tmpldir = shift;
-}
-#---------
-sub debug_ENV {
-  foreach my $item (sort keys %ENV) {
-   print STDERR qq{$item=$ENV{$item}
-   };
-  }
-  print STDERR qq{================================
-  };
-}
 #---------
 
 1;
