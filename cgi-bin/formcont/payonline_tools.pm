@@ -83,46 +83,4 @@ sub debug_params {
   }
 }
 
-#--------
-sub loadargs {
-
-  my $query = $ENV{QUERY_STRING};
-  my $postdata;
-  
-  if ($ENV{'REQUEST_METHOD'} && $ENV{'REQUEST_METHOD'} eq 'POST') {
-   read (STDIN, $postdata, $ENV{'CONTENT_LENGTH'});
-  }
-  my $allargs = $query . '&' . $postdata;
-  my @fields  = split (/&/, $allargs);
-  foreach (@fields) {
-    s/\+/ /g;  
-    s/%([0-9a-f]{2,2})/pack ("C", hex ($1))/gie;
-  }
-  my %args;
-  foreach my $field (@fields) {
-    next unless ($field =~ /=/);  
-    my ($name, $value) = split(/=/, $field, 2);  
-    $args {$name} .= ' ' if $args {$name};  
-    $args {$name} .= "$value";
-  }
-  %args
-}
-#--------
-sub getTrans {
-  my ($id_trans, $etat) = @_;
-  return unless $id_trans;
-  return if  $id_trans =~ /select/i;
-  return if  $id_trans =~ /insert/i;
-  return if  $id_trans =~ /update/i;
-  return if  $etat     =~ /select/i;
-  return if  $etat     =~ /insert/i;
-  return if  $etat     =~ /update/i;
-
-  my $sql = qq{select * from transact where id='$id_trans'};
-  $sql .= qq{ and etat='$etat'} if $etat;
-  my $sth = dbquery ($sql) or return;
-  return $sth->fetchrow_hashref ();
-  
-}
-
 1;
