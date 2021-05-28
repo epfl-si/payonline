@@ -20,7 +20,7 @@ use Digest::MD5 qw(md5_hex);
 use Digest::SHA1 ;
 
 use strict;
-use vars qw( $dbh $DEBUG $su_list $logfile $errmsg $demfond $codeTVA
+use vars qw( $dbh $DEBUG $su_list $errmsg $demfond $codeTVA
             $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
             $ges_list $SHAsalt $postURL $redirectURL
             );
@@ -62,10 +62,6 @@ sub get_time {
   return sprintf "%4d-%02d-%02d %02d:%02d:00",$year,$mon,$mday,$hour,$min;
 }
 #--------
-sub setLog {
-  $logfile = shift;
-}
-#--------
 sub setTmplDir {
   $tmpldir = shift;
 }
@@ -85,16 +81,6 @@ sub debug_params {
   foreach my $item (sort keys %$params) {
    warn "formcont : DEBUG::$item=$params->{$item}=\n";
   }
-}
-
-#--------
-sub write_log {
-  my ($sciper, $code) = @_;
-  
-  open (LOG, ">>$logfile") or warn "** ERR : write_log: open log file $logfile: $!";
-  $code =~ s/\n/ /g;
-  printf LOG "%s\t%s\t%s\n", get_time(), $sciper, $code;
-  close LOG;
 }
 
 #--------
@@ -120,20 +106,6 @@ sub loadargs {
     $args {$name} .= "$value";
   }
   %args
-}
-#--------
-sub doLog {
-  my ($sciper, $msg) = @_;
-
-  return unless $sciper and $msg;
-  $msg =~ s/\'/\'\'/g;
-  $msg =~ s/\n/ /g;
-  my $sql = qq{insert into logs set
-  	ts=Now(),
-	sciper='$sciper',
-	descr='$msg'
-  };
-  dbquery ($sql) ;
 }
 #--------
 sub getTrans {
