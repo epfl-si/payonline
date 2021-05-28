@@ -48,7 +48,7 @@ my %msgs	= (
 		'You will receive a mail confirmation at the address you provided on the form',
 		'Name',
 		'Amount',
-		'Payed by',
+		'Paid by',
 		'Please contact Postfinance\'s support at : shopperhelp@postfinance.ch and provide all details of the transaction',
 	],
 	);

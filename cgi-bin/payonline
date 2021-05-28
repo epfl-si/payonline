@@ -64,8 +64,8 @@ my %errmsgs	= (
 		'<li>Compte budgétaire missing</li>',							# 9
 		'<li>End date is compulsory</li>',								# 10
 		'<li>Unknown operation</li>',									# 11
-		'Transactions payed',									# 12
-		'Transactions not payed',								# 13
+		'Transactions paid',									# 12
+		'Transactions not paid',								# 13
 	      ],
 	);
 my %nat_comptable = (

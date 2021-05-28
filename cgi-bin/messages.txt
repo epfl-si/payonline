@@ -183,9 +183,9 @@ $messages = {
 			fr => q{Code Postal, Ville, Pays},
 			en => q{ZIP, City, Country},
 		},
-		payed_by_label => {
+		paid_by_label => {
 			fr => q{Payé par},
-			en => q{Payed by},
+			en => q{Paid by},
 		},
 		phone_label => {
 			fr => q{Tél.},

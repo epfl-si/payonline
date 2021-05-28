@@ -206,7 +206,7 @@ warn "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STAT
 	Date : $trans->{datecr}
 	Total: $query->{Total} $query->{Currency}
 
-	Payed for
+	Paid for
 		$query->{FirstName} $query->{LastName}
 		$query->{Addr}
 		$query->{Country}, $query->{ZipCode} $query->{City}
@@ -230,8 +230,8 @@ warn ">> send_mail to : $dest\n";
   }
 
   if ($trans->{etat} eq 'payé') {
-  	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction already payed: status=$args{STATUS}\n";
-		my $msg = qq{error :: id_trans=$id_trans :: transaction already payed, status=$args{STATUS}	};
+  	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction already paid: status=$args{STATUS}\n";
+		my $msg = qq{error :: id_trans=$id_trans :: transaction already paid, status=$args{STATUS}	};
 		if ($args{STATUS} eq '2') {
 			my $sql = qq{update transact set etat='' where id=?};
 			my $sth = payonline_tools::dbquery ($sql, ($id_trans));
@@ -241,7 +241,7 @@ warn ">> send_mail to : $dest\n";
 			transaction refused : status updated
 			};
 		}
-		payonline_tools::send_mail ('payonline@epfl.ch', "payonline WARNING :: transaction payed: status=$args{STATUS}", $msg);
+		payonline_tools::send_mail ('payonline@epfl.ch', "payonline WARNING :: transaction paid: status=$args{STATUS}", $msg);
   	return;
   } else {
 		if ($args{STATUS} eq '2') {
