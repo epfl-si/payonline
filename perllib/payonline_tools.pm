@@ -17,7 +17,6 @@ use lib '/var/www/vhosts/payonline.epfl.ch/private/perl-mods/';
 package payonline_tools;
 
 use Net::LDAP;
-use Crypt::RC4;
 use Mail::Sendmail;
 use Digest::MD5 qw(md5_hex);
 use Digest::SHA1 ;
@@ -33,7 +32,7 @@ use Encode;
 use CGI qw/ :cgi-lib -utf8 /;
 
 use strict;
-use vars qw( $absdbh $DEBUG $su_list $logfile $rc4key $errmsg $demfond $codeTVA
+use vars qw( $absdbh $DEBUG $su_list $logfile $errmsg $demfond $codeTVA
             $tmpldir
             $ges_list $HMAC_salts $PayonlineShopID $db_dinfo $Rights $Accreds $rejectIP
            $epflLOGO $mailFrom $mailBcc $exceptions $CAMIPROload);
@@ -275,39 +274,8 @@ sub setLog {
   $logfile = shift;
 }
 #--------
-sub setRC4key {
-  $rc4key = shift;
-}
-#--------
 sub setTmplDir {
   $tmpldir = shift;
-}
-#---------
-sub RC4decrypt {
-  my ($txt, $flag) = @_;
-  die "RC4decrypt: no rc4key" unless $rc4key;
-  
-  my $rc4 = Crypt::RC4->new ($rc4key);
-  return $rc4->RC4 (pack ("h*", $txt));
-}
-#---------
-sub RC4encrypt {
-  my ($txt, $flag) = @_;
-  die "RC4encrypt: no rc4key" unless $rc4key;
-  my $rc4 = Crypt::RC4->new ($rc4key);
-
-  return unpack ("h*", $rc4->RC4 ($txt)) unless $flag;
-
-  my $RC4pwd = genkey ();
-  my $rc4txt = unpack ("h*", $rc4->RC4 ($RC4pwd))."\n";
-  $rc4       = Crypt::RC4->new ($RC4pwd);
-  my $count  = 0;
-  foreach my $item (split(/\n/, $txt)) {
-   $rc4txt   .= unpack ("h*", $rc4->RC4 ($item))."\n";
-   $count++;
-  }
-  $rc4txt   .= unpack ("h*", $rc4->RC4 ("count=$count"))."\n";
-  return $rc4txt;
 }
 #---------
 sub debug_ENV {
