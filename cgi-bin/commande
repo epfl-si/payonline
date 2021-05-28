@@ -16,6 +16,8 @@ use HTML::Template;
 
 use payonline_tools;
 
+use v5.10;  # For say()
+
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $messages);
 
 use utf8::all;
@@ -128,7 +130,7 @@ sub maintrans {
 
   my $tmpl_file = $noHeaderInsts =~ /$args{id_inst}/ ? 'maintrans-noheader.tmpl' : 'maintrans.tmpl';
 
-#warn "-_> maintrans : tmpl_file=$tmpl_file\n";
+#say STDERR "-_> maintrans : tmpl_file=$tmpl_file\n";
 
   my $template  = initTempl($tmpl_file);
 
@@ -154,11 +156,11 @@ sub maintrans {
   }
 
   if ($errmsg) {
-warn "maintrans : ERR from $ENV{HTTP_REFERER} :: $errmsg\n";
+say STDERR "maintrans : ERR from $ENV{HTTP_REFERER} :: $errmsg\n";
      $errmsg = qq{<h3>$errmsgs{$lang}->[12]</h3>$errmsgs{$lang}->[13]     };
 	#	- dump args
 	 foreach my $item (sort keys %args) {
-		warn "maintrans : ERR from : $item=$args{$item}=\n";
+		say STDERR "maintrans : ERR from : $item=$args{$item}=\n";
 	 }
 
      $template->param(sErrMsg => $errmsg);
@@ -238,7 +240,7 @@ warn "maintrans : ERR from $ENV{HTTP_REFERER} :: $errmsg\n";
 	  $query =~ s/^&//;
 	  $query =~ s/\n/ /g;
 	  $query =~ s/\\//g;
-warn "payonline :: maintrans 1: query=$query\n";
+say STDERR "payonline :: maintrans 1: query=$query\n";
 	  $id_trans	= payonline_tools::gentablekey('transact',18);
 	  my $sql   = qq{update transact set id_inst=?,datecr=Now(),lang=?,query=? where id=?  };
 	  my $sth   = payonline_tools::dbquery ($sql, ($args{id_inst},$lang,$query,$id_trans));
@@ -247,7 +249,7 @@ warn "payonline :: maintrans 1: query=$query\n";
 
   my $UserTotal 	 = sprintf "%.2f",$args{Total};
   my $ParamTotal	 = $UserTotal * 100;	# 		- pas de décimales
-warn "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\n";
+say STDERR "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\n";
 
   my $flow = YellowPayFlow::Payonline->by_instance($inst);
 
@@ -311,7 +313,7 @@ warn "payonline :: maintrans 2: id_inst=$args{id_inst},id_trans=$id_trans\n";
 sub initTempl {
    my ($tmplpath) = @_;
 
-#warn "initTempl: $tmpldir$tmplpath\n";
+#say STDERR "initTempl: $tmpldir$tmplpath\n";
    my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
 	   strict => 0,
 	   cache => 1,

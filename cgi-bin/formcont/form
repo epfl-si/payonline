@@ -15,6 +15,8 @@ use payonline_tools;
 use formcont_tools;
 use formcont_templates;
 
+use v5.10;  # For say()
+
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
 
 use utf8::all;
@@ -45,7 +47,7 @@ $crtdate 		= payonline_tools::getcrtdate();
 $lang			= $args{lang};
 $lang			= 'en' unless $lang;
 
-warn "--> lang=$lang, args=$args{lang}\n";
+say STDERR "--> lang=$lang, args=$args{lang}\n";
 
 print formcont_templates::header ();
 

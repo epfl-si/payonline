@@ -14,6 +14,8 @@ use strict;
 use payonline_tools;
 use formcont_tools;
 
+use v5.10;  # For say()
+
 use vars qw(%args $lang $errmsg $crtdate $usessl
 	);
 
@@ -59,18 +61,18 @@ exit;
 sub cert {
 
 	print "Content-Type: text/html; charset=UTF-8\n\n";
-warn "formcont :: done cert: ** CERT from YellowPay **\n";
+say STDERR "formcont :: done cert: ** CERT from YellowPay **\n";
 	my $YPSrv = $ENV{REMOTE_ADDR};
 	return unless $YPSrv;
-warn "formcont :: done cert: ... 1 YPSrv=$YPSrv\n";
+say STDERR "formcont :: done cert: ... 1 YPSrv=$YPSrv\n";
 	return unless (payonline_tools::is_known_postfinance_ip($YPSrv));
 
 	foreach my $item (keys %args) {
-warn "formcont :: done .. cert args : $item=$args{$item}\n";
+say STDERR "formcont :: done .. cert args : $item=$args{$item}\n";
 	}  
 
 	unless ($args{result}) {
-warn "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO ** : result=$args{result}\n";
+say STDERR "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO ** : result=$args{result}\n";
 #		exit;
 	}
 
@@ -78,7 +80,7 @@ warn "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO ** : res
 	$trans->{total} = $args{amount};
 
 	my $id_trans = $trans->{id};
-	warn "formcont :: done cert: ... 2 id_trans=$id_trans\n";
+	say STDERR "formcont :: done cert: ... 2 id_trans=$id_trans\n";
 	return unless $id_trans;
 	return if  $id_trans =~ /select/i;
 	return if  $id_trans =~ /insert/i;
@@ -100,9 +102,9 @@ warn "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO ** : res
 	my $check_hash 	= YellowPayFlow::FormCont->current->makeHash ($hashdata);
 
 	# - check hash --------
-warn "formcont :: done cert: ... 4 hash=$hash, arghash=$args{SHASIGN}\n";
+say STDERR "formcont :: done cert: ... 4 hash=$hash, arghash=$args{SHASIGN}\n";
 	unless ($hash eq $args{SHASIGN}) {
-warn "** ERR : formcont :: cert SHASIGN FAILED : $id_trans ";
+say STDERR "** ERR : formcont :: cert SHASIGN FAILED : $id_trans ";
 		return;
 	}
 	
@@ -116,7 +118,7 @@ warn "** ERR : formcont :: cert SHASIGN FAILED : $id_trans ";
 		 PaymentID='$args{PAYID}' 
 		 where id='$id_trans'};
 		my $sth = formcont_tools::dbquery($sql);
-warn " ==>> formcont cert: OK : $id_trans\n";
+say STDERR " ==>> formcont cert: OK : $id_trans\n";
 		$sth->finish ();
 
 		# 	- send email
@@ -138,12 +140,12 @@ warn " ==>> formcont cert: OK : $id_trans\n";
 		#  payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL formcont :: payment confirmation', $msg);
 		formcont_tools::send_mail ($email, 'Formation continue UNIL/EPFL :: payment confirmation', $msg);
 
-	warn " ==>> formcont cert: confirmation email to : $email $msg\n";    
+	say STDERR " ==>> formcont cert: confirmation email to : $email $msg\n";    
 	}
 	
-warn " ==>> formcont cert: args dump <<==\n";
+say STDERR " ==>> formcont cert: args dump <<==\n";
 	foreach my $item (keys %args) {
-warn "$item=$args{$item}\n";
+say STDERR "$item=$args{$item}\n";
 	}
 	exit;
 
@@ -155,7 +157,7 @@ sub do_post {
 
 	my $id_transact = $trans->{id_transact};
 
-warn "formcont :: do_post : id_transact=$id_transact, result=$result\n";
+say STDERR "formcont :: do_post : id_transact=$id_transact, result=$result\n";
 
 	return unless $id_transact;
 
@@ -172,7 +174,7 @@ warn "formcont :: do_post : id_transact=$id_transact, result=$result\n";
 	my $ua = new LWP::UserAgent;
 	push @{ $ua->requests_redirectable }, 'POST';
 
-	warn "do_post : $url, $id_transact, $result\n";
+	say STDERR "do_post : $url, $id_transact, $result\n";
 
 	my $postdata    = {
 		id_transact	=> $id_transact,
@@ -193,6 +195,6 @@ warn "formcont :: do_post : id_transact=$id_transact, result=$result\n";
 
 	my $response = $ua->post($url, $postdata);
 	my $content  = $response->decoded_content();
-	warn "do_post done : $content\n";
+	say STDERR "do_post done : $content\n";
 
 }

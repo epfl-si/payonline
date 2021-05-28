@@ -16,6 +16,8 @@ use payonline_tools;
 use formcont_tools;
 use formcont_templates;
 
+use v5.10;  # For say()
+
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
 
 use utf8::all;
@@ -139,9 +141,9 @@ sub main {
 
   my $id_trans 	= gentablekey($userdata);
 
-warn " ==>> formcont payment : args dump <<==\n";
+say STDERR " ==>> formcont payment : args dump <<==\n";
 foreach my $item (keys %args) {
-	warn "$item=$args{$item}\n";
+	say STDERR "$item=$args{$item}\n";
 }
 
   my $flow = YellowPayFlow::FormCont->current();
@@ -256,7 +258,7 @@ sub gentablekey {
 
  my $size = 18;
  while (1) {
-#warn "payonline :: gentablekey ...";
+#say STDERR "payonline :: gentablekey ...";
     srand (time ^ ($$ + ($$ << 15)));
     my $key = "";
     for (my $i = 0; $i < $size; $i++) {
@@ -294,7 +296,7 @@ sub gentablekey {
       	email='$userdata->{email}',
       	id_transact='$userdata->{id_transact}'
       };
-warn "formcont :: gentablekey : key=$key\n";
+say STDERR "formcont :: gentablekey : key=$key\n";
       my $sth = dbquery ($sql);
       return $key if $sth;
     }

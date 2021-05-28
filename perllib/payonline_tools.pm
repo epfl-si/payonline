@@ -13,6 +13,7 @@
 
 use lib '/opt/dinfo/lib/perl';
 use lib '/var/www/vhosts/payonline.epfl.ch/private/perl-mods/';
+use v5.10;  # For say()
 
 package payonline_tools;
 
@@ -102,7 +103,7 @@ $exceptions = {
 sub init {
 
 	if ($rejectIP =~ /$ENV{REMOTE_ADDR}/) {
-		warn "** ERR : IP rejected : $ENV{REMOTE_ADDR}\n";
+		say STDERR "** ERR : IP rejected : $ENV{REMOTE_ADDR}\n";
 		exit;
 	}
 
@@ -180,7 +181,7 @@ sub prdate {
 sub send_mail {
   my ($dest, $subj, $msg) = @_;
 
-warn "payonline :: send_mail : $dest, $subj\n";
+say STDERR "payonline :: send_mail : $dest, $subj\n";
   $dest			 ='ion.cionca@epfl.ch' if $DEBUG;
 
   my %mail;
@@ -193,13 +194,13 @@ warn "payonline :: send_mail : $dest, $subj\n";
   $mail{Message} = $msg;	
   if (sendmail (%mail)) {
      if ($Mail::Sendmail::error) {
-		warn "payonline :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+		say STDERR "payonline :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
      } else {
 		$msg =~ s/\n/;/g;
-		warn "payonline :: send_mail : $mail{To}, SUBJ: $subj\n";
+		say STDERR "payonline :: send_mail : $mail{To}, SUBJ: $subj\n";
      }
   } else {
-		warn "payonline :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+		say STDERR "payonline :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
   }
 }
 #--------
@@ -209,7 +210,7 @@ sub send_mail_bc {
 	$mailBcc .= ",$bcc" if $bcc;
 	$mailBcc	=~ s/^,//;
 	$mailBcc	=~ s/,$//;
-warn "payonline :: send_mail_bc : dest=$dest, mailFrom=$mailFrom, mailBcc=$mailBcc, $subj\n";
+say STDERR "payonline :: send_mail_bc : dest=$dest, mailFrom=$mailFrom, mailBcc=$mailBcc, $subj\n";
 
   return unless $dest or $mailBcc;
   
@@ -225,13 +226,13 @@ warn "payonline :: send_mail_bc : dest=$dest, mailFrom=$mailFrom, mailBcc=$mailB
   $mail{Message} = $msg;	
   if (sendmail (%mail)) {
      if ($Mail::Sendmail::error) {
-		warn "payonline :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+		say STDERR "payonline :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
      } else {
 		$msg =~ s/\n/;/g;
-		warn "payonline :: send_mail : $mail{To}, SUBJ: $subj\n";
+		say STDERR "payonline :: send_mail : $mail{To}, SUBJ: $subj\n";
      }
   } else {
-		warn "payonline :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+		say STDERR "payonline :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
   }
 }
 #--------
@@ -241,7 +242,7 @@ sub get_time {
   $year += 1900;
   $days[2] = 29 if (($year % 400 == 0) || ($year % 4 == 0 && $year % 100 != 0)) ;
 
-warn "--> last feb day = $days[2]\n";
+say STDERR "--> last feb day = $days[2]\n";
 
   return sprintf "%4d-%02d-%02d %02d:%02d:00",$year,$mon,$mday,$hour,$min;
 }
@@ -250,7 +251,7 @@ sub gentablekey {
   my ($table, $size) = @_;
 
  while (1) {
-#warn "payonline :: gentablekey ...";
+#say STDERR "payonline :: gentablekey ...";
     srand (time ^ ($$ + ($$ << 15)));
     my $key = "";
     for (my $i = 0; $i < $size; $i++) {
@@ -261,7 +262,7 @@ sub gentablekey {
     my $sth = dbquery ($sql, ($key));
     unless (my ($id) = $sth->fetchrow_array ()) {
       my $sql = qq{insert into $table set id=?};
-warn "payonline :: gentablekey : key=$key\n";
+say STDERR "payonline :: gentablekey : key=$key\n";
       my $sth = dbquery ($sql, ($key));
       return $key if $sth;
     }
@@ -289,7 +290,7 @@ sub debug_params {
   my ($params) = @_;
   
   foreach my $item (sort keys %$params) {
-   warn "payonline : DEBUG::$item=$params->{$item}=\n";
+   say STDERR "payonline : DEBUG::$item=$params->{$item}=\n";
   }
 }
 #--------
@@ -375,7 +376,7 @@ sub dbconnect {
 	die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
 	my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306}; 
 
-#warn "dbconnect : $dsndb\n";
+#say STDERR "dbconnect : $dsndb\n";
 
 	my $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd, {mysql_enable_utf8 => 1});
 
@@ -404,7 +405,7 @@ sub write_log_db {
 #--------
 sub getPersonInfos {
 	my $sciper = shift;
-#warn "payonline getPersonInfos : sciper=$sciper=";
+#say STDERR "payonline getPersonInfos : sciper=$sciper=";
 	my $sql = qq{select distinct dinfo.sciper.nom_acc,dinfo.sciper.prenom_acc from dinfo.sciper where dinfo.sciper.sciper=?};
 	my $sth = $db_dinfo->query ( $sql, ($sciper)) or return;
 	my ($nom, $prenom) = $sth->fetchrow_array ();
@@ -445,7 +446,7 @@ sub getTrans {
 #--------
 sub getQuery {
   my ($id_trans) = @_;
-#warn "getQuery : $id_trans\n";
+#say STDERR "getQuery : $id_trans\n";
   return unless $id_trans;
   return if  $id_trans =~ /select/i;
   return if  $id_trans =~ /insert/i;
@@ -460,7 +461,7 @@ sub getQuery {
     my ($param, $val) = split (/=/, $item);
     $val =~ s/%26/&/g;
     $query{$param} = $val;
-#warn "getQuery : $param=$val;";
+#say STDERR "getQuery : $param=$val;";
   }
   return \%query;
 }
@@ -563,11 +564,11 @@ sub makeToken {
   my $ctx = Digest::SHA1->new;
   my $str = "$id_transact:$trans->{id_inst}";
 
-#warn ">> salt=$salt, str=$str\n";
+#say STDERR ">> salt=$salt, str=$str\n";
   $ctx->add($str);
   $ctx->add($salt);
   my $token = '{SSHA}'.MIME::Base64::encode($ctx->digest . $salt,'');
-#warn ">> token=$token\n";  
+#say STDERR ">> token=$token\n";  
   return qq{$salt:$token};
 }
 
@@ -576,7 +577,7 @@ sub inMaintenance {
 	#	- POSTFINANCE MAINTENANCE
 	my $crtdate = shift;
 
-	opendir DIR, "$MAINT_DIR" || warn "** ERR read $MAINT_DIR : $!\n";
+	opendir DIR, "$MAINT_DIR" || say STDERR "** ERR read $MAINT_DIR : $!\n";
 	my @maintenances = readdir (DIR);
 	close DIR;
 
@@ -586,14 +587,15 @@ sub inMaintenance {
 		my $startdate = substr ($date, 0, 16);
 		my $enddate   = substr ($date, 16, 16);
 		next if $crtdate lt $startdate || $crtdate gt $enddate;
-warn "maintenance $crtdate : $startdate, $enddate, IN maintenance\n";
+say STDERR "maintenance $crtdate : $startdate, $enddate, IN maintenance\n";
 		return qq{$startdate,$enddate};
 	}
-warn "maintenance $crtdate : NO maintenance\n";
+say STDERR "maintenance $crtdate : NO maintenance\n";
 	return 0;	
 }
 
 package YellowPayFlow;  #########################################
+use v5.10;  # For say()
 
 sub _makeHash {
   my ($data, $hmac_key) = @_;
@@ -610,10 +612,10 @@ sub _makeHash {
     $txt = $data->{orderID}.$data->{currency}.$data->{amount}.$data->{PM}.$data->{ACCEPTANCE}.$data->{STATUS}.$data->{CARDNO}.$data->{PAYID}.$data->{NCERROR}.$data->{BRAND}
   }
   $txt .= $hmac_key;
-#warn "makeHash : txt=$txt\n";
+#say STDERR "makeHash : txt=$txt\n";
   $ctx->add($txt);
   my $hexdigest = uc($ctx->hexdigest);
-#warn "makeHash : digest=$hexdigest\n";
+#say STDERR "makeHash : digest=$hexdigest\n";
   return ($hexdigest);
 }
 

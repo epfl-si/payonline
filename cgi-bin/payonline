@@ -16,6 +16,8 @@ use HTML::Template;
 use lib qw/./;
 use payonline_tools;
 
+use v5.10;  # For say()
+
 use Devel::Confess;
 use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits $tmpldir $lang $errmsg %CFs $crtdate	$messages);
 
@@ -258,11 +260,11 @@ sub listinst {
   $sql =~ s/where $//;
 
   $sql .= $args{orderby} ? qq{ order by $args{orderby} }  : qq{ order by descr } ;
-#warn "--> $sql\nparams=@params\n";
+#say STDERR "--> $sql\nparams=@params\n";
   my @inst;
   my $sth = payonline_tools::dbquery ($sql, @params);
   while (my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$mailinst,$contact) = $sth->fetchrow_array ()) {
-#warn "--> $id, $fonds, $etat, $cf, $descr\n";
+#say STDERR "--> $id, $fonds, $etat, $cf, $descr\n";
     next unless $descr;
     my $sEditTxt;
    	$sEditTxt  = qq{$me/detinst?id=$id&lang=$lang}	;
@@ -423,7 +425,7 @@ sub listtrans {
   $sql 	 .= qq{ and etat=''} 	 if $args{op} eq 'notpayed';
   $sql   .= qq{ order by datecr desc $limit};
 
-#warn "payonline :: listtrans : $sql";
+#say STDERR "payonline :: listtrans : $sql";
   my $sth = payonline_tools::dbquery ($sql, @params);
   while (my $result = $sth->fetchrow_hashref ()) {
     next unless $result;
@@ -448,7 +450,7 @@ sub listtrans {
     );
     push(@inst, \%item);
   }
-#warn "listtrans : ";
+#say STDERR "listtrans : ";
   my $resp = payonline_tools::getPersonInfos ($resp_sciper);
   my $sOtherTitle = qq{<a href="$me/listtrans?lang=$lang&id=$id_inst};
   $sOtherTitle   .=	$args{op} ? qq{">$errmsgs{$lang}->[12]  <img src=/images/ok.gif border=0 align=middle></a>} : qq{&op=notpayed">$errmsgs{$lang}->[13] <img src=/images/ko.gif border=0 align=middle></a>};
@@ -1016,7 +1018,7 @@ sub doneinst {
 
 	  # - delete test transactions
 	  my $sql = qq{delete from transact where id_inst=?};
-#warn "payonline :: doneinst : $sql1";
+#say STDERR "payonline :: doneinst : $sql1";
 	  payonline_tools::dbquery($sql, ($id));
 
      # - send mail to SF
@@ -1292,7 +1294,7 @@ sub donefnd {
 sub initTempl {
    my ($tmplpath) = @_;
 
-warn "initTempl: $tmpldir$tmplpath";
+say STDERR "initTempl: $tmpldir$tmplpath";
    my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
 	   strict => 0,
 	   cache  => 1,
@@ -1381,13 +1383,13 @@ sub authenticate {
   }
 
 use Data::Dmp;
-warn sprintf(">> fonds: %s\n", dmp($fonds));
+say STDERR sprintf(">> fonds: %s\n", dmp($fonds));
 
   my ($n1, $n2) = split(/,/, $nom)    if ($nom =~ /,/);
   $nom = $n1 if $n2;
   my ($n1, $n2) = split(/,/, $prenom) if ($prenom =~ /,/);
   $prenom = $n1 if $n2;
-warn "authenticate $sciper, $nom $prenom :: respunits=$respunits";
+say STDERR "authenticate $sciper, $nom $prenom :: respunits=$respunits";
 
 }
 

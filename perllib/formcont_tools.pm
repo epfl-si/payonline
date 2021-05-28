@@ -1,5 +1,6 @@
 package formcont_tools;
 use payonline_tools;
+use v5.10;  # For say()
 
 use vars qw($postURL $redirectURL);
 
@@ -22,7 +23,7 @@ sub dbconnect {
 
   die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
   my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306};
-warn "dbconnect : $dsndb";
+say STDERR "dbconnect : $dsndb";
   $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd, {mysql_enable_utf8 => 1});
 die "dbconnect : ERR DBI CONNECT : $dbhost, $dbname, $dbuser" unless $dbh;
 
@@ -31,7 +32,7 @@ die "dbconnect : ERR DBI CONNECT : $dbhost, $dbname, $dbuser" unless $dbh;
 sub dbquery {
   my ($sql) = @_;
 
-#warn "--> dbquery : $dbname, $sql, params=@params\n";
+#say STDERR "--> dbquery : $dbname, $sql, params=@params\n";
 
   dbconnect () unless $dbh;
   my $sth = $dbh->prepare( $sql) or die "database fatal erreur prepare\n$DBI::errstr\n$sql\n";
@@ -54,13 +55,13 @@ sub send_mail {
   $mail{Message} = $msg;
   if (sendmail (%mail)) {
      if ($Mail::Sendmail::error) {
-		warn "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+		say STDERR "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
      } else {
 		$msg =~ s/\n/;/g;
-		warn "formcont :: send_mail : $mail{To}, SUBJ: $subj\n";
+		say STDERR "formcont :: send_mail : $mail{To}, SUBJ: $subj\n";
      }
   } else {
-		warn "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+		say STDERR "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
   }
 }
 

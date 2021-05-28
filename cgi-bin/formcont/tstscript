@@ -15,6 +15,8 @@ use lib '/var/www/cgi-bin';
 use lib '/var/www/html/payonline/cgi-bin';
 #use lib '/var/www/html/payonline/cgi-bin/dev';
 
+use v5.10;  # For say()
+
 use strict;
 use payonline_tools;
 use formcont_tools;
@@ -94,14 +96,14 @@ my %nat_comptable = (
 print "Content-Type: text/html; charset=UTF-8\n\n";
 
 %args		= payonline_tools::loadargs ();
-warn "==== payonline :: tstscript ====";
+say STDERR "==== payonline :: tstscript ====";
 debug_params (\%args);
-warn "==== payonline :: tstscript ====";
+say STDERR "==== payonline :: tstscript ====";
 
 sub debug_params {
   my ($params) = @_;
 
   foreach my $item (sort keys %$params) {
-   warn "formcont : DEBUG::$item=$params->{$item}=\n";
+   say STDERR "formcont : DEBUG::$item=$params->{$item}=\n";
   }
 }

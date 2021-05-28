@@ -18,6 +18,8 @@ use Data::Dmp;
 
 use payonline_tools;
 
+use v5.10;  # For say()
+
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $usessl $messages	);
 
 use utf8::all;
@@ -88,14 +90,14 @@ sub dispatch {
 sub cert {
 
   print "Content-Type: text/html; charset=utf-8\n\n";
-warn "payonline cert: ** CERT from YellowPay **\n";
+say STDERR "payonline cert: ** CERT from YellowPay **\n";
   my $YPSrv = $ENV{REMOTE_ADDR};
   return unless $YPSrv;
-warn "payonline cert: ... 1 YPSrv=$YPSrv\n";
+say STDERR "payonline cert: ... 1 YPSrv=$YPSrv\n";
   unless (payonline_tools::is_known_postfinance_ip($YPSrv)) {
-warn "payonline cert: $YPSrv : unknown server in static list\n";
+say STDERR "payonline cert: $YPSrv : unknown server in static list\n";
 		if (payonline_tools::is_ip_in_postfinance_ranges($YPSrv)) {
-warn "payonline cert: OK :: $YPSrv in range\n";
+say STDERR "payonline cert: OK :: $YPSrv in range\n";
 		} else {
 			my $msg = qq{error :: id_trans=$args{orderID} illegal access from server IP=$YPSrv};
 			payonline_tools::send_mail ('payonline@epfl.ch', 'payonline ERROR :: unknown Postfinance server', $msg);
@@ -104,11 +106,11 @@ warn "payonline cert: OK :: $YPSrv in range\n";
   }
 
   foreach my $item (keys %args) {
-	warn "payonline .. cert ARGS : $item=$args{$item}\n";
+	say STDERR "payonline .. cert ARGS : $item=$args{$item}\n";
   }  
 
   my $id_trans = $args{orderID};
-warn "payonline cert: ... 2 id_trans=$id_trans\n";
+say STDERR "payonline cert: ... 2 id_trans=$id_trans\n";
   return unless $id_trans;
   return if  $id_trans =~ /select/i;
   return if  $id_trans =~ /insert/i;
@@ -116,12 +118,12 @@ warn "payonline cert: ... 2 id_trans=$id_trans\n";
 
   my $query	= payonline_tools::getQuery ($id_trans);
   return unless $query;
-warn "payonline cert: ... 3 query OK\n";
+say STDERR "payonline cert: ... 3 query OK\n";
 
   # - get transaction data
   my $trans= payonline_tools::getTrans ($id_trans,'');
   unless ($trans) {
-  	warn "payonline process_response: id_trans=$id_trans not found\n";
+  	say STDERR "payonline process_response: id_trans=$id_trans not found\n";
   	return;
   }
   
@@ -130,11 +132,11 @@ warn "payonline cert: ... 3 query OK\n";
   my $sth  = payonline_tools::dbquery ($sql, ($trans->{id_inst}));
   my $inst = $sth->fetchrow_hashref();
   unless ($inst) {
-  	warn "payonline process_response: instance: not found for id_trans=$id_trans\n";
+  	say STDERR "payonline process_response: instance: not found for id_trans=$id_trans\n";
   	return;
   }
   my $etat = $inst->{etat};
-warn "payonline cert: etat=$etat\n";
+say STDERR "payonline cert: etat=$etat\n";
 
 # - check hash --------
   my $hashdata = {
@@ -151,7 +153,7 @@ warn "payonline cert: etat=$etat\n";
   };
   my $check_hash = YellowPayFlow::Payonline->by_instance($inst)->makeHash($hashdata);
   unless ($check_hash eq $args{SHASIGN}) {
-		warn "** ERR : payonline :: cert FAILED : $id_trans\n$check_hash\n$args{SHASIGN}\n";
+		say STDERR "** ERR : payonline :: cert FAILED : $id_trans\n$check_hash\n$args{SHASIGN}\n";
 		return;
 	}
 	
@@ -169,7 +171,7 @@ warn "payonline cert: etat=$etat\n";
 	};
 	#	- failed transaction - notify
   if ($args{fail}) {
-warn "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: CANCEL\n";
+say STDERR "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: CANCEL\n";
 		$msg = qq{PAYONLINE FAILED TRANSACTION}.$msg;
 		payonline_tools::send_mail ('payonline@epfl.ch', "payonline FAILED TRANSACTION : status=$args{STATUS}", $msg);
 		return;
@@ -178,7 +180,7 @@ warn "payonline cert PAYID=$args{PAYID}, STATUS=$args{STATUS}: CANCEL\n";
 	#	- offline transactions
 	$args{offline} = 1 if $trans->{etat} eq 'payé';
   if ($args{offline}) {
-warn "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STATUS}\n";
+say STDERR "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STATUS}\n";
 		#	- notify payonline
 		$msg = qq{OFFLINE STATUS CHANGE}.$msg;
 		payonline_tools::send_mail ('payonline@epfl.ch', "payonline OFFLINE STATUS CHANGE : status=$args{STATUS}", $msg);
@@ -193,7 +195,7 @@ warn "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STAT
 				 PaymentID=? 
 				 where id=?};
 				my $sth = payonline_tools::dbquery ($sql, ("$args{PM} $args{BRAND}", $args{PAYID}, $id_trans));
-				warn "OFFLINE UPDATE TRANSACT $id_trans: STATUS=$args{STATUS}, etat=refuse\n";
+				say STDERR "OFFLINE UPDATE TRANSACT $id_trans: STATUS=$args{STATUS}, etat=refuse\n";
 
 				# - notify 
 				$msg = qq{payonline : TRANSACTION REFUSED
@@ -219,7 +221,7 @@ warn "payonline : OFFLINE STATUS CHANGE :  PAYID=$args{PAYID}, STATUS=$args{STAT
 				 $dest =~ s/,is-academia\@groupes.epfl.ch//;
 				 $dest =~ s/^,//;
 				 $dest =~ s/,$//;
-warn ">> send_mail to : $dest\n";
+say STDERR ">> send_mail to : $dest\n";
 				#	- notify instance conact
 				payonline_tools::send_mail ($dest, "payonline OFFLINE TRANSACTION REFUSED : $id_trans", $msg);
 
@@ -230,13 +232,13 @@ warn ">> send_mail to : $dest\n";
   }
 
   if ($trans->{etat} eq 'payé') {
-  	warn "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction already paid: status=$args{STATUS}\n";
+  	say STDERR "payonline cert: ... 2a id_trans=$id_trans :: WARNING : transaction already paid: status=$args{STATUS}\n";
 		my $msg = qq{error :: id_trans=$id_trans :: transaction already paid, status=$args{STATUS}	};
 		if ($args{STATUS} eq '2') {
 			my $sql = qq{update transact set etat='' where id=?};
 			my $sth = payonline_tools::dbquery ($sql, ($id_trans));
 			$sth->finish ();
-			warn "payonline cert id_trans=$id_trans :: ** TRANSACTION REFUSED **, status updated\n ";
+			say STDERR "payonline cert id_trans=$id_trans :: ** TRANSACTION REFUSED **, status updated\n ";
 			$msg .= qq{
 			transaction refused : status updated
 			};
@@ -245,7 +247,7 @@ warn ">> send_mail to : $dest\n";
   	return;
   } else {
 		if ($args{STATUS} eq '2') {
-			warn "** ERR : payonline :: transaction refused : $id_trans ";
+			say STDERR "** ERR : payonline :: transaction refused : $id_trans ";
 			return;
 		}
   }
@@ -257,10 +259,10 @@ warn ">> send_mail to : $dest\n";
 	 PaymentID=? 
 	 where id=?};
   my $sth = payonline_tools::dbquery ($sql, ("$args{PM} $args{BRAND}", $args{PAYID}, $id_trans));
-warn " ==>> payonline cert: OK : $id_trans\n";
+say STDERR " ==>> payonline cert: OK : $id_trans\n";
   $sth->finish ();
 
-warn " ==>> payonline cert: : query Email=$query->{Email}\n";
+say STDERR " ==>> payonline cert: : query Email=$query->{Email}\n";
  my $email = $etat eq 'prod' 
  					 ? $query->{Email}
  					 : 'payonline@epfl.ch';
@@ -322,7 +324,7 @@ Director of Philanthropy
 		if ($query->{Total} >= $payonline_tools::exceptions->{$inst->{id}}->{alertOn} &&
 				$payonline_tools::exceptions->{$inst->{id}}->{alertTo}) 
 		{
-warn "==> cert $payonline_tools::exceptions->{$inst->{id}} : mailBcc=$payonline_tools::mailBcc\n";
+say STDERR "==> cert $payonline_tools::exceptions->{$inst->{id}} : mailBcc=$payonline_tools::mailBcc\n";
 			$payonline_tools::mailBcc = $payonline_tools::exceptions->{$inst->{id}}->{alertTo};
 		}
 	}
@@ -331,11 +333,11 @@ warn "==> cert $payonline_tools::exceptions->{$inst->{id}} : mailBcc=$payonline_
 
 	payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL payonline :: payment confirmation', $msg);
 #    payonline_tools::send_mail ($email, 'EPFL payonline :: payment confirmation', $msg);
-	warn " ==>> payonline cert: confirmation email to : $email, $inst->{mailinst}\n";    
+	say STDERR " ==>> payonline cert: confirmation email to : $email, $inst->{mailinst}\n";    
 
-warn " ==>> payonline cert: args dump <<==\n";
+say STDERR " ==>> payonline cert: args dump <<==\n";
  foreach my $item (keys %args) {
-    warn "$item=$args{$item}\n";
+    say STDERR "$item=$args{$item}\n";
  }
  exit;
 
@@ -348,7 +350,7 @@ sub result {
   my $resultcode = $args{code};
   my $errmsg;
 
-warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
+say STDERR "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
   
   unless ($id_trans) {
 	  $errmsg 	= qq{no transaction id};
@@ -427,7 +429,7 @@ warn "==> result id_trans=$id_trans :: resultcode=$resultcode \n";
 			$urlconf  = 'http://'.$urlconf ;
 		}
 		if ($id_transact) {
-warn "==> result : id_transact=$id_transact\n";
+say STDERR "==> result : id_transact=$id_transact\n";
 			if ($urlconf =~ /\?/) {
 				$urlconf =~ s/&$//;
 				$urlconf .= qq(&id_transact=$id_transact);
@@ -438,14 +440,14 @@ warn "==> result : id_transact=$id_transact\n";
 		}
 		my $sOnLoad 	= qq{onload="window.location.href='$urlconf';"} if $inst->{bypass_return} && $resultcode;
 		$template->param(sOnLoad	=> $sOnLoad);
-warn "==> result : urlconf=$urlconf\n";
+say STDERR "==> result : urlconf=$urlconf\n";
 		$template->param(URL 			=> $urlconf);
 	}
 
   $template->param(Descr 		=> $inst->{descr});
   $template->param(Date			=> $trans->{datecr});
   $template->param(PayMode	=> $trans->{paymode});
-warn "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultcode\n";
+say STDERR "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultcode\n";
 
 # 
 #   if ($trans->{etat} ne 'payé' or $resultcode ne '1') {
@@ -461,7 +463,7 @@ warn "==> result id_trans=$id_trans :: etat=$trans->{etat}, resultcode=$resultco
 			#	- update transaction to failed
 			my $sql = qq{update transact set etat='' where id=?};
 			my $sth = payonline_tools::dbquery ($sql, $id_trans);
-warn "update failed failed transact $id_trans\n";
+say STDERR "update failed failed transact $id_trans\n";
 			
 			my $msg = qq{TRANSACTION FAILED		
 			$inst->{descr}
@@ -480,7 +482,7 @@ warn "update failed failed transact $id_trans\n";
 				 $dest .= ','.$query->{Email} 	if $query->{Email};
 				 $dest =~ s/^,//;
 				 $dest =~ s/,$//;
-warn ">> send_mail to : $dest\n";
+say STDERR ">> send_mail to : $dest\n";
 			payonline_tools::send_mail ($dest, "payonline TRASACTION REFUSED : $id_trans", $msg);
 			
 		}
@@ -502,7 +504,7 @@ warn ">> send_mail to : $dest\n";
 sub initTempl {
    my ($tmplpath) = @_;
 
-warn "initTempl: $tmpldir$tmplpath\n";
+say STDERR "initTempl: $tmpldir$tmplpath\n";
    my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
 	   strict => 0,
 	   cache => 1,
@@ -530,16 +532,16 @@ sub postResult {
 	my $result  = shift;
 	my $trans		= shift;
 	
-	warn "payonline :: do :postResult 1 : $id_trans, $result, $trans\n";  
+	say STDERR "payonline :: do :postResult 1 : $id_trans, $result, $trans\n";  
 	return unless $id_trans;  
-	warn "payonline :: do :postResult 2 \n";  
+	say STDERR "payonline :: do :postResult 2 \n";  
 	$trans = payonline_tools::getTrans ($id_trans, '');
 	return unless $trans;
 	my $id_inst	  = $trans->{id_inst};
 	return unless $id_inst;
-	warn "payonline :: do :postResult 3 result:$result\n";  
+	say STDERR "payonline :: do :postResult 3 result:$result\n";  
 #	$result	  = $trans->{etat} eq 'payé' ? 1 : 0;
-	warn "payonline :: do :postResult 4 result:$result\n";  
+	say STDERR "payonline :: do :postResult 4 result:$result\n";  
 	my $sql = qq{select url from instances where id=?};
 	my $sth = payonline_tools::dbquery ($sql, ($id_inst));
 	my $inst = $sth->fetchrow_hashref ();
@@ -548,7 +550,7 @@ sub postResult {
 	my $queryArgs   = payonline_tools::getArgs($trans->{query});
 	my $id_transact = $queryArgs->{id_transact};
 	my $informreturnaddress = $queryArgs->{informreturnaddress};
-	warn "payonline :: do :postResult 5 url:$url,informreturnaddress:$informreturnaddress,id_transact=$id_transact\n";  
+	say STDERR "payonline :: do :postResult 5 url:$url,informreturnaddress:$informreturnaddress,id_transact=$id_transact\n";  
 
 	do_post ($id_transact, $result, $trans, $url, $queryArgs) 	  	 if $url and $id_transact;
 	do_post ($id_transact, $result, $trans, $informreturnaddress,'') if $informreturnaddress and $id_transact;
@@ -562,7 +564,7 @@ sub do_post {
   my $ua = new LWP::UserAgent;
   push @{ $ua->requests_redirectable }, 'POST';
 
-warn "do_post a : $url, $id_transact, $result\n";
+say STDERR "do_post a : $url, $id_transact, $result\n";
 	#	- confirmation token if URL Return - but not to inform
 	my $token = payonline_tools::makeToken ($id_transact, $trans) if $queryArgs && !$queryArgs->{informreturnaddress};
   my $postdata    = {
@@ -576,7 +578,7 @@ warn "do_post a : $url, $id_transact, $result\n";
   	paymode			=> $trans->{paymode},
   };
 
-warn sprintf(">> do_post postdata: %s\n", dmp($postdata));
+say STDERR sprintf(">> do_post postdata: %s\n", dmp($postdata));
   
   if ($queryArgs) {
 		foreach my $key (keys %$queryArgs) {
@@ -589,6 +591,6 @@ warn sprintf(">> do_post postdata: %s\n", dmp($postdata));
   my $response = $ua->post($url, $postdata);
 
   my $content  = $response->decoded_content();
-warn "do_post done : $content\n";
+say STDERR "do_post done : $content\n";
 
 }
