@@ -22,7 +22,7 @@ use Digest::SHA1 ;
 use strict;
 use vars qw( $dbh $DEBUG $su_list $logfile $errmsg $demfond $codeTVA
             $YellowPayPrdSrv $YellowPayTstSrv $YellowPaySrv $YPServersIP $ShopID $tmpldir 
-            $su_list $ges_list $SHAsalt $postURL $redirectURL
+            $ges_list $SHAsalt $postURL $redirectURL
             );
 
 my $me 		= $ENV {SCRIPT_NAME};
@@ -31,8 +31,6 @@ my $qs 		= $ENV {QUERY_STRING};
 my $pi 		= $ENV {PATH_INFO};
 my @days 	= (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 my $resp 	= 'ion.cionca@epfl.ch';
-
-$su_list	= '104782';	# - ic,
 
 $DEBUG 		= '0';
 
@@ -122,13 +120,6 @@ sub loadargs {
     $args {$name} .= "$value";
   }
   %args
-}
-#--------
-sub IsSuperUser {
-  my ($mysciper) = @_;
-  return 0 unless $mysciper;
-  return 1 if ($su_list =~ /$mysciper/);
-  return 0;
 }
 #--------
 sub doLog {
