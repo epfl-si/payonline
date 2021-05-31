@@ -13,7 +13,6 @@
 use strict;
 use HTML::Template;
 
-use lib qw/./;
 use payonline_tools;
 
 use Devel::Confess;

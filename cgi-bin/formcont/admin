@@ -11,8 +11,6 @@
 #
 
 
-use lib '/opt/dinfo/lib/perl';
-
 use strict;
 use Tequila::Client;
 use payonline_tools;

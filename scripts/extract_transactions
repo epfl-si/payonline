@@ -10,8 +10,6 @@
 #
 #
 
-use lib '/opt/dinfo/lib/perl';
-
 use strict;
 use utf8::all;
 

@@ -11,8 +11,6 @@
 
 use strict;
 
-use lib '/opt/dinfo/lib/perl';
-
 use CGI qw(-utf8);
 
 use Cadi::CadiDB;

@@ -11,9 +11,6 @@
 #
 #
 
-use lib '/opt/dinfo/lib/perl';
-use lib '/var/www/vhosts/payonline.epfl.ch/private/perl-mods/';
-
 package payonline_tools;
 
 use Net::LDAP;
