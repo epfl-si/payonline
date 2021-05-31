@@ -16,8 +16,6 @@ use HTML::Template;
 use lib qw/./;
 use payonline_tools;
 
-use v5.10;  # For say()
-
 use Devel::Confess;
 use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits $tmpldir $lang $errmsg %CFs $crtdate	$messages);
 
@@ -260,11 +258,11 @@ sub listinst {
   $sql =~ s/where $//;
 
   $sql .= $args{orderby} ? qq{ order by $args{orderby} }  : qq{ order by descr } ;
-#say STDERR "--> $sql\nparams=@params\n";
+  # log_event "payonline", sql => $sql, params => \@params;
   my @inst;
   my $sth = payonline_tools::dbquery ($sql, @params);
   while (my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$mailinst,$contact) = $sth->fetchrow_array ()) {
-#say STDERR "--> $id, $fonds, $etat, $cf, $descr\n";
+#    log_event "payonline", step => "dbquery row", id => $id, fonds => $fonds, etat => $etat, cf => $cf, descr => $descr;
     next unless $descr;
     my $sEditTxt;
    	$sEditTxt  = qq{$me/detinst?id=$id&lang=$lang}	;
@@ -425,7 +423,7 @@ sub listtrans {
   $sql 	 .= qq{ and etat=''} 	 if $args{op} eq 'notpayed';
   $sql   .= qq{ order by datecr desc $limit};
 
-#say STDERR "payonline :: listtrans : $sql";
+#  log_event "payonline::listtrans", sql => $sql;
   my $sth = payonline_tools::dbquery ($sql, @params);
   while (my $result = $sth->fetchrow_hashref ()) {
     next unless $result;
@@ -450,7 +448,6 @@ sub listtrans {
     );
     push(@inst, \%item);
   }
-#say STDERR "listtrans : ";
   my $resp = payonline_tools::getPersonInfos ($resp_sciper);
   my $sOtherTitle = qq{<a href="$me/listtrans?lang=$lang&id=$id_inst};
   $sOtherTitle   .=	$args{op} ? qq{">$errmsgs{$lang}->[12]  <img src=/images/ok.gif border=0 align=middle></a>} : qq{&op=notpayed">$errmsgs{$lang}->[13] <img src=/images/ko.gif border=0 align=middle></a>};
@@ -1018,7 +1015,7 @@ sub doneinst {
 
 	  # - delete test transactions
 	  my $sql = qq{delete from transact where id_inst=?};
-#say STDERR "payonline :: doneinst : $sql1";
+          log_event("payonline::doneinst", sql => $sql);
 	  payonline_tools::dbquery($sql, ($id));
 
      # - send mail to SF
@@ -1294,7 +1291,7 @@ sub donefnd {
 sub initTempl {
    my ($tmplpath) = @_;
 
-say STDERR "initTempl: $tmpldir$tmplpath";
+   log_event "payonline::initTempl", tmpldir => $tmpldir, tmplpath => $tmplpath;
    my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
 	   strict => 0,
 	   cache  => 1,
@@ -1312,7 +1309,7 @@ say STDERR "initTempl: $tmpldir$tmplpath";
    $template->param(sLang			=> $lang);
    $template->param(sLangFR		=> 1) if $lang eq 'fr';
 
-   $template->param(sSuperUser=> payonline_tools::IsSuperUser($sciper));
+   $template->param(sSuperxvbUser=> payonline_tools::IsSuperUser($sciper));
    $template->param(sRespAdmin=> $respunits);
    $template->param(sDebug 		=> $payonline_tools::DEBUG ? ' *** Attention : version de test. Ne pas utiliser, svp ! ***' : '');
 
@@ -1382,14 +1379,14 @@ sub authenticate {
     exit;
   }
 
-use Data::Dmp;
-say STDERR sprintf(">> fonds: %s\n", dmp($fonds));
+  log_event "payonline::authenticate", fonds => $fonds;
 
   my ($n1, $n2) = split(/,/, $nom)    if ($nom =~ /,/);
   $nom = $n1 if $n2;
   my ($n1, $n2) = split(/,/, $prenom) if ($prenom =~ /,/);
   $prenom = $n1 if $n2;
-say STDERR "authenticate $sciper, $nom $prenom :: respunits=$respunits";
+  log_event "payonline::authenticate", sciper => $sciper, nom => $nom, prenom => $prenom,
+    respunits => $respunits;
 
 }
 

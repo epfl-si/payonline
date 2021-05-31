@@ -15,8 +15,6 @@ use lib '/opt/dinfo/lib/perl';
 use strict;
 use utf8::all;
 
-use v5.10;  # For say()
-
 use Mail::Sendmail;
 use MIME::Lite;
 use HTML::Entities ();
@@ -45,7 +43,7 @@ my $date = sprintf "%4d-%02d-%02d", $year, $mon, $mday;
 #my $date   = '2021-03-28' ;
 #my $mailSF = 'payonline-ops@groupes.epfl.ch';
 
-say STDERR "date=$date, mailSF=$mailSF\n";
+log_event "extract_transactions", date => $date, mailSF => $mailSF;
 #---------------------
 
 	$ENV{REMOTE_ADDR} = 'ignore';	#	bypass web check
@@ -100,7 +98,7 @@ sub extrans {
 			$descr =~ s/\n/ /g;
 			$descr =~ s/\r/ /g;
 			$descr =~ s/;/,/g;
-say STDERR ">> $descr, $datecr\n";
+                        log_event "extrans", descr => $descr, datecr => $datecr;
 			my $TVAcode = $codetva ? $codetva : payonline_tools::getTVAcode($naturecomptable);
 				 $TVAcode =~ s/A/C/;
 				 $TVAcode =~ s/Q7/C7/;
@@ -153,7 +151,7 @@ say STDERR ">> $descr, $datecr\n";
 			 Disposition => 'attachment',
 	  );
 	  $msg->send('smtp', 'mail.epfl.ch') or die "err send: $!";
-say STDERR "--> mailto=$mailSF\ncount=$count\n";
+          log_event "extrans:sent", mailto => $mailSF, count => $count;
 
    }
 
@@ -181,8 +179,8 @@ Date fin : $result->{datefin}
    my $dest = $payonline_tools::DEBUG ? '' : $resp->{mail} ;
    payonline_tools::send_mail ($dest, 'payonline : fermeture instance de paiement', $txt) ;
 
-   say STDERR "$result->{descr}\t$result->{datefin}\tarchive";
    payonline_tools::dbquery (qq{update instances set etat='archive' where id='$result->{id}'});
+   log_event "closeinst", descr => $result->{descr}, datefin => $result->{datefin};
   }
 
 }

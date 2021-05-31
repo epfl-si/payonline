@@ -14,8 +14,6 @@ use strict;
 use payonline_tools;
 use formcont_tools;
 
-use v5.10;  # For say()
-
 use vars qw(%args $lang $errmsg $crtdate $usessl
 	);
 
@@ -61,18 +59,14 @@ exit;
 sub cert {
 
 	print "Content-Type: text/html; charset=UTF-8\n\n";
-say STDERR "formcont :: done cert: ** CERT from YellowPay **\n";
 	my $YPSrv = $ENV{REMOTE_ADDR};
 	return unless $YPSrv;
-say STDERR "formcont :: done cert: ... 1 YPSrv=$YPSrv\n";
+        log_event "formcont/cert::cert", YPSrv => $YPSrv, %args;
 	return unless (payonline_tools::is_known_postfinance_ip($YPSrv));
 
-	foreach my $item (keys %args) {
-say STDERR "formcont :: done .. cert args : $item=$args{$item}\n";
-	}  
-
 	unless ($args{result}) {
-say STDERR "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO ** : result=$args{result}\n";
+          log_event "formcont/cert::cert", level => "error", transaction => $args{orderID},
+            result => $args{result};
 #		exit;
 	}
 
@@ -80,7 +74,7 @@ say STDERR "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO **
 	$trans->{total} = $args{amount};
 
 	my $id_trans = $trans->{id};
-	say STDERR "formcont :: done cert: ... 2 id_trans=$id_trans\n";
+        log_event "formcont/cert::cert", id_trans => $id_trans;
 	return unless $id_trans;
 	return if  $id_trans =~ /select/i;
 	return if  $id_trans =~ /insert/i;
@@ -102,9 +96,12 @@ say STDERR "formcont :: done .. cert : ** ERR : transaction $args{orderID} KO **
 	my $check_hash 	= YellowPayFlow::FormCont->current->makeHash ($hashdata);
 
 	# - check hash --------
-say STDERR "formcont :: done cert: ... 4 hash=$check_hash, arghash=$args{SHASIGN}\n";
+        log_event("formcont/cert::cert", step => "HMAC check", id_trans => $id_trans,
+              computed_hash => $check_hash, received_hash => $args{SHASIGN});
+
 	unless ($check_hash eq $args{SHASIGN}) {
-say STDERR "** ERR : formcont :: cert SHASIGN FAILED : $id_trans ";
+          log_event("formcont/cert::cert", error => "HMAC mismatch", id_trans => $id_trans,
+              computed_hash => $check_hash, received_hash => $args{SHASIGN});
 		return;
 	}
 	
@@ -118,7 +115,7 @@ say STDERR "** ERR : formcont :: cert SHASIGN FAILED : $id_trans ";
 		 PaymentID='$args{PAYID}' 
 		 where id='$id_trans'};
 		my $sth = formcont_tools::dbquery($sql);
-say STDERR " ==>> formcont cert: OK : $id_trans\n";
+                log_event "formcont/cert::cert", status => "OK", id_trans => $id_trans;
 		$sth->finish ();
 
 		# 	- send email
@@ -140,13 +137,9 @@ say STDERR " ==>> formcont cert: OK : $id_trans\n";
 		#  payonline_tools::send_mail_bc ($email, $inst->{mailinst}, 'EPFL formcont :: payment confirmation', $msg);
 		formcont_tools::send_mail ($email, 'Formation continue UNIL/EPFL :: payment confirmation', $msg);
 
-	say STDERR " ==>> formcont cert: confirmation email to : $email $msg\n";    
+                log_event("formcont/cert::cert", confirmation_email_to => $email, msg => $msg);
 	}
 	
-say STDERR " ==>> formcont cert: args dump <<==\n";
-	foreach my $item (keys %args) {
-say STDERR "$item=$args{$item}\n";
-	}
 	exit;
 
 }
@@ -157,7 +150,7 @@ sub do_post {
 
 	my $id_transact = $trans->{id_transact};
 
-say STDERR "formcont :: do_post : id_transact=$id_transact, result=$result\n";
+        log_event "formcont/cert::do_post", id_transact => $id_transact, result => $result;
 
 	return unless $id_transact;
 
@@ -174,7 +167,7 @@ say STDERR "formcont :: do_post : id_transact=$id_transact, result=$result\n";
 	my $ua = new LWP::UserAgent;
 	push @{ $ua->requests_redirectable }, 'POST';
 
-	say STDERR "do_post : $url, $id_transact, $result\n";
+        log_event "formcont/cert::do_post", url => $url, result => $result;
 
 	my $postdata    = {
 		id_transact	=> $id_transact,
@@ -195,6 +188,6 @@ say STDERR "formcont :: do_post : id_transact=$id_transact, result=$result\n";
 
 	my $response = $ua->post($url, $postdata);
 	my $content  = $response->decoded_content();
-	say STDERR "do_post done : $content\n";
+        log_event "formcont/cert::do_post", step => "done", content => $content;
 
 }

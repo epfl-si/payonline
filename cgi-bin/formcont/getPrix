@@ -14,14 +14,13 @@
 use strict;
 use payonline_tools;
 use formcont_tools;
-use v5.10;  # For say()
 
 use utf8::all;
 binmode(STDOUT, ":utf8");
 
 $payonline_tools::DEBUG	 = 1;
 
-say STDERR "getPrix..\n";
+log_event("getPrix");
 
 print qq{Content-Type: text/plain; charset=UTF-8
 Access-Control-Allow-Origin: *\n\n};
@@ -36,7 +35,7 @@ print qq{
 
 while (my ($montant) = $sth->fetchrow) {
 	print qq{<option value="cours:$montant">$montant CHF</option>};
-#say STDERR " >> $montant\n";
+# log_event "getPrix", montant => $montant;
 }
 print qq{
 </select >

@@ -16,8 +16,6 @@ use HTML::Template;
 
 use payonline_tools;
 
-use v5.10;  # For say()
-
 use vars qw(%args $tmpldir $lang $errmsg $crtdate);
 
 use utf8::all;
@@ -144,7 +142,7 @@ my $header = qq{
 
   payonline_tools::init ();
 
-#say STDERR "payonline :: init : tmpldir=$tmpldir\n";
+# log_event "free_reg", step => "after payonline_tools::init", tmpldir => $tmpldir;
   
   maintrans ();
 
@@ -155,7 +153,7 @@ sub maintrans {
 
   my $tmpl_file = $noHeaderInsts =~ /$args{id_inst}/ ? 'maintrans-noheader.tmpl' : 'maintrans.tmpl';
 
-say STDERR "-_> maintrans : tmpl_file=$tmpl_file\n";
+  log_event "free_reg::maintrans", tmpl_file => $tmpl_file;
 
   my $template  = initTempl($tmpl_file);
 
@@ -180,13 +178,7 @@ say STDERR "-_> maintrans : tmpl_file=$tmpl_file\n";
   }
 
   if ($errmsg) {
-say STDERR "maintrans : ERR from $ENV{HTTP_REFERER} :: $errmsg\n";
-     $errmsg = qq{<h3>$errmsgs{$lang}->[12]</h3>$errmsgs{$lang}->[13]     };
-	#	- dump args
-	 foreach my $item (sort keys %args) {
-		say STDERR "maintrans : ERR from : $item=$args{$item}=\n";
-	 }
-
+    log_event "free_reg::maintrans", error => $errmsg, referer => $ENV{HTTP_REFERER}, %args;
      $template->param(sErrMsg => $errmsg);
      print "Content-Type: text/html; charset=UTF-8\n\n", $template->output;
      exit;
@@ -282,7 +274,7 @@ Best Regards
 sub initTempl {
    my ($tmplpath) = @_;
 
-#say STDERR "initTempl: $tmpldir$tmplpath\n";
+#   log_event "free_reg::initTempl", tmpldir => $tmpldir, tmplpath => $tmplpath;
    my $template = HTML::Template->new(filename => $tmpldir.$tmplpath,
 	   strict => 0,
 	   cache => 1,

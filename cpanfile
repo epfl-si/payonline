@@ -16,4 +16,3 @@ requires 'MIME::Lite', '3.031';
 requires 'Devel::Confess', '0.009004';
 requires 'CGI', '4.52';
 requires 'utf8::all', '0.024';
-requires 'Data::Dmp', '0.240';

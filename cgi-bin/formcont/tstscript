@@ -10,8 +10,6 @@
 #
 #
 
-use v5.10;  # For say()
-
 use strict;
 use payonline_tools;
 use formcont_tools;
@@ -91,14 +89,10 @@ my %nat_comptable = (
 print "Content-Type: text/html; charset=UTF-8\n\n";
 
 %args		= payonline_tools::loadargs ();
-say STDERR "==== payonline :: tstscript ====";
-debug_params (\%args);
-say STDERR "==== payonline :: tstscript ====";
+log_event "tstscript", %args;
 
 sub debug_params {
   my ($params) = @_;
 
-  foreach my $item (sort keys %$params) {
-   say STDERR "formcont : DEBUG::$item=$params->{$item}=\n";
-  }
+  log_event "tstscript::debug_params", %$params;
 }

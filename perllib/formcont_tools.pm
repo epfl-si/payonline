@@ -1,6 +1,5 @@
 package formcont_tools;
 use payonline_tools;
-use v5.10;  # For say()
 
 use vars qw($postURL $redirectURL);
 
@@ -23,7 +22,7 @@ sub dbconnect {
 
   die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
   my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306};
-say STDERR "dbconnect : $dsndb";
+  log_event "dbconnect", dbname => $dsndb;
   $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd, {mysql_enable_utf8 => 1});
 die "dbconnect : ERR DBI CONNECT : $dbhost, $dbname, $dbuser" unless $dbh;
 
@@ -32,7 +31,7 @@ die "dbconnect : ERR DBI CONNECT : $dbhost, $dbname, $dbuser" unless $dbh;
 sub dbquery {
   my ($sql) = @_;
 
-#say STDERR "--> dbquery : $dbname, $sql, params=@params\n";
+  log_event "dbquery", sql => $sql;
 
   dbconnect () unless $dbh;
   my $sth = $dbh->prepare( $sql) or die "database fatal erreur prepare\n$DBI::errstr\n$sql\n";
@@ -53,15 +52,17 @@ sub send_mail {
   $mail{Smtp} 	 = 'mail.epfl.ch';
   $mail{Subject} = $subj;
   $mail{Message} = $msg;
+
+  $log_event = "formcont::send_mail";
   if (sendmail (%mail)) {
      if ($Mail::Sendmail::error) {
-		say STDERR "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+       log_event $log_event, error => $Mail::Sendmail::error;
      } else {
-		$msg =~ s/\n/;/g;
-		say STDERR "formcont :: send_mail : $mail{To}, SUBJ: $subj\n";
+       $msg =~ s/\n/;/g;
+       log_event $log_event, to => $mail{To}, subject => $subj;
      }
   } else {
-		say STDERR "formcont :: send_mail : **ERROR** : $Mail::Sendmail::error\n";
+    log_event $log_event, status => "failed", error => $Mail::Sendmail::error;
   }
 }
 

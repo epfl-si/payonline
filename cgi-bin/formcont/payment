@@ -16,8 +16,6 @@ use payonline_tools;
 use formcont_tools;
 use formcont_templates;
 
-use v5.10;  # For say()
-
 use vars qw(%args $tmpldir $lang $errmsg $crtdate $lang);
 
 use utf8::all;
@@ -141,10 +139,7 @@ sub main {
 
   my $id_trans 	= gentablekey($userdata);
 
-say STDERR " ==>> formcont payment : args dump <<==\n";
-foreach my $item (keys %args) {
-	say STDERR "$item=$args{$item}\n";
-}
+  log_event("payment::main", %args);
 
   my $flow = YellowPayFlow::FormCont->current();
   my $hashdata = {
@@ -258,8 +253,8 @@ sub gentablekey {
 
  my $size = 18;
  while (1) {
-#say STDERR "payonline :: gentablekey ...";
-    srand (time ^ ($$ + ($$ << 15)));
+     log_event("formcont/payment::gentablekey");
+     srand (time ^ ($$ + ($$ << 15)));
     my $key = "";
     for (my $i = 0; $i < $size; $i++) {
       my $car .= int rand (35);
@@ -296,7 +291,7 @@ sub gentablekey {
       	email='$userdata->{email}',
       	id_transact='$userdata->{id_transact}'
       };
-say STDERR "formcont :: gentablekey : key=$key\n";
+      log_event("formcont/payment::gentablekey", key => $key);
       my $sth = dbquery ($sql);
       return $key if $sth;
     }
