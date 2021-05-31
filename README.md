@@ -14,20 +14,17 @@ Déploiement to test VMs
 
 Déploiement to prod VMs
 ```
-./deploy_prod.sh
+./deploy_prod.sh$
 ```
 
 ### Déploiement sur OpenShift
 
 Déploiement vers le namespace de test
 ```
-./deploy_os.sh  -t develop -n payonline-test
+./deploy_os.sh
 ```
 
-Déploiement vers le namespace de prod
-```
-./deploy_os.sh  -t v1.0.0 -n payonline-prod
-```
+Déploiement vers le namespace de prod → utiliser [le dépôt «ops»](https://github.com/epfl-si/payonline.ops)
 
 ## Troubleshooting
 
