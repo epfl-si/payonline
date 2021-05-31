@@ -2,7 +2,7 @@ use utf8::all;
 
 $messages = {
 		default_label => {
-			fr	=> q{<p>payonline-ops@groupes.epfl.ch met à votre disposition un canal d'encaissement électronique pour vos manifestations, conférences, vente de services, etc.<br>
+			fr	=> q{<p>payonline.epfl.ch met à votre disposition un canal d'encaissement électronique pour vos manifestations, conférences, vente de services, etc.<br>
 	L'accès à ce service est soumis au droit <b>payonline</b> du système d'accréditation. <br>
 	Veuillez contacter votre responsable accréditation pour plus de détails.</p>
 							},
