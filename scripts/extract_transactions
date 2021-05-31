@@ -63,8 +63,7 @@ sub extrans {
   my $sth_inst  = payonline_tools::dbquery ($sql);
   return unless $sth_inst;
 
-  open (OUT, ">$tmpfile") or die "err open payonline tmp : $!";
-  binmode(OUT, ":utf8");  
+  open (OUT, ">:encoding(latin-1)", $tmpfile) or die "err open payonline tmp : $!";
 
   my $count = 0;
   
