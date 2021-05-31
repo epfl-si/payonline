@@ -22,7 +22,7 @@ use Encode;
 
 use payonline_tools;
 
-my $mailresp	= 'idev-fsd@groupes.epfl.ch';
+my $mailresp	= 'payonline-ops@groupes.epfl.ch';
 my $mailSF		= $ENV{PAYONLINE_MAIL_SF_RECIPIENTS};
 
 my $separator	= ';';
