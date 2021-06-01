@@ -22,7 +22,6 @@ use Net::CIDR;
 use Net::CIDR ':all';
 use JSON;
 
-use Tequila::Client;
 use Cadi::CadiDB;
 use Cadi::Accreds;
 use Encode;
