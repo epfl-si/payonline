@@ -76,7 +76,7 @@ if ( $args{total} ) {
 
 	<script language="javascript">
 	var getPrix = new XMLHttpRequest();
-	getPrix.open("GET", "https://test-payonline.epfl.ch/cgi-bin/formcont/getPrix");
+	getPrix.open("GET", "/cgi-bin/formcont/getPrix");
 	getPrix.send();
 	getPrix.onreadystatechange=function() 
 	{
