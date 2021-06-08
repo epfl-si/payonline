@@ -105,7 +105,7 @@ my %nat_comptable = (
 			},
 );
 			
-my $mailSF		= 'marc.fromentin@epfl.ch,barbara.scheuner@epfl.ch,pascal.schweingruber@epfl.ch,pierre.fournier@epfl.ch';
+my $mailSF		= $ENV{PAYONLINE_INSTANCE_VALIDATION_NOTIFICATION_EMAIL};
 my $MyPrintID = 'xwmc1evtcdibo6b3cq1si1ozu2tb8uff';
 
   payonline_tools::setLog($logfile);
