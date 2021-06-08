@@ -1305,7 +1305,7 @@ sub initTempl {
    $template->param(sLangFR		=> 1) if $lang eq 'fr';
 
    $template->param(sSuperxvbUser=> $user->is_super_user);
-   $template->param(sRespAdmin=> join(",", $user->units_with_payonline_right));
+   $template->param(sRespPayonline=> join(",", $user->units_with_payonline_right));
    $template->param(sDebug 		=> $payonline_tools::DEBUG ? ' *** Attention : version de test. Ne pas utiliser, svp ! ***' : '');
 
 	 foreach my $msg (keys %{$messages}) {
