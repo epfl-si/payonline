@@ -257,7 +257,9 @@ sub listinst {
   $sql =~ s/and$//;
   $sql =~ s/where $//;
 
-  $sql .= $args{orderby} ? qq{ order by $args{orderby} }  : qq{ order by descr } ;
+  my ($orderby) = $args{orderby} ? $args{orderby} =~ m/(descr|etat|datedeb)/ : qw(descr);
+
+  $sql .= qq{ order by $orderby };
   # log_event "payonline", sql => $sql, params => \@params;
   my @inst;
   my $sth = payonline_tools::dbquery ($sql, @params);
