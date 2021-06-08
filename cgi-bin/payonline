@@ -17,6 +17,7 @@ use payonline_tools;
 
 use Devel::Confess;
 use vars qw(%args $tequila $key $user $tmpldir $lang $errmsg %CFs $crtdate	$messages);
+$user = Payonline::User->nobody;
 
 require 'messages.txt';
 

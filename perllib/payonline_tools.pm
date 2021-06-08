@@ -617,6 +617,13 @@ sub by_sciper {
   return bless { sciper => $sciper }, $class;
 }
 
+sub nobody {
+  my ($class) = @_;
+  return bless {
+    nom => "", prenom => "", email => "", sciper => ""
+   }, $class;
+}
+
 sub nom {
   my ($self) = @_;
   $self->_fetch_nom_prenom;
@@ -641,7 +648,7 @@ sub mail { shift->email }
 
 sub _fetch_nom_prenom {
   my ($self) = @_;
-  return if ($self->{nom} || $self->{prenom});
+  return if (exists $self->{nom} || exists $self->{prenom});
 
   my $sql = qq{select distinct sciper.nom_acc,sciper.prenom_acc from sciper where sciper.sciper=?};
   my $sth = _db_dinfo()->query ( $sql, ($self->{sciper})) or die "Unknown sciper in dinfo.sciper: $self->{sciper}";
@@ -651,7 +658,7 @@ sub _fetch_nom_prenom {
 
 sub _fetch_email {
   my ($self) = @_;
-  return if $self->{email};
+  return if exists $self->{email};
 
   my $sql = qq{select distinct emails.addrlog from emails where emails.sciper=?};
   my $sth = _db_dinfo()->query ($sql, ($self->{sciper})) or die "Unknown sciper in dinfo.emails: $self->{sciper}";
