@@ -17,7 +17,7 @@ use payonline_tools;
 use formcont_tools;
 use formcont_templates;
 
-use vars qw(%args $lang $errmsg $crtdate $sciper $key $tequila);
+use vars qw(%args $lang $errmsg $crtdate $sciper $access_granted $key $tequila);
 
 use utf8::all;
 binmode(STDOUT, ":utf8");
@@ -30,7 +30,6 @@ my $lang 		= 'fr';
 my @languages 	= ('fr','en');
 my $mailresp	= 'payonline-ops@groupes.epfl.ch';
 my $masterIP	= '128.178.1.146';
-my $accesslist	= '104782,213338,273001,242631,293099';
 my $URL			= '/cgi-bin/formcont/admin';
 
 init();
@@ -38,7 +37,7 @@ authenticate ();
 
 print formcont_templates::header ();
   
-error ('Accès réservé', 1) unless $accesslist =~ /$sciper/;
+error ('Accès réservé', 1) unless $access_granted;
 
 print qq{
 	<b>Actions</b><br>
@@ -242,11 +241,11 @@ sub authenticate {
   $tequila->setclientsesskey ($key) if $key;
   $tequila->setservice  	('Formcont : admin paiement en ligne');
   $tequila->setidentities 	('any');
-  $tequila->request     	('name','firstname','uniqueid');
+  $tequila->request     	('name','firstname','uniqueid', 'group');
 
   $tequila->authenticate ();
 
-  $key 		= $args {key};
-  $sciper 	= $tequila->{attrs}->{uniqueid};
-
+  $key 			= $args {key};
+  $sciper 		= $tequila->{attrs}->{uniqueid};
+  $access_granted	= grep { $_ eq $ENV{"PAYONLINE_FORMCONT_ADMIN_GROUP"} } (split m/,/, $tequila->{attrs}->{group});
 }
