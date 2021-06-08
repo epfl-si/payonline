@@ -26,6 +26,7 @@ use Cadi::Accreds;
 use Encode;
 
 use CGI qw/ :cgi-lib -utf8 /;
+$CGI::APPEND_QUERY_STRING = 1;
 
 use strict;
 use vars qw( $absdbh $DEBUG $logfile $errmsg $demfond $codeTVA
