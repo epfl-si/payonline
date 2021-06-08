@@ -822,7 +822,7 @@ Date fin : $datefin
 
   my $txt1 = qq{
 Veuillez cliquer sur ce lien pour valider les données financières de l'instance ci-dessus :
-http://payonline.epfl.ch/cgi-bin/};
+https://payonline.epfl.ch/cgi-bin/};
   $txt1 .= "dev/" if $payonline_tools::DEBUG;
   $txt1 .= qq{payonline/detinst?id=$id&lang=$lang
 

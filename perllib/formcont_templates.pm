@@ -32,7 +32,7 @@ a:hover {
 
 <body>
 
-<div class="logobox"><a href="http://www.formation-continue-unil-epfl.ch/"><img src="https://payonline.epfl.ch/images/formcont-logo.png" alt="Formation continue UNIL/EPFL" border="0"></a></div>
+<div class="logobox"><a href="http://www.formation-continue-unil-epfl.ch/"><img src="/images/formcont-logo.png" alt="Formation continue UNIL/EPFL" border="0"></a></div>
 };
 }
 
