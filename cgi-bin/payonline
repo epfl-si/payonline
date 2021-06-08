@@ -16,7 +16,7 @@ use HTML::Template;
 use payonline_tools;
 
 use Devel::Confess;
-use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits $tmpldir $lang $errmsg %CFs $crtdate	$messages);
+use vars qw(%args $tequila $key $user $respunits $tmpldir $lang $errmsg %CFs $crtdate	$messages);
 
 require 'messages.txt';
 
@@ -206,7 +206,7 @@ sub listinst {
 
   my $sql = qq{select * from instances };
   my @params;
-  unless (payonline_tools::IsSuperUser($sciper)) {
+  unless ($user->is_super_user) {
   	$sql .= qq{where cf in ($cfs)} ;
   }
   if ($args{no_inst}) {
@@ -267,17 +267,17 @@ sub listinst {
    	$sEditTxt  = qq{$me/detinst?id=$id&lang=$lang}	;
    	my $style  = $etat =~ /^inactive/ ? 'inactive' : $etat;
 
-    my $resp = payonline_tools::getPersonInfos ($tsciper);
+    my $resp = Payonline::User->by_sciper($tsciper);
 
     my %item = (
 	  'id', $id,
-	  'respNom', $resp->{nom},
-	  'respPrenom', $resp->{prenom},
-	  'respMail', $resp->{mail},
+	  'respNom', $resp->nom,
+	  'respPrenom', $resp->prenom,
+	  'respMail', $resp->mail,
 	  'sPathMe', $me,
 	  'sEdit',$sEditTxt,
 	  'fonds', $fonds,
-	  'sIsSuperUSer', payonline_tools::IsSuperUser($sciper),
+	  'sIsSuperUSer', $user->is_super_user,
 	  'sresp', $tsciper,
 	  'etat',$etat,
 	  'style', $style,
@@ -295,7 +295,7 @@ sub listinst {
   $template->param(sErrMsg 	=> $errmsg);
   $template->param(sAuthstr	=> 1 );
   $template->param(sEtat	=> $args{etat});
-  $template->param(sIsSuperUSer	=> payonline_tools::IsSuperUser($sciper) );
+  $template->param(sIsSuperUSer	=> $user->is_super_user );
   $template->param(sLoop	=> \@inst );
   print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
   exit;
@@ -351,9 +351,9 @@ sub dettrans {
   my $urlconf		= $resultinst->{urlconf};
   my $etatinst		= $resultinst->{etat};
   my $queryArgs 	= payonline_tools::getArgs($result->{query});
-  my $resp 			= payonline_tools::getPersonInfos ($resp_sciper);
-  $template->param(respNom 		=> $resp->{nom});
-  $template->param(respPrenom 	=> $resp->{prenom});
+  my $resp 			= Payonline::User->by_sciper($resp_sciper);
+  $template->param(respNom 		=> $resp->nom);
+  $template->param(respPrenom 	=> $resp->prenom);
   $template->param(fonds 		=> $fonds);
   $template->param(naturecomptable => $naturecomptable);
   $template->param(urlconf 		=> $urlconf);
@@ -447,7 +447,7 @@ sub listtrans {
     );
     push(@inst, \%item);
   }
-  my $resp = payonline_tools::getPersonInfos ($resp_sciper);
+  my $resp = Payonline::User->by_sciper($resp_sciper);
   my $sOtherTitle = qq{<a href="$me/listtrans?lang=$lang&id=$id_inst};
   $sOtherTitle   .=	$args{op} ? qq{">$errmsgs{$lang}->[12]  <img src=/images/ok.gif border=0 align=middle></a>} : qq{&op=notpayed">$errmsgs{$lang}->[13] <img src=/images/ko.gif border=0 align=middle></a>};
   my $sOp = qq{&op=notpayed} if $args{op} eq 'notpayed';
@@ -456,8 +456,8 @@ sub listtrans {
 	 'sTitle' 		, $args{op} ? "$errmsgs{$lang}->[13] <img src=/images/ko.gif align=middle>" : "$errmsgs{$lang}->[12] <img src=/images/ok.gif align=middle>",
 	 'sOtherTitle'	, $sOtherTitle,
 	 'sOp'			, $sOp,
-	 'respNom' 		, $resp->{nom},
-	 'respPrenom' 	, $resp->{prenom},
+	 'respNom' 		, $resp->nom,
+	 'respPrenom' 	, $resp->prenom,
 	 'fonds' 		, $fonds,
 	 'naturecomptable' , $naturecomptable,
 	 'urlconf' 		, $urlconf,
@@ -574,7 +574,7 @@ sub detinst {
   }
   
   my ($sql, $cfs, @params);
-  if (payonline_tools::IsSuperUser($sciper)) {
+  if ($user->is_super_user) {
   	$sql = qq{select * from instances where id = ?};
   	push @params, $id;
   } else {
@@ -599,7 +599,7 @@ sub detinst {
   }
   my $selfonds = $result->{fonds};
 
-  if (payonline_tools::IsSuperUser($sciper)) {
+  if ($user->is_super_user) {
 		my $ref_units = $payonline_tools::Accreds->getAllUnitsWhereHasRight ($result->{sciper}, 38);	#	- 'payonline'
 		$respunits = join ",", keys %$ref_units;
 		foreach my $cfline (payonline_tools::getCFs($respunits)) {
@@ -651,11 +651,11 @@ sub detinst {
   }
   $nat_comptable_txt .= qq{</select>};
 
-  if ( ($result->{etat} eq 'prod') && ! payonline_tools::IsSuperUser($sciper) ) {
+  if ( ($result->{etat} eq 'prod') && ! $user->is_super_user ) {
   	$nat_comptable_txt = qq{<input type="hidden" name="naturecomptable" value="$result->{naturecomptable}"> $ncref->{$result->{naturecomptable}}};
   }
 
-  my $resp 		= payonline_tools::getPersonInfos ($result->{sciper});
+  my $resp 		= Payonline::User->by_sciper($result->{sciper});
   my $selCHF	= 'selected' if $result->{monnaie} eq 'CHF';
   my $selEUR	= 'selected' if $result->{monnaie} eq 'EUR';
   my $selUSD	= 'selected' if $result->{monnaie} eq 'USD';
@@ -665,30 +665,30 @@ sub detinst {
 	   <option value="USD" $selUSD>USD</option>
   </select>};
 
-  if ( ($result->{etat} eq 'prod') && ! payonline_tools::IsSuperUser($sciper) ) {
+  if ( ($result->{etat} eq 'prod') && ! $user->is_super_user ) {
   	$monnaietxt = qq{<input type="hidden" name="monnaie" value="$result->{monnaie}"> $result->{monnaie}};
   }
-  $template->param(IsSuperUser => payonline_tools::IsSuperUser($sciper));
+  $template->param(IsSuperUser => $user->is_super_user);
 #  $template->param(IsSuperUser => 0);
   
-  $template->param(IsSuperUser => payonline_tools::IsSuperUser($sciper));
+  $template->param(IsSuperUser => $user->is_super_user);
   $template->param(sMonnaie		=> $monnaietxt );
   $template->param(id 				=> $result->{id});
   $template->param(sDelValid	=> ($result->{etat} eq 'test'));
-  $template->param(sValid			=> ($result->{etat} eq 'validation') && payonline_tools::IsSuperUser($sciper));
+  $template->param(sValid			=> ($result->{etat} eq 'validation') && $user->is_super_user);
 
   $template->param(sActivate	=> $result->{etat} =~ /^inactive/);
   $template->param(sInactivate=> $result->{etat} =~ /^test|^prod/);
-  $template->param(respNom 		=> $resp->{nom});
-  $template->param(respPrenom => $resp->{prenom});
-  $template->param(respMail 	=> $resp->{mail});
+  $template->param(respNom 		=> $resp->nom);
+  $template->param(respPrenom => $resp->prenom);
+  $template->param(respMail 	=> $resp->mail);
   $template->param(sCodeTVA		=> $codeTVAtxt );
   $template->param(sNCTxt			=> $nat_comptable_txt );
 #  $template->param(sMonnaie		=> $result->{monnaie} ?  $result->{monnaie} : 'CHF' );
   $template->param(urlconf		=> $result->{urlconf});
   $template->param(etat 			=> $result->{etat});
 
-  if ( ($result->{etat} eq 'prod') && ! payonline_tools::IsSuperUser($sciper) ) {
+  if ( ($result->{etat} eq 'prod') && ! $user->is_super_user ) {
 	  $template->param(sNoEdit	=> 1);
 	  $template->param(sFonds		=> $seltxt21 );
   } else {
@@ -801,18 +801,17 @@ sub demvalid {
   
   $sql = qq{update instances set etat='validation' where id=?};
   payonline_tools::dbquery ($sql, ($id));
-  payonline_tools::write_log_db ($sciper, qq{demvalid::$id});
+  payonline_tools::write_log_db ($user, qq{demvalid::$id});
 
   # - send mail to SF
 
-   my $resp = payonline_tools::getPersonInfos ($sciper);
    my $txt = qq{
 *Demande de validation d'instance de paiement*
 
 Instance no: $id
 OIS : $ois
 Description : $descr
-Responsable : $resp->{prenom} $resp->{nom} [sciper: $sciper, mail:$resp->{mail}]
+Responsable : $user->prenom $user->nom [sciper: $user->sciper, mail:$user->mail]
 Centre financier : $cf
 Fonds : $fonds
 Date début: $datedeb
@@ -897,7 +896,7 @@ sub doneinst {
      $cfs =~ s/^,//;
 
      my $sql = qq{select * from instances where id = ?}; 
-     $sql   .= qq{ and cf in ($cfs)} unless (payonline_tools::IsSuperUser($sciper)) ;
+     $sql   .= qq{ and cf in ($cfs)} unless ($user->is_super_user) ;
      my $sth = payonline_tools::dbquery ($sql, ($id));
      my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$monnaie,$mailinst,$contact,$ois) = $sth->fetchrow_array ();
 
@@ -931,7 +930,7 @@ sub doneinst {
 		  <li>mailinst=$mailinst
 		  <li>contact=$contact
        };
-       payonline_tools::write_log_db ($sciper, qq{delinst::$id;$cf;$fonds;$naturecomptable;$urlconf;$descr;$datedeb;$datefin;$monnaie;$url});
+       payonline_tools::write_log_db ($user, qq{delinst::$id;$cf;$fonds;$naturecomptable;$urlconf;$descr;$datedeb;$datefin;$monnaie;$url});
        $template->param(sMsg 	=> $msg);
        $template->param(sAuthstr	=> 1 );
        print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
@@ -965,7 +964,7 @@ sub doneinst {
   
   my ($msg, $sql);
   if ($id) {
-	if ($args{valid} and payonline_tools::IsSuperUser($sciper) and $etat_precedent eq 'validation') {
+	if ($args{valid} and $user->is_super_user and $etat_precedent eq 'validation') {
 	# - validation
 		$sql = qq{update instances set
 		  cf=?,
@@ -1018,14 +1017,13 @@ sub doneinst {
 	  payonline_tools::dbquery($sql, ($id));
 
      # - send mail to SF
-	  my $resp = payonline_tools::getPersonInfos ($sciper);
 	  my $txt = qq{
 *Validation d'instance de paiement*
 
 Instance no: $id
 OIS : $ois
 Description : $descr
-Responsable : $resp->{prenom} $resp->{nom} [sciper: $sciper, mail:$resp->{mail}]
+Responsable : $user->prenom $user->nom [sciper: $user->{sciper}, mail:$user->mail]
 Centre financier : $CF
 Fonds : $Fonds
 Compte budgétaire : $naturecomptable
@@ -1043,10 +1041,10 @@ Toutes les transactions de test ont été effacées.
 
 Votre service de paiement en ligne
 };
-	  payonline_tools::send_mail ($resp->{mail}, 'payonline : validation instance de paiement', $txt) ;
+	  payonline_tools::send_mail ($user->mail, 'payonline : validation instance de paiement', $txt) ;
 
-	  payonline_tools::write_log_db ($sciper, qq{del_test_trasact::$id});
-	  payonline_tools::write_log_db ($sciper, qq{validinst::$id;$CF;$Fonds;$naturecomptable;$codetva;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$url;$mailinst;$contact});
+	  payonline_tools::write_log_db ($user, qq{del_test_trasact::$id});
+	  payonline_tools::write_log_db ($user, qq{validinst::$id;$CF;$Fonds;$naturecomptable;$codetva;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$url;$mailinst;$contact});
 
 	   } elsif ($args{mod}) {
 	# - mise a jour
@@ -1095,7 +1093,7 @@ Votre service de paiement en ligne
 		<li>bypass return=$bypass_return
 		};
 
-		payonline_tools::write_log_db ($sciper, qq{modinst::$id;$etat;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
+		payonline_tools::write_log_db ($user, qq{modinst::$id;$etat;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
 
 	   } elsif ($args{activate}) {
 	# - activer instance
@@ -1123,7 +1121,7 @@ Votre service de paiement en ligne
 		<li>bypass return=$bypass_return
 		};
 
-		payonline_tools::write_log_db ($sciper, qq{modinst:active=$etat:$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
+		payonline_tools::write_log_db ($user, qq{modinst:active=$etat:$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
 
 	   } elsif ($args{inactivate}) {
 	# - inactiver instance
@@ -1151,7 +1149,7 @@ Votre service de paiement en ligne
 		<li>bypass return=$bypass_return
 		};
 
-		payonline_tools::write_log_db ($sciper, qq{modinst:inactive:$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
+		payonline_tools::write_log_db ($user, qq{modinst:inactive:$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
 
 	}
 	
@@ -1179,9 +1177,9 @@ Votre service de paiement en ligne
   	   where   	   id=?
      };
      
-     payonline_tools::dbquery($sql, ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$sciper,$monnaie,$urlconf,$bypass_cg,$bypass_return,$id));
+     payonline_tools::dbquery($sql, ($CF,$Fonds,$ois,$descr,$datedebvalide,$datefinvalide,$url,$mailinst,$contact,$naturecomptable,$user->{sciper},$monnaie,$urlconf,$bypass_cg,$bypass_return,$id));
      
-     payonline_tools::write_log_db ($sciper, qq{newinst::$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
+     payonline_tools::write_log_db ($user, qq{newinst::$id;$CF;$Fonds;$naturecomptable;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$monnaie;$url;$mailinst;$contact});
      $msg = qq{
       <h3>L'instance no "$id" a été créée</h3>
       l'instance est en mode de <b>test</b>
@@ -1265,7 +1263,7 @@ sub donefnd {
   my $txt = qq{
   Demande de fonds pour le paiement en ligne
   
-  Sciper responsable: $sciper
+  Sciper responsable: $user->{sciper}
   Centre Financier:   $CF
   Raison de la demande:
   $descr
@@ -1275,7 +1273,7 @@ sub donefnd {
   my $subj = qq{Paiement en ligne: demande de fonds};
 
   payonline_tools::send_mail ($payonline_tools::demfond, $subj, $txt);
-  payonline_tools::write_log_db ($sciper, "demfonds cf:$CF, descr:$descr");
+  payonline_tools::write_log_db ($user, "demfonds cf:$CF, descr:$descr");
 
   $template->param(sAuthstr		=> 1 );
   $template->param(sTxt			=> $txt );
@@ -1302,13 +1300,13 @@ sub initTempl {
    $year += 1900;
    $template->param(sCrtYear 	=> $year);
    $template->param(sPathMe 	=> $me);
-   $template->param(sID 			=> $sciper);
-   $template->param(sPrenom 	=> $prenom);
-   $template->param(sNom 			=> $nom);
+   $template->param(sID 			=> $user->{sciper});
+   $template->param(sPrenom 	=> $user->prenom);
+   $template->param(sNom 			=> $user->nom);
    $template->param(sLang			=> $lang);
    $template->param(sLangFR		=> 1) if $lang eq 'fr';
 
-   $template->param(sSuperxvbUser=> payonline_tools::IsSuperUser($sciper));
+   $template->param(sSuperxvbUser=> $user->is_super_user);
    $template->param(sRespAdmin=> $respunits);
    $template->param(sDebug 		=> $payonline_tools::DEBUG ? ' *** Attention : version de test. Ne pas utiliser, svp ! ***' : '');
 
@@ -1318,17 +1316,6 @@ sub initTempl {
 	 }
 
    return $template;
-}
-
-use Encode;
-
-sub tequila_to_unicode {
-  my ($bytes) = @_;
-  if (utf8::is_utf8($bytes)) {
-    return $bytes;
-  } else {
-    return Encode::decode('UTF-8', $bytes,     Encode::FB_CROAK);
-  }
 }
 
 #------
@@ -1349,19 +1336,15 @@ sub authenticate {
   $tequila->authenticate ();
 
   $key 		= $args {key};
-  $sciper 	= $tequila->{attrs}->{uniqueid};
-  $args{sciper} = $sciper;
-  $nom 		= tequila_to_unicode($tequila->{attrs}->{name});
-  $prenom 	= tequila_to_unicode($tequila->{attrs}->{firstname});
-  $email 	= $tequila->{attrs}->{email};
+  $user         = Payonline::User->from_tequila_attrs($tequila->{attrs});
   
 # impersonate
-#  $sciper 	 = '106442' if $sciper eq '104782';
+#  $user->{sciper} 	 = '106442' if $user->{sciper} eq '104782';
 
-  my $ref_units = $payonline_tools::Accreds->getAllUnitsWhereHasRight ($sciper, 38);	#	- 'payonline'
+  my $ref_units = $payonline_tools::Accreds->getAllUnitsWhereHasRight ($user->{sciper}, 38);	#	- 'payonline'
   $respunits = join ",", keys %$ref_units;
   
-  unless (payonline_tools::IsSuperUser($sciper) or $respunits) {
+  unless ($user->is_super_user or $respunits) {
     my $template = initTempl('default.tmpl');
     $template->param(sErrMsg => qq{Pas de droits pour ce service : le droit <b>payonline</b> est requis.
     	<br>Plus de détails auprès de votre responsable accréditation.});
@@ -1370,7 +1353,7 @@ sub authenticate {
   }
   
   my $fonds = payonline_tools::getFonds ($respunits);
-  unless (payonline_tools::IsSuperUser($sciper) or scalar (keys %$fonds)) {
+  unless ($user->is_super_user or scalar (keys %$fonds)) {
     my $template = initTempl('default.tmpl');
     $template->param(sErrMsg => qq{Pas de fonds ouverts disponibles.
     	<br>Plus de détails auprès de votre accréditeur.});
@@ -1380,13 +1363,12 @@ sub authenticate {
 
   log_event "payonline::authenticate", fonds => $fonds;
 
-  my ($n1, $n2) = split(/,/, $nom)    if ($nom =~ /,/);
-  $nom = $n1 if $n2;
-  my ($n1, $n2) = split(/,/, $prenom) if ($prenom =~ /,/);
-  $prenom = $n1 if $n2;
-  log_event "payonline::authenticate", sciper => $sciper, nom => $nom, prenom => $prenom,
+  my ($n1, $n2) = split(/,/, $user->nom)    if ($user->nom =~ /,/);
+  $user->nom = $n1 if $n2;
+  my ($n1, $n2) = split(/,/, $user->prenom) if ($user->prenom =~ /,/);
+  $user->prenom = $n1 if $n2;
+  log_event "payonline::authenticate", sciper => $user->sciper, nom => $user->nom, prenom => $user->prenom,
     respunits => $respunits;
-
 }
 
 #--------

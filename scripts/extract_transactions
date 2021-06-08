@@ -161,10 +161,10 @@ sub closeinst {
   my $sql = qq{select * from instances where DATEDIFF(datefin,TIMESTAMP('$date')) < '00:00:00' and etat <> 'archive'};
   my $sth 	= payonline_tools::dbquery ($sql);
   while (my $result = $sth->fetchrow_hashref) {
-   my $resp = payonline_tools::getPersonInfos ($result->{sciper});
+   my $resp = Payonline::User->by_sciper($result->{sciper});
    my $txt = qq{Instance no: $result->{id} passe en mode *archive*
 Description : $result->{descr}
-Responsable : $resp->{prenom} $resp->{nom} [sciper: $result->{sciper}, mail:$resp->{mail}]
+Responsable : $resp->prenom $resp->nom [sciper: $result->{sciper}, mail:$resp->mail]
 Centre financier : $result->{cf}
 Fonds : $result->{fonds}
 Compte budgétaire : $result->{naturecomptable}
@@ -173,7 +173,7 @@ Date début: $result->{datedeb}
 Date fin : $result->{datefin}
 };
 
-   my $dest = $payonline_tools::DEBUG ? '' : $resp->{mail} ;
+   my $dest = $payonline_tools::DEBUG ? '' : $resp->mail ;
    payonline_tools::send_mail ($dest, 'payonline : fermeture instance de paiement', $txt) ;
 
    payonline_tools::dbquery (qq{update instances set etat='archive' where id='$result->{id}'});

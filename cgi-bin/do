@@ -370,7 +370,7 @@ sub result {
   }
   
   $resultcode 	= '' if $trans->{etat} ne 'payé';
-  my $resp  		= payonline_tools::getPersonInfos ($inst->{sciper});
+  my $resp  		= Payonline::User->by_sciper($inst->{sciper});
   my $query			= payonline_tools::getQuery ($id_trans);
   my $email 		= $query->{Email};
   $lang 				= $query->{lang} ? $query->{lang} : 'en';
@@ -397,8 +397,8 @@ sub result {
 	  $template->param(Resp 		=> $inst->{contact});
 	  $template->param(RespMail 	=> $inst->{contact});
   } else {
-	  $template->param(Resp 		=> "$resp->{prenom} $resp->{nom}");
-	  $template->param(RespMail 	=> $resp->{mail});
+	  $template->param(Resp 		=> "$resp->prenom $resp->nom");
+	  $template->param(RespMail 	=> $resp->mail);
   }
 
 

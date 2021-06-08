@@ -22,14 +22,13 @@ use Net::CIDR;
 use Net::CIDR ':all';
 use JSON;
 
-use Cadi::CadiDB;
 use Cadi::Accreds;
 use Encode;
 
 use CGI qw/ :cgi-lib -utf8 /;
 
 use strict;
-use vars qw( $absdbh $DEBUG $su_list $logfile $errmsg $demfond $codeTVA
+use vars qw( $absdbh $DEBUG $logfile $errmsg $demfond $codeTVA
             $tmpldir
             $ges_list $HMAC_salts $PayonlineShopID $db_dinfo $Rights $Accreds $rejectIP
            $epflLOGO $mailFrom $mailBcc $exceptions $CAMIPROload);
@@ -57,7 +56,6 @@ $rejectIP = ('128.178.109.243','157.55.39.166');	#	crawlers
 
 $epflLOGO	= 'https://web2018.epfl.ch/2.0.0/icons/epfl-logo.svg';
 $demfond 	= 'bertold.walther@epfl.ch,payonline-ops@groupes.epfl.ch';
-$su_list	= '104782,149509,105640,146727,159357,148402,114746,181537,107490,254724,229454,268229';	# - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
 $codeTVA	= 'Q7';
 $mailFrom	= 'noreply@epfl.ch';
 
@@ -318,15 +316,6 @@ sub loadargs {
   return Vars;
 }
 #--------
-sub IsSuperUser {
-  my ($mysciper) = @_;
-
-  return 0 unless $mysciper;
-  return 1 if ($su_list =~ /\b$mysciper\b/);
-
-  return 0;
-}
-#--------
 sub getCFs {
   my ($unitlist) = @_;
   
@@ -407,30 +396,11 @@ sub dbquery {
 
 #--------
 sub write_log_db {
-  my ($sciper, $descr) = @_;
+  my ($user, $descr) = @_;
   
-  dbquery ("insert into logs set ts=now(),	sciper=?,	ip='$ENV{REMOTE_ADDR}',	descr=?", ($sciper, $descr));
+  dbquery ("insert into logs set ts=now(),	sciper=?,	ip='$ENV{REMOTE_ADDR}',	descr=?", ($user->sciper, $descr));
 }
 
-#--------
-sub getPersonInfos {
-	my $sciper = shift;
-#        log_event "payonline::getPersonInfos", sciper => $sciper;
-	my $sql = qq{select distinct dinfo.sciper.nom_acc,dinfo.sciper.prenom_acc from dinfo.sciper where dinfo.sciper.sciper=?};
-	my $sth = $db_dinfo->query ( $sql, ($sciper)) or return;
-	my ($nom, $prenom) = $sth->fetchrow_array ();
-	$sql = qq{select distinct dinfo.emails.addrlog from dinfo.emails where dinfo.emails.sciper=?};
-	$sth = $db_dinfo->query ($sql, ($sciper)) or return;
-	my ($mail) = $sth->fetchrow;
-
-	my %persdata = (
-		sciper => $sciper,
-		nom 	 => $nom,
-		prenom => $prenom,
-		mail 	 => $mail,
-	); 
-	\%persdata;
-}
 
 #--------
 sub getTrans {
@@ -664,6 +634,101 @@ sub by_instance {
 sub makeHash {
   my ($self, $struct) = @_;
   return YellowPayFlow::_makeHash($struct, $self->{hmac});
+}
+
+package Payonline::User;  #######################################
+
+use Encode;
+use Cadi::CadiDB;
+
+sub from_tequila_attrs {
+  my ($class, $tequila_attrs) = @_;
+  return bless {
+    sciper => $tequila_attrs->{uniqueid},
+    nom    => _tequila_to_unicode($tequila_attrs->{name}),
+    prenom => _tequila_to_unicode($tequila_attrs->{firstname}),
+    email  => $tequila_attrs->{email},
+
+   }, $class;
+}
+
+sub by_sciper {
+  my ($class, $sciper) = @_;
+
+  return bless { sciper => $sciper }, $class;
+}
+
+sub nom {
+  my ($self) = @_;
+  $self->_fetch_nom_prenom;
+  return $self->{nom};
+}
+
+sub prenom {
+  my ($self) = @_;
+  $self->_fetch_nom_prenom;
+  return $self->{prenom};
+}
+
+sub email {
+  my ($self) = @_;
+  $self->_fetch_email;
+  return $self->{email};
+}
+
+sub sciper { shift->{sciper} }
+
+sub mail { shift->email }
+
+sub _fetch_nom_prenom {
+  my ($self) = @_;
+  return if ($self->{nom} || $self->{prenom});
+
+  my $sql = qq{select distinct sciper.nom_acc,sciper.prenom_acc from sciper where sciper.sciper=?};
+  my $sth = _db_dinfo()->query ( $sql, ($self->{sciper})) or die "Unknown sciper in dinfo.sciper: $self->{sciper}";
+
+  ($self->{nom}, $self->{prenom}) = $sth->fetchrow_array();
+}
+
+sub _fetch_email {
+  my ($self) = @_;
+  return if $self->{email};
+
+  my $sql = qq{select distinct emails.addrlog from emails where emails.sciper=?};
+  my $sth = _db_dinfo()->query ($sql, ($self->{sciper})) or die "Unknown sciper in dinfo.emails: $self->{sciper}";
+
+  ($self->{email}) = $sth->fetchrow;
+}
+
+sub is_super_user {
+  my ($self) = @_;
+
+  my @su_list = qw(104782 149509 105640 146727 159357 148402 114746 181537 107490 254724 229454 268229);   # - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
+
+  return !! grep { $_ == $self->{sciper} } @su_list;
+}
+
+sub _tequila_to_unicode {
+  my ($bytes) = @_;
+  if (utf8::is_utf8($bytes)) {
+    return $bytes;
+  } else {
+    return Encode::decode('UTF-8', $bytes, Encode::FB_CROAK);
+  }
+}
+
+{
+  my $db_dinfo;
+
+  sub _db_dinfo {
+    if (! $db_dinfo) {
+      $db_dinfo = new Cadi::CadiDB (
+        dbname => 'dinfo',
+        trace => 1,
+        utf8 => 1,
+       );
+    }
+    return $db_dinfo;
 }
 
 1;
