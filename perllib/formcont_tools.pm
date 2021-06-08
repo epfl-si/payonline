@@ -18,7 +18,7 @@ sub dbconnect {
   my $dbname  = 'formcont';
   my $dbuser  = 'formcont';
   my $dbpwd   = $dbuser.'59';
-  my $dbhost  = is_prod ? 'test-cadidb.epfl.ch' : 'cadidb.epfl.ch';
+  my $dbhost  = is_prod ? 'cadidb.epfl.ch' : 'test-cadidb.epfl.ch';
 
   die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
   my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306};
