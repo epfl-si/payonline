@@ -14,7 +14,7 @@ use strict;
 use payonline_tools;
 use formcont_tools;
 
-use vars qw(%args $tequila $key $sciper $email $nom $prenom $respunits 
+use vars qw(%args $tequila $key $sciper $email $nom $prenom
 	$tmpldir $lang $errmsg %CFs $crtdate
 	);
 

@@ -30,7 +30,7 @@ use CGI qw/ :cgi-lib -utf8 /;
 use strict;
 use vars qw( $absdbh $DEBUG $logfile $errmsg $demfond $codeTVA
             $tmpldir
-            $ges_list $HMAC_salts $PayonlineShopID $db_dinfo $Rights $Accreds $rejectIP
+            $ges_list $HMAC_salts $PayonlineShopID $Rights $rejectIP
            $epflLOGO $mailFrom $mailBcc $exceptions $CAMIPROload);
 
 use base 'Exporter'; our @EXPORT = our @EXPORT_OK = qw(log_event);
@@ -129,13 +129,6 @@ sub init {
 	  accreddbname => 'accred',
 	   dinfodbname => 'dinfo',
 	};
-	$db_dinfo = new Cadi::CadiDB (
-	  dbname => 'dinfo',
-	   trace => 1,
-		utf8 => 1,
-	) unless $db_dinfo;
-	die "FATAL dinfo DB ACCESS" unless $db_dinfo;
-	$Accreds = new Cadi::Accreds (caller => '104782', utf8 => 1);
 }
 
 #--------
@@ -314,40 +307,6 @@ sub genkey {
 #--------
 sub loadargs {
   return Vars;
-}
-#--------
-sub getCFs {
-  my ($unitlist) = @_;
-  
-  $unitlist    =~ s/,/\',\'/g;
-  my @cfs;
-  my $sql = qq{select cf,sigle from dinfo.unites where id_unite in (\'$unitlist\')};
-  my $sth = $db_dinfo->query ( $sql);
-  while (my ($cf,$sigle) = $sth->fetchrow_array ()) {
-    next unless $cf;
-    push (@cfs, "$sigle:$cf");
-  }
-  return (sort @cfs);
-}
-
-#--------
-sub getFonds {
-  my ($unitlist) = @_;
-  
-  $unitlist    =~ s/,/\',\'/g;
-  my $fondsperCF;
-  my $sql = qq{select cf from dinfo.unites where id_unite in (\'$unitlist\')};
-  my $sth = $db_dinfo->query ( $sql);
-  while (my ($cf) = $sth->fetchrow_array ()) {
-    my @fonds;
-    $sql = qq{select no_fond,libelle from dinfo.fonds where cf = ? and etat='O'};
-    my $sth = $db_dinfo->query ( $sql, ("F$cf"));
-    while (my ($no_fond,$libelle) = $sth->fetchrow_array ()) {
-      push (@fonds, "$no_fond:$libelle");
-    }
-    $fondsperCF->{$cf} = \@fonds;
-  }
-  return $fondsperCF;
 }
 #=============
 sub dbconnect {
@@ -717,6 +676,50 @@ sub _tequila_to_unicode {
   }
 }
 
+sub cfs {
+  my ($self) = @_;
+  my $unitlist = join ",", map { qq('$_') } $self->units_with_payonline_right;
+
+  my @cfs;
+  my $sql = qq{select cf,sigle from dinfo.unites where id_unite in ($unitlist)};
+  my $sth = _db_dinfo()->query ( $sql);
+  while (my ($cf,$sigle) = $sth->fetchrow_array ()) {
+    next unless $cf;
+    push (@cfs, "$sigle:$cf");
+  }
+  return (sort @cfs);
+}
+
+sub fonds {
+  my ($self) = @_;
+  my $unitlist = join ",", map { qq('$_') } $self->units_with_payonline_right;
+
+  my $fondsperCF;
+  my $sql = qq{select cf from dinfo.unites where id_unite in ($unitlist)};
+  my $sth = _db_dinfo()->query ( $sql);
+  while (my ($cf) = $sth->fetchrow_array ()) {
+    my @fonds;
+    $sql = qq{select no_fond,libelle from dinfo.fonds where cf = ? and etat='O'};
+    my $sth = _db_dinfo()->query ( $sql, ("F$cf"));
+    while (my ($no_fond,$libelle) = $sth->fetchrow_array ()) {
+      push (@fonds, "$no_fond:$libelle");
+    }
+    $fondsperCF->{$cf} = \@fonds;
+  }
+  return $fondsperCF;
+}
+
+sub units_with_payonline_right {
+  my ($self) = @_;
+
+  if (! $self->{_units_with_payonline_right}) {
+    my $payonline_right_id = 38;
+    $self->{_units_with_payonline_right} = [keys %{ _accreds()->getAllUnitsWhereHasRight(
+      $self->{sciper}, $payonline_right_id) }];
+  }
+  return @{$self->{_units_with_payonline_right}};
+}
+
 {
   my $db_dinfo;
 
@@ -729,6 +732,16 @@ sub _tequila_to_unicode {
        );
     }
     return $db_dinfo;
+  }
+
+  my $accreds;
+  sub _accreds {
+    if (! $accreds) {
+      $accreds = new Cadi::Accreds (caller => '104782', utf8 => 1);
+    }
+    return $accreds;
+  }
+
 }
 
 1;
