@@ -30,7 +30,7 @@ use CGI qw/ :cgi-lib -utf8 /;
 use strict;
 use vars qw( $absdbh $DEBUG $logfile $errmsg $demfond $codeTVA
             $tmpldir
-            $ges_list $HMAC_salts $PayonlineShopID $Rights $rejectIP
+            $ges_list $HMAC_salts $PayonlineShopID $rejectIP
            $epflLOGO $mailFrom $mailBcc $exceptions $CAMIPROload);
 
 use base 'Exporter'; our @EXPORT = our @EXPORT_OK = qw(log_event);
