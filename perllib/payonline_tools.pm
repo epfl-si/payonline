@@ -607,7 +607,7 @@ sub from_tequila_attrs {
     nom    => _tequila_to_unicode($tequila_attrs->{name}),
     prenom => _tequila_to_unicode($tequila_attrs->{firstname}),
     email  => $tequila_attrs->{email},
-
+    groups => [split m/,/, $tequila_attrs->{group}]
    }, $class;
 }
 
@@ -662,9 +662,7 @@ sub _fetch_email {
 sub is_super_user {
   my ($self) = @_;
 
-  my @su_list = qw(104782 149509 105640 146727 159357 148402 114746 181537 107490 254724 229454 268229);   # - ic, pschw, cl, mschl, bg-m, mf, bw, pf, nr
-
-  return !! grep { $_ == $self->{sciper} } @su_list;
+  return !! grep { $_ eq $ENV{PAYONLINE_SUPERUSER_GROUP} } @{$self->{groups}};
 }
 
 sub _tequila_to_unicode {

@@ -1322,7 +1322,7 @@ sub authenticate {
   unless ($tequila) {
 	$tequila = new Tequila::Client (
 	  service    => 'paiement en ligne',
-	  request    => [ 'name','firstname','uniqueid','email' ],
+	  request    => [ 'name','firstname','uniqueid','email', 'group' ],
 	  identities => 'any',
 	  urlaccess  => "https://$ENV{SERVER_NAME}/cgi-bin/payonline/priv?$ENV{QUERY_STRING}",
 	);
