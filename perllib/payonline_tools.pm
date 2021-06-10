@@ -39,8 +39,6 @@ use base 'Exporter'; our @EXPORT = our @EXPORT_OK = qw(log_event);
 require '/opt/dinfo/etc/params';
 
 my $me 		= $ENV {SCRIPT_NAME};
-my $us 		= $ENV {SERVER_NAME};
-my $qs 		= $ENV {QUERY_STRING};
 my $pi 		= $ENV {PATH_INFO};
 my @days 	= (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 my $resp 	= 'payonline-ops@groupes.epfl.ch';

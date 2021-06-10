@@ -22,8 +22,6 @@ use utf8::all;
 binmode(STDOUT, ":utf8");
 
 my $me 			= $ENV {SCRIPT_NAME};
-my $us 			= $ENV {SERVER_NAME};
-my $qs 			= $ENV {QUERY_STRING};
 my $pi 			= $ENV {PATH_INFO};
 my $mailresp	= 'payonline-ops@groupes.epfl.ch';
 my $masterIP	= '128.178.1.146';

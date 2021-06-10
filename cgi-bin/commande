@@ -24,8 +24,6 @@ binmode(STDOUT, ":utf8");
 require 'messages.txt';
 
 my $me 			= $ENV {SCRIPT_NAME};
-my $us 			= $ENV {SERVER_NAME};
-my $qs 			= $ENV {QUERY_STRING};
 my $pi 			= $ENV {PATH_INFO};
 my $lang 		= 'en';
 my $tmpldir 	= '/var/www/vhosts/payonline.epfl.ch/private/tmpl/';
