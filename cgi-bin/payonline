@@ -600,8 +600,10 @@ sub detinst {
   }
   my $selfonds = $result->{fonds};
 
+  my $instance_owner = Payonline::User->by_sciper($result->{sciper});
+
   if ($user->is_super_user) {
-		foreach my $cfline ($user->cfs) {
+		foreach my $cfline ($instance_owner->cfs) {
 			 next unless $cfline;
 			 my ($sigle,$cf) = split(/:/, $cfline);
 			 $cfs .= qq{,'$cf'};
@@ -609,7 +611,7 @@ sub detinst {
 		$cfs =~ s/^,//;
   }
 
-  my $fonds = $user->fonds;
+  my $fonds = $instance_owner->fonds;
   my $seltxt2 = qq{<select name="fonds">\n}; my $seltxt21;
   foreach my $cf (sort keys %$fonds) {
     my $flistref   = $fonds->{$cf};
