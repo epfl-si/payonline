@@ -573,25 +573,9 @@ sub detinst {
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
   }
-  
-  my ($sql, $cfs, @params);
-  if ($user->is_super_user) {
-  	$sql = qq{select * from instances where id = ?};
-  	push @params, $id;
-  } else {
-	foreach my $cfline ($user->cfs) {
-	   next unless $cfline;
-	   my ($sigle,$cf) = split(/:/, $cfline);
-	   $cfs .= qq{,'$cf'};
-	}
-	$cfs =~ s/^,//;
-	$sql = qq{select * from instances where id = ? and cf in ($cfs)};
-  	push @params, $id;
 
-  }
-  my $sth 	 = payonline_tools::dbquery ($sql, @params);
-  my $result = $sth->fetchrow_hashref ();
-  
+  my $result = find_instance_by_id($user, $id);
+
   unless ($result->{descr}) {
      my $errmsg = qq{instance pas trouvée ou en dehors de votre responsabilité};
      $template->param(sErrMsg 	=> $errmsg);
@@ -1370,3 +1354,23 @@ sub quit {
   main ();
 }
 
+sub find_instance_by_id {
+  my ($user, $id) = @_;
+  my ($sql, $cfs, @params);
+  if ($user->is_super_user) {
+  	$sql = qq{select * from instances where id = ?};
+  	push @params, $id;
+  } else {
+	foreach my $cfline ($user->cfs) {
+	   next unless $cfline;
+	   my ($sigle,$cf) = split(/:/, $cfline);
+	   $cfs .= qq{,'$cf'};
+	}
+	$cfs =~ s/^,//;
+	$sql = qq{select * from instances where id = ? and cf in ($cfs)};
+  	push @params, $id;
+
+  }
+  my $sth 	 = payonline_tools::dbquery ($sql, @params);
+  return scalar $sth->fetchrow_hashref ();
+}
