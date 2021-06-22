@@ -763,11 +763,9 @@ sub demvalid {
 	exit;
   }
 
-  my $sql = qq{select * from instances where id = ?};
-  my $sth = payonline_tools::dbquery ($sql, ($id));
-  my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$d1,$d2,$d3,$ois) = $sth->fetchrow_array ();
+  my $instance = find_instance_by_id($user, $id);
 
-  unless ($descr) {
+  unless ($instance) {
    my $errmsg = qq{instance $id pas trouvée ou en dehors de votre contrôle};
 	$template->param(sErrMsg 	=> $errmsg);
 	$template->param(sAuthstr	=> 1 );
@@ -775,7 +773,7 @@ sub demvalid {
 	exit;
   }
   
-  $sql = qq{update instances set etat='validation' where id=?};
+  my $sql = qq{update instances set etat='validation' where id=?};
   payonline_tools::dbquery ($sql, ($id));
   payonline_tools::write_log_db ($user, qq{demvalid::$id});
 
@@ -785,13 +783,13 @@ sub demvalid {
 *Demande de validation d'instance de paiement*
 
 Instance no: $id
-OIS : $ois
-Description : $descr
-Responsable : $user->prenom $user->nom [sciper: $user->sciper, mail:$user->mail]
-Centre financier : $cf
-Fonds : $fonds
-Date début: $datedeb
-Date fin : $datefin
+OIS : ${\($instance->{ois})}
+Description : ${\($instance->{descr})}
+Responsable : ${\($user->prenom)} ${\($user->nom)} [sciper: ${\($user->sciper)}, mail:${\($user->mail)}]
+Centre financier : ${\($instance->{cf})}
+Fonds : ${\($instance->{fonds})}
+Date début: ${\($instance->{datedeb})}
+Date fin : ${\($instance->{datefin})}
 
 };
 
