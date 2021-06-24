@@ -24,7 +24,7 @@ my $mailresp	= 'payonline-ops@groupes.epfl.ch';
 my $mailSF		= $ENV{PAYONLINE_MAIL_SF_RECIPIENTS};
 
 my $separator	= ';';
-my $tmpfile 	= '/tmp/payonline.txt';
+my $tmpfile 	= '/tmp/payonline-utf8.txt';
 my $lockfile	= '/tmp/payonline.lock';
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time - 86400);
@@ -61,7 +61,7 @@ sub extrans {
   my $sth_inst  = payonline_tools::dbquery ($sql);
   return unless $sth_inst;
 
-  open (OUT, ">:encoding(latin-1)", $tmpfile) or die "err open payonline tmp : $!";
+  open (OUT, ">", $tmpfile) or die "err open payonline tmp : $!";
 
   my $count = 0;
   
@@ -131,6 +131,8 @@ sub extrans {
   }
    close OUT;
 
+  system("piconv -f utf8 -t latin1 < /tmp/payonline-utf8.txt > /tmp/payonline.txt");
+
    return if $payonline_tools::DEBUG;
 
    if ( $count ) {
@@ -142,9 +144,15 @@ sub extrans {
 		 Type    =>'multipart/mixed',
 	  );
 	  $msg->attach(
-			 Type		 => 'text/plain',
+			 Type		 => 'text/plain; charset=iso-8859-1',
 			 Path		 => "$tmpfile",
 			 Filename	 => "payonline.txt",
+			 Disposition => 'attachment',
+          );
+	  $msg->attach(
+			 Type		 => 'text/plain; charset=utf-8',
+			 Path		 => "$tmpfile",
+			 Filename	 => "payonline-utf8.txt",
 			 Disposition => 'attachment',
 	  );
 	  $msg->send('smtp', 'mail.epfl.ch') or die "err send: $!";
