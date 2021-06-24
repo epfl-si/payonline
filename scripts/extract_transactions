@@ -33,7 +33,7 @@ my $lockfile	= '/tmp/payonline.lock';
 ###################################################
 
 my $date =
-  ($ARGV[0] && $ARGV[0] =~ m/^(\d{4}-\d{2}\d{2})$/) ?
+  ($ARGV[0] && $ARGV[0] =~ m/^(\d{4}-\d{2}-\d{2})$/) ?
   $ARGV[0] :
   strftime("%F", localtime(time - 86000));
 
