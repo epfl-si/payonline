@@ -487,7 +487,8 @@ sub extrans {
   my $query  		= payonline_tools::getArgs ($result->{query});
   my $skeys 		= qq{date${separator}PaymentID${separator}methode${separator}}.join($separator, keys %$query);
 
-  print "Content-Type: application/vnd.ms-excel; charset=utf-8\n\n";
+  print "Content-Type:application/x-download\n";
+  print "Content-Disposition: attachment; filename=payonline.tsv\n\n";
   my @params;
   do {
     my $queryArgs = payonline_tools::getArgs($result->{query});
