@@ -718,8 +718,8 @@ sub units_with_payonline_right {
 
   if (! $self->{_units_with_payonline_right}) {
     my $payonline_right_id = 38;
-    $self->{_units_with_payonline_right} = [keys %{ _accreds()->getAllUnitsWhereHasRight(
-      $self->{sciper}, $payonline_right_id) }];
+    my $rights = _accreds()->getAllUnitsWhereHasRight($self->{sciper}, $payonline_right_id);
+    $self->{_units_with_payonline_right} = [keys %{ $rights || {} }];
   }
   return @{$self->{_units_with_payonline_right}};
 }
