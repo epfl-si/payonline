@@ -290,7 +290,7 @@ sub gentablekey {
       	id_transact='$userdata->{id_transact}'
       };
       log_event("formcont/payment::gentablekey", key => $key);
-      my $sth = dbquery ($sql);
+      my $sth = formcont_tools::dbquery ($sql);
       return $key if $sth;
     }
  }
