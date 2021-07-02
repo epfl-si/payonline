@@ -682,7 +682,9 @@ sub _tequila_to_unicode {
 
 sub cfs {
   my ($self) = @_;
-  my $unitlist = join ",", map { qq('$_') } $self->units_with_payonline_right;
+  my @units = $self->units_with_payonline_right;
+  return  if (! @units);
+  my $unitlist = join ",", @units;
 
   my @cfs;
   my $sql = qq{select cf,sigle from dinfo.unites where id_unite in ($unitlist)};
@@ -696,7 +698,10 @@ sub cfs {
 
 sub fonds {
   my ($self) = @_;
-  my $unitlist = join ",", map { qq('$_') } $self->units_with_payonline_right;
+  my @units = $self->units_with_payonline_right;
+  return {} if (! @units);
+
+  my $unitlist = join ",", @units;
 
   my $fondsperCF;
   my $sql = qq{select cf from dinfo.unites where id_unite in ($unitlist)};
