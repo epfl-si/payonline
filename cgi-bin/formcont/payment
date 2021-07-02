@@ -109,7 +109,7 @@ sub main {
   $errmsg .= "$errmsgs{$lang}->[20]<br>" 	unless $args{Email};
   if ($args{Email}) {
 	  # - validation email
-	  $errmsg .= "$errmsgs{$lang}->[21]<br>" unless ($args{Email} =~ /^(\w|\-|\_|\.)+\@((\w|\-|\_)+\.)+[a-zA-Z]{2,}$/);
+	  $errmsg .= "$errmsgs{$lang}->[21]<br>" unless ($args{Email} =~ /^(\w|[-_.+])+\@((\w|\-|\_)+\.)+[a-zA-Z]{2,}$/);
   }
   # validation du total:  [0-9]{0,9}\.[0-9]{1,2}
   my ($raison, $UserTotal) = split (/:/, $args{Total});
