@@ -926,7 +926,7 @@ sub doneinst {
 Instance no: $id
 OIS : $ois
 Description : $descr
-Responsable : $user->prenom $user->nom [sciper: $user->{sciper}, mail:$user->mail]
+Responsable : ${\($user->prenom)} ${\($user->nom)} [sciper: ${\($user->sciper)}, mail:${\($user->mail)}]
 Centre financier : $CF
 Fonds : $Fonds
 Compte budgétaire : $naturecomptable
@@ -1166,7 +1166,7 @@ sub donefnd {
   my $txt = qq{
   Demande de fonds pour le paiement en ligne
   
-  Sciper responsable: $user->{sciper}
+  Sciper responsable: ${\($user->sciper)}
   Centre Financier:   $CF
   Raison de la demande:
   $descr
