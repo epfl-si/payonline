@@ -778,6 +778,7 @@ sub doneinst {
   $cfFonds='0042:0042-24' if ($id eq $MyPrintID);
   
   my ($CF, $Fonds)		= split (/:/, $cfFonds);
+  my $instance;
 
   unless ($args{add}) {
      unless($id) {
@@ -796,10 +797,7 @@ sub doneinst {
      }
      $cfs =~ s/^,//;
 
-     my $sql = qq{select * from instances where id = ?}; 
-     $sql   .= qq{ and cf in ($cfs)} unless ($user->is_super_user) ;
-     my $sth = payonline_tools::dbquery ($sql, ($id));
-     my ($id,$fonds,$etat,$cf,$descr,$naturecomptable,$urlconf,$datedeb,$datefin,$tsciper,$url,$monnaie,$mailinst,$contact,$ois) = $sth->fetchrow_array ();
+     $instance = find_instance_by_id($user, $id);
 
      unless ($descr) {
       my $errmsg = qq{instance $id pas trouvée ou en dehors de votre contrôle};
@@ -812,7 +810,7 @@ sub doneinst {
 
      # - del instance
      if ($args{del}) {
-       $sql = qq{delete from instances where id = ?};
+       my $sql = qq{delete from instances where id = ?};
        payonline_tools::dbquery ($sql, ($id));
        my $msg = qq{
      	  <h3>Instance effacée</h3>
@@ -831,7 +829,7 @@ sub doneinst {
 		  <li>mailinst=$mailinst
 		  <li>contact=$contact
        };
-       payonline_tools::write_log_db ($user, qq{delinst::$id;$cf;$fonds;$naturecomptable;$urlconf;$descr;$datedeb;$datefin;$monnaie;$url});
+       payonline_tools::write_log_db ($user, qq{delinst::$id;$instance->{cf};$instance->{fonds};$instance->{naturecomptable};$instance->{urlconf};$instance->{descr};$instance->{datedeb};$instance->{datefin};$instance->{monnaie};$instance->{url}});
        $template->param(sMsg 	=> $msg);
        $template->param(sAuthstr	=> 1 );
        print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
@@ -917,14 +915,15 @@ sub doneinst {
           log_event("payonline::doneinst", sql => $sql);
 	  payonline_tools::dbquery($sql, ($id));
 
-     # - send mail to SF
+          # - send mail to instance owner
+          my $resp    = Payonline::User->by_sciper($instance->{sciper});
 	  my $txt = qq{
 *Validation d'instance de paiement*
 
 Instance no: $id
 OIS : $ois
 Description : $descr
-Responsable : ${\($user->prenom)} ${\($user->nom)} [sciper: ${\($user->sciper)}, mail:${\($user->mail)}]
+Responsable : ${\($resp->prenom)} ${\($resp->nom)} [sciper: ${\($resp->sciper)}, mail:${\($resp->mail)}]
 Centre financier : $CF
 Fonds : $Fonds
 Compte budgétaire : $naturecomptable
@@ -942,7 +941,7 @@ Toutes les transactions de test ont été effacées.
 
 Votre service de paiement en ligne
 };
-	  payonline_tools::send_mail ($user->mail, 'payonline : validation instance de paiement', $txt) ;
+	  payonline_tools::send_mail ($resp->mail, 'payonline : validation instance de paiement', $txt) ;
 
 	  payonline_tools::write_log_db ($user, qq{del_test_trasact::$id});
 	  payonline_tools::write_log_db ($user, qq{validinst::$id;$CF;$Fonds;$naturecomptable;$codetva;$urlconf;$ois;$descr;$datedebvalide;$datefinvalide;$url;$mailinst;$contact});
