@@ -549,9 +549,9 @@ sub detinst {
   }
   my $selfonds = $result->{fonds};
 
-  my $instance_owner = Payonline::User->by_sciper($result->{sciper});
+  my $resp    = Payonline::User->by_sciper($result->{sciper});
 
-  my $fonds = $instance_owner->fonds;
+  my $fonds = $resp->fonds;
   my $seltxt2 = qq{<select name="fonds">\n}; my $seltxt21;
   foreach my $cf (sort keys %$fonds) {
     my $flistref   = $fonds->{$cf};
@@ -585,8 +585,6 @@ sub detinst {
   }
   $template->param(IsSuperUser => $user->is_super_user);
 #  $template->param(IsSuperUser => 0);
-
-  my $resp    = Payonline::User->by_sciper($result->{sciper});
   
   $template->param(IsSuperUser => $user->is_super_user);
   $template->param(sMonnaie		=> $monnaie->stringify );
