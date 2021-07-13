@@ -21,6 +21,7 @@ use MIME::Base64 ;
 use Net::CIDR;
 use Net::CIDR ':all';
 use JSON;
+use v5.21;
 
 use Cadi::Accreds;
 use Encode;
@@ -103,6 +104,24 @@ Log arguments as a JSON associative array to stderr, for Kibana to digest.
 
 sub log_event {
   my (%details) = ("event", @_);
+  # The following fields have clashing types, which Kibana doesn't
+  # like (see
+  # https://jira.camptocamp.com/servicedesk/customer/portal/5/INF-6760);
+  # fix that by casting values resp. renaming keys
+  state @cast_to_string_fields = qw(step sciper);
+  state @polish_notation_fields = qw(fonds);
+
+  foreach my $field (@cast_to_string_fields) {
+    if (exists $details{$field}) {
+      $details{$field} .= "";
+    }
+  }
+  foreach my $field (@polish_notation_fields) {
+    if (my $ref = ref($details{$field})) {
+      $details{"${field}_${ref}"} = delete $details{$field};
+    }
+  }
+
   print STDERR JSON::encode_json(\%details) . "\n";
 }
 
