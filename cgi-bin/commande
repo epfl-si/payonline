@@ -218,7 +218,7 @@ sub maintrans {
 		 print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
 		 exit;
 	  }
-  
+
 	  my $UserTotal = sprintf "%.2f",$args{Total};
 	  foreach my $item (keys %args) {
 			$args{$item} = $UserTotal if ($item eq 'Total');
@@ -228,7 +228,7 @@ sub maintrans {
 	  $query =~ s/^&//;
 	  $query =~ s/\n/ /g;
 	  $query =~ s/\\//g;
-          log_event("commande::maintrans", step => 1, query => $query);
+          log_event("commande::maintrans", step => 1, query => $query, form => \%args);
 	  $id_trans	= payonline_tools::gentablekey('transact',18);
 	  my $sql   = qq{update transact set id_inst=?,datecr=Now(),lang=?,query=? where id=?  };
 	  my $sth   = payonline_tools::dbquery ($sql, ($args{id_inst},$lang,$query,$id_trans));

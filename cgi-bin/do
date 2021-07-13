@@ -106,7 +106,7 @@ sub cert {
 
   my $query	= payonline_tools::getQuery ($id_trans);
   return unless $query;
-  log_event("do::cert", query => "OK");
+  log_event("do::cert", query_status => "OK");
 
   # - get transaction data
   my $trans= payonline_tools::getTrans ($id_trans, '');
