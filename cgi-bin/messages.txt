@@ -151,7 +151,7 @@ $messages = {
 			en => q{Instance details},
 		},
 		inst_id_label => {
-			fr => q{Identificateur de l'instance},
+			fr => q{Identifiant de l'instance},
 			en => q{Instance identifier},
 		},
 		status_label => {

@@ -103,7 +103,7 @@ sub prix {
 #------
 sub detail {
 
-  error (qq{identificateur de transaction absent}) unless $args{id};
+  error (qq{identifiant de transaction absent}) unless $args{id};
 
   my $sql = qq{select * from transact where id='$args{id}'};
   print qq{

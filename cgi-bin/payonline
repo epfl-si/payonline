@@ -357,7 +357,7 @@ sub listtrans {
   my $id_inst  = $args{id};
 
   unless ($id_inst) {
-     my $errmsg = qq{identificateur d'instance absent};
+     my $errmsg = qq{identifiant d'instance absent};
      $template->param(sErrMsg 	=> $errmsg);
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
@@ -447,7 +447,7 @@ sub extrans {
   my $separator= "\t";
 
   unless ($id_inst) {
-     my $errmsg = qq{identificateur d'instance absent};
+     my $errmsg = qq{identifiant d'instance absent};
      $template->param(sErrMsg 	=> $errmsg);
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
@@ -533,7 +533,7 @@ sub detinst {
   my $template = initTempl('detinst.tmpl');
   my $id = $args{id};
   unless ($id) {
-     my $errmsg = qq{identificateur d'instance absent};
+     my $errmsg = qq{identifiant d'instance absent};
      $template->param(sErrMsg 	=> $errmsg);
      print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
      exit;
@@ -684,7 +684,7 @@ sub demvalid {
   
   $template->param(sAuthstr		=> 1 );
   unless($id) {
-	my $errmsg = qq{identificateur d'instance absent};
+	my $errmsg = qq{identifiant d'instance absent};
 	$template->param(sErrMsg 	=> $errmsg);
 	print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
 	exit;
@@ -782,7 +782,7 @@ sub doneinst {
 
   unless ($args{add}) {
      unless($id) {
-       my $errmsg = qq{identificateur d'instance absent};
+       my $errmsg = qq{identifiant d'instance absent};
        $template->param(sErrMsg 	=> $errmsg);
        $template->param(sAuthstr	=> 1 );
        print "Content-Type: text/html; charset=utf-8\n\n", $template->output;
