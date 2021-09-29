@@ -934,7 +934,7 @@ Date début: $datedeb
 Date fin : $datefin
 Monnaie : $monnaie
 CG gérées par la manifestation : $bypass_cg
-Retour sur sit manifestation : $bypass_return
+Retour sur site manifestation : $bypass_return
 
 L'instance a été validée par le Service Financier de l'EPFL et est passée en mode *production*.
 Toutes les transactions de test ont été effacées.
