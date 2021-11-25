@@ -40,7 +40,7 @@ a:hover {
 sub footer {
 	return qq{
 		<hr>
-		<span class="copy">&copy; 2011 - <a href="http://www.formation-continue-unil-epfl.ch/" target="_blank">Formation continue UNIL-EPFL</a> - <a href=mailto:formcont\@unil.ch>contact</a></span>
+		<span class="copy">&copy; 2011 - <a href="http://www.formation-continue-unil-epfl.ch/" target="_blank">Formation continue UNIL-EPFL</a> - <a href="mailto:formcont@unil.ch">contact</a></span>
 	};
 }
 

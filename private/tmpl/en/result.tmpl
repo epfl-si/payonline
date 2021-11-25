@@ -29,7 +29,7 @@
    <td >
 	  <TMPL_IF NAME=Descr>
 		 <h3><TMPL_VAR NAME=Descr></h3>
-		 <b>Responsable :</b> <a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a><br>
+		 <b>Responsable :</b> <a href="mailto:<TMPL_VAR NAME=RespMail>"><TMPL_VAR NAME=Resp></a><br>
 		 <b>Transaction nb. : </b><TMPL_VAR NAME=OrderIDShop><br>
 		 <b>PostFinance ID : </b><TMPL_VAR NAME=TransactionID><br>
 		 <b>Payment date : </b><TMPL_VAR NAME=Date><br>
@@ -45,8 +45,8 @@
 		 <hr>
 	 </TMPL_IF>
 
-	  <p>In case of repeating failures, please check the <a href=/docs/troubleshooting-en.html><b>troubleshooting online help</b></a> and send this information and the error message to Postfinance's support [<a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>], to
-	  the person in charge of the instance [<a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a>]
+	  <p>In case of repeating failures, please check the <a href=/docs/troubleshooting-en.html><b>troubleshooting online help</b></a> and send this information and the error message to Postfinance's support [<a href="mailto:shopperhelp@postfinance.ch">shopperhelp@postfinance.ch</a>], to
+	  the person in charge of the instance [<a href="mailto:<TMPL_VAR NAME=RespMail>"><TMPL_VAR NAME=Resp></a>]
 	  or to <a href="mailto:payonline-ops@groupes.epfl.ch">payonline-ops@groupes.epfl.ch</a>, according to the point of failure.
 	  </p>
   </td>

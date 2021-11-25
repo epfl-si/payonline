@@ -28,7 +28,7 @@
    <td >
 	  <TMPL_IF NAME=Descr>
 		 <h3><TMPL_VAR NAME=Descr></h3>
-		 <b>Responsable :</b> <a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a><br>
+		 <b>Responsable :</b> <a href="mailto:<TMPL_VAR NAME=RespMail>"><TMPL_VAR NAME=Resp></a><br>
 		 <b>No. transaction : </b><TMPL_VAR NAME=OrderIDShop><br>
 		 <b>Identifiant PostFinance : </b><TMPL_VAR NAME=TransactionID><br>
 		 <b>Date de paiement: </b><TMPL_VAR NAME=Date><br>
@@ -45,7 +45,7 @@
 	 </TMPL_IF>
 
 	  <p>En cas de problème récurent, veuillez consulter <b><a href=/docs/troubleshooting-fr.html>l'aide en ligne</a></b> et transmettre ces informations ainsi que le message
-	  d'erreur au support technique de Postfinance [<a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>], au responsable de l'instance [<a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a>]
+	  d'erreur au support technique de Postfinance [<a href="mailto:shopperhelp@postfinance.ch">shopperhelp@postfinance.ch</a>], au responsable de l'instance [<a href="mailto:<TMPL_VAR NAME=RespMail>"><TMPL_VAR NAME=Resp></a>]
 	  ou à <a href="mailto:payonline-ops@groupes.epfl.ch">payonline-ops@groupes.epfl.ch</a> selon l'étape où le problème est arrivé.
 	  </p>
 

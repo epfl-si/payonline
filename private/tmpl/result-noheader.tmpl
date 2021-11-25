@@ -47,7 +47,7 @@
 
 <TMPL_IF NAME=Descr>
 	 <h3><TMPL_VAR NAME=Descr></h3>
-	 <b>Responsable:</b> <a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a><br>
+	 <b>Responsable:</b> <a href="mailto:<TMPL_VAR NAME=RespMail>"><TMPL_VAR NAME=Resp></a><br>
 	 <b>Transaction nb.: </b><TMPL_VAR NAME=OrderIDShop><br>
 	 <b>PostFinance ID: </b><TMPL_VAR NAME=TransactionID><br>
 	 <b><TMPL_VAR NAME=date_label>: </b><TMPL_VAR NAME=Date><br>
@@ -67,8 +67,8 @@
 	<p>En cas de problème récurent, veuillez consulter <b><a href=/docs/troubleshooting-fr.html>l'aide en ligne</a></b> et transmettre ces informations ainsi que le message
 	d'erreur
  	<div class="col-md-12" style="padding: 0 0 10px 10px;">
-	<li>au support technique de Postfinance [<a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>], </li>
-	<li>au responsable de l'instance [<a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a>]</li>
+	<li>au support technique de Postfinance [<a href="mailto:shopperhelp@postfinance.ch">shopperhelp@postfinance.ch</a>], </li>
+	<li>au responsable de l'instance [<a href="mailto:<TMPL_VAR NAME=RespMail>"><TMPL_VAR NAME=Resp></a>]</li>
 	<li>ou à <a href="mailto:payonline-ops@groupes.epfl.ch">payonline-ops@groupes.epfl.ch</a> </li>
 	selon l'étape où le problème est arrivé.
 	</div>
@@ -76,8 +76,8 @@
 <TMPL_ELSE>
 	<p>In case of repeating failures, please check the <a href=/docs/troubleshooting-en.html><b>troubleshooting online help</b></a> and send this information and the error message
  	<div class="col-md-12" style="padding: 0 0 10px 10px;">
- 	<li>to Postfinance's support [<a href=mailto:shopperhelp@postfinance.ch>shopperhelp@postfinance.ch</a>], </li>
- 	<li>to the person in charge of the instance [<a href=mailto:<TMPL_VAR NAME=RespMail>><TMPL_VAR NAME=Resp></a>]</li>
+ 	<li>to Postfinance's support [<a href="mailto:shopperhelp@postfinance.ch">shopperhelp@postfinance.ch</a>], </li>
+ 	<li>to the person in charge of the instance [<a href="mailto:<TMPL_VAR NAME=RespMail>"><TMPL_VAR NAME=Resp></a>]</li>
  	<li>or to <a href="mailto:payonline-ops@groupes.epfl.ch">payonline-ops@groupes.epfl.ch</a>, </li>
  	according to the point of failure.
 	</div>
