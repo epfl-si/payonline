@@ -395,7 +395,7 @@ sub result {
 	  $template->param(Resp 		=> $inst->{contact});
 	  $template->param(RespMail 	=> $inst->{contact});
   } else {
-	  $template->param(Resp 		=> "$resp->prenom $resp->nom");
+	  $template->param(Resp 		=> "${\$resp->prenom} ${\$resp->nom}");
 	  $template->param(RespMail 	=> $resp->mail);
   }
 

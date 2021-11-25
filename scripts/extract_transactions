@@ -166,15 +166,15 @@ sub closeinst {
   my $sth 	= payonline_tools::dbquery ($sql);
   while (my $result = $sth->fetchrow_hashref) {
    my $resp = Payonline::User->by_sciper($result->{sciper});
-   my $txt = qq{Instance no: $result->{id} passe en mode *archive*
-Description : $result->{descr}
-Responsable : $resp->prenom $resp->nom [sciper: $result->{sciper}, mail:$resp->mail]
-Centre financier : $result->{cf}
-Fonds : $result->{fonds}
-Compte budgétaire : $result->{naturecomptable}
-Code TVA : $result->{codetva}
-Date début: $result->{datedeb}
-Date fin : $result->{datefin}
+   my $txt = qq{Instance no: ${\$result->{id}} passe en mode *archive*
+Description : ${\$result->{descr}}
+Responsable : ${\($user->prenom)} ${\($user->nom)} [sciper: ${\$result->{sciper}}, mail:${\$resp->mail}]
+Centre financier : ${\$result->{cf}}
+Fonds : ${\$result->{fonds}}
+Compte budgétaire : ${\$result->{naturecomptable}}
+Code TVA : ${\$result->{codetva}}
+Date début: ${\$result->{datedeb}}
+Date fin : ${\$result->{datefin}}
 };
 
    my $dest = $payonline_tools::DEBUG ? '' : $resp->mail ;
