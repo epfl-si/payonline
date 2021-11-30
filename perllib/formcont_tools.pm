@@ -14,18 +14,7 @@ sub is_prod {
 #--------
 my $dbh;
 sub dbconnect {
-
-  my $dbname  = 'formcont';
-  my $dbuser  = 'formcont';
-  my $dbpwd   = $dbuser.'59';
-  my $dbhost  = is_prod ? 'cadidb.epfl.ch' : 'test-cadidb.epfl.ch';
-
-  die "dbconnect : ERR DB CONFIG : $dbname, $dbhost, $dbuser" unless ($dbname and $dbhost and $dbuser and $dbpwd) ;
-  my $dsndb    = qq{dbi:mysql:$dbname:$dbhost:3306};
-  log_event "dbconnect", dbname => $dsndb;
-  $dbh = DBI->connect ($dsndb, $dbuser, $dbpwd, {mysql_enable_utf8 => 1});
-die "dbconnect : ERR DBI CONNECT : $dbhost, $dbname, $dbuser" unless $dbh;
-
+  $dbh = payonline_tools::dbconnect('formcont');
 }
 #___________
 sub dbquery {
