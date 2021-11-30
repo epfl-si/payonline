@@ -168,7 +168,7 @@ sub closeinst {
    my $resp = Payonline::User->by_sciper($result->{sciper});
    my $txt = qq{Instance no: ${\$result->{id}} passe en mode *archive*
 Description : ${\$result->{descr}}
-Responsable : ${\($user->prenom)} ${\($user->nom)} [sciper: ${\$result->{sciper}}, mail:${\$resp->mail}]
+Responsable : ${\($resp->prenom)} ${\($resp->nom)} [sciper: ${\$result->{sciper}}, mail:${\$resp->mail}]
 Centre financier : ${\$result->{cf}}
 Fonds : ${\$result->{fonds}}
 Compte budgétaire : ${\$result->{naturecomptable}}
