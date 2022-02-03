@@ -457,7 +457,7 @@ sub result {
 				 $dest =~ s/^,//;
 				 $dest =~ s/,$//;
                         log_event "do::result", step => "send mail", to => $dest;
-			payonline_tools::send_mail ($dest, "payonline TRASACTION REFUSED : $id_trans", $msg);
+			payonline_tools::send_mail ($dest, "payonline TRANSACTION REFUSED : $id_trans", $msg);
 			
 		}
 
