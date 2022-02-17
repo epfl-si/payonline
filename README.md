@@ -5,20 +5,7 @@ L'accès à ce service est soumis au droit *payonline* du système d'accréditat
 
 ## Déploiement
 
-### Déploiement sur OpenShift
-
-Le build se fait dans OpenShift. Pour le lancer :
-
-```
-./ops/paysible -t payonline.k8s.build
-```
-
-Une fois les tests concluants sur https://payonline-preprod.epfl.ch/ :
-
-```
-./ops/paysible --prod -t payonline.k8s,payonline.k8s.promote
-```
-
+Voir les instructions dans [payonline-ops](https://github.com/epfl-si/payonline.ops)
 
 ## Troubleshooting
 
