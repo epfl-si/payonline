@@ -5,26 +5,20 @@ L'accès à ce service est soumis au droit *payonline* du système d'accréditat
 
 ## Déploiement
 
-### Déploiement on VM
-
-Déploiement to test VMs
-```
-./deploy_test.sh
-```
-
-Déploiement to prod VMs
-```
-./deploy_prod.sh$
-```
-
 ### Déploiement sur OpenShift
 
-Déploiement vers le namespace de test
+Le build se fait dans OpenShift. Pour le lancer :
+
 ```
-./deploy_os.sh
+./ops/paysible -t payonline.k8s.build
 ```
 
-Déploiement vers le namespace de prod → utiliser [le dépôt «ops»](https://github.com/epfl-si/payonline.ops)
+Une fois les tests concluants sur https://payonline-preprod.epfl.ch/ :
+
+```
+./ops/paysible --prod -t payonline.k8s,payonline.k8s.promote
+```
+
 
 ## Troubleshooting
 
