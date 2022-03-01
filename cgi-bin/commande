@@ -13,6 +13,7 @@
 
 use strict;
 use HTML::Template;
+use Text::Unidecode;
 
 use payonline_tools;
 
@@ -327,5 +328,6 @@ Returns C<$com>, weeding out things that Yellowpay won't proceed.
 sub sanitize_COM {
   my ($COM) = @_;
   $COM 	  	 	= substr($COM, 0, 99) if length($COM) > 100;
+  $COM = unidecode($COM);
   return $COM;
 }
