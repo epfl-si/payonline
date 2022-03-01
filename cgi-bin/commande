@@ -252,8 +252,7 @@ sub maintrans {
   my $send_hash = $flow->makeHash($hashdata);
   
   my $txtLang	= $lang eq 'fr' ? 'fr_FR' : 'en_US';
-  my $COM 	 	= $inst->{descr};
-  $COM 	  	 	= substr($COM, 0, 99) if length($COM) > 100;
+  my $COM 	 	= sanitize_COM($inst->{descr});
   #	- EPFL Shop
   my $sOnLoad 	= 'onload="document.cmd.submit();"' if $inst->{bypass_cg};
   my $CGchecked = 'checked' 												if $inst->{bypass_cg};
@@ -313,4 +312,20 @@ sub initTempl {
    $template->param(sPathMe 	=> $me);
    $template->param(sDebug 		=> $payonline_tools::DEBUG);
    return $template;
+}
+
+=head2 sanitize_com ($com)
+
+Filter to sanitize the COM field passed to Yellowpay.
+
+That field is L<rumored|https://e-payment-postfinance.ecom-psp.com/en/integration-solutions/integrations/hosted-payment-page#e_commerce_integration_guides_link_your_website_to_the_payment_page> to be used for “structured communications” (possibly in credit card billing data flows?). Experience shows that it should not contain non-ASCII characters. Cargo-cult code suggests that it should be no longer than 100 characters.
+
+Returns C<$com>, weeding out things that Yellowpay won't proceed.
+
+=cut
+
+sub sanitize_COM {
+  my ($COM) = @_;
+  $COM 	  	 	= substr($COM, 0, 99) if length($COM) > 100;
+  return $COM;
 }
