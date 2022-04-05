@@ -574,7 +574,7 @@ sub detinst {
 
   my $codeTVA;
   if ($result->{naturecomptable} eq '740060' || $result->{naturecomptable} eq '741070') {
-    $codeTVA = Widget::CodeTVA->new($result->{codetva});
+    $codeTVA = Widget::CodeTVA->new($result->{codetva})->make_read_only;
   }
 
   my $nat_comptable = Widget::NatureComptable->new($lang, $result->{naturecomptable});
@@ -1312,6 +1312,7 @@ sub stringify {
 sub make_read_only {
   my ($self) = @_;
   $self->{is_readonly} = 1;
+  $self;
 }
 
 package Widget::NatureComptable;
@@ -1411,7 +1412,7 @@ sub as_select {
   }
 }
 
-sub as_readonly {
+sub as_read_only {
   my ($self) = @_;
   my $selected = $self->{monnaie};
   return qq{<input type="hidden" name="monnaie" value="$self->{monnaie}"> $self->{monnaie}};
@@ -1441,3 +1442,5 @@ sub as_select {
     </select>
    };
 }
+
+sub as_read_only { shift->{codeTVA} }
