@@ -210,8 +210,9 @@ sub send_mail {
   $mail{To}   	 = $dest;
 
   $mail{Smtp} 	 = 'mail.epfl.ch';
-  $mail{Subject} = $subj;
-  $mail{Message} = $msg;
+  $mail{charset} = "utf-8";
+  $mail{Subject} = Encode::encode('utf8', $subj);
+  $mail{Message} = Encode::encode('utf8', $msg);
   if (sendmail (%mail)) {
      if ($Mail::Sendmail::error) {
        log_event($log_event, error => $Mail::Sendmail::error);
@@ -245,8 +246,9 @@ sub send_mail_bc {
   $mail{To}   = $dest;
 
   $mail{Smtp} 	 = 'mail.epfl.ch';
-  $mail{Subject} = $subj;
-  $mail{Message} = $msg;	
+  $mail{charset} = "utf-8";
+  $mail{Subject} = Encode::encode('utf8', $subj);
+  $mail{Message} = Encode::encode('utf8', $msg);
   if (sendmail (%mail)) {
      if ($Mail::Sendmail::error) {
        log_event($log_event, error => $Mail::Sendmail::error);
