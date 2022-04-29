@@ -29,11 +29,12 @@ BEGIN {
 
 use constant CHOMP_DOT => $Carp::VERSION < 1.25;
 
-sub _warn { warn &_longmess }
+sub _warn { warn _longmess("WARN", @_) }
 
-sub _die { die ref $_[0] ? @_ : &_longmess }
+sub _die { die ref $_[0] ? @_ : _longmess("DIE", @_) }
 
 sub _longmess {
+  my $event = shift;
   if (CHOMP_DOT && $_[-1] =~ /\.\n\z/) {
     my $arg = pop @_;
     $arg =~ s/\.\n\z/\n/;
@@ -54,7 +55,7 @@ sub _longmess {
       push @stack, { what => $what, where => $where };
     }
   }
-  encode_json({ stacktrace => { message => $message, stack => \@stack }}) . "\n";
+  encode_json({ stacktrace_event => $event, stacktrace => { message => $message, stack => \@stack }}) . "\n";
 }
 
 my @HOOKS = qw(__DIE__ __WARN__);
