@@ -563,5 +563,6 @@ sub do_post {
   my $response = $ua->post($url, $postdata);
 
   my $content  = $response->decoded_content();
+  $content =~ s/^(.{4096})(.*$)/$1 + "[...]"/s;
   log_event "do::do_post", step => "done", content => $content;
 }
