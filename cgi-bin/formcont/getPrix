@@ -22,11 +22,11 @@ $payonline_tools::DEBUG	 = 1;
 
 log_event("getPrix");
 
-print qq{Content-Type: text/plain; charset=UTF-8
-Access-Control-Allow-Origin: *\n\n};
-
 my $sql = qq{select montant from prix order by montant + 0};
 my $sth = formcont_tools::dbquery ($sql);
+
+print qq{Content-Type: text/plain; charset=UTF-8
+Access-Control-Allow-Origin: *\n\n};
 
 print qq{
 <select name="Total">

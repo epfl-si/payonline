@@ -84,7 +84,6 @@ sub dispatch {
 #------
 sub cert {
 
-  print "Content-Type: text/html; charset=utf-8\n\n";
   my $YPSrv = $ENV{REMOTE_ADDR};
   return unless $YPSrv;
   log_event "do::cert", YPSrv => $YPSrv, %args;
@@ -323,8 +322,7 @@ Director of Philanthropy
 #    payonline_tools::send_mail ($email, 'EPFL payonline :: payment confirmation', $msg);
   log_event "do::cert:confirmation_email", to => $email, mailinst => $inst->{mailinst};
 
- exit;
-
+  print "Content-Type: text/html; charset=utf-8\n\n"; exit;
 }
 
 #------
