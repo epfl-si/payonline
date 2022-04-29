@@ -40,7 +40,7 @@ sub send_mail {
   $mail{To}   = $dest;
 
   $mail{Smtp} 	 = 'mail.epfl.ch';
-  $mail{charset} = "utf-8";
+  $mail{"Content-Type"} = 'text/plain; charset="utf-8"';
   $mail{Subject} = Encode::encode('utf8', $subj);
   $mail{Message} = Encode::encode('utf8', $msg);
 
