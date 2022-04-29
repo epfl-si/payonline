@@ -83,6 +83,7 @@ sub dispatch {
 
 #------
 sub cert {
+  my $cgi_success = "Content-Type: text/html; charset=utf-8\n\n";
 
   my $YPSrv = $ENV{REMOTE_ADDR};
   return unless $YPSrv;
@@ -93,7 +94,6 @@ sub cert {
                   log_event("do::cert: illegal access", id_trans => $args{orderID});
 			my $msg = qq{error :: id_trans=$args{orderID} illegal access from server IP=$YPSrv};
 			payonline_tools::send_mail ('payonline-ops@groupes.epfl.ch', 'payonline ERROR :: unknown Postfinance server', $msg);
-#			return;  
 		}
   }
 
@@ -162,8 +162,8 @@ sub cert {
     log_event("do::cert", status => "cancel", PAYID => $args{PAYID},
               STATUS => $args{STATUS});
 		$msg = qq{PAYONLINE FAILED TRANSACTION}.$msg;
-		payonline_tools::send_mail ('payonline-ops@groupes.epfl.ch', "payonline FAILED TRANSACTION : status=$args{STATUS}", $msg);
-		return;
+    payonline_tools::send_mail ('payonline-ops@groupes.epfl.ch', "payonline FAILED TRANSACTION : status=$args{STATUS}", $msg);
+    print $cgi_success; return;
   }
 
 	#	- offline transactions
@@ -214,7 +214,7 @@ sub cert {
 			}
 		}
 
-		return;
+    print $cgi_success; return;
   }
 
   if ($trans->{etat} eq 'payé') {
@@ -231,11 +231,11 @@ sub cert {
 			};
 		}
 		payonline_tools::send_mail ('payonline-ops@groupes.epfl.ch', "payonline WARNING :: transaction paid: status=$args{STATUS}", $msg);
-  	return;
+    print $cgi_success; return;
   } else {
 		if ($args{STATUS} eq '2') {
                         log_event("do::cert", status => "transaction refused", id_trans => $id_trans);
-			return;
+                        print $cgi_success; return;
 		}
   }
 
@@ -322,7 +322,7 @@ Director of Philanthropy
 #    payonline_tools::send_mail ($email, 'EPFL payonline :: payment confirmation', $msg);
   log_event "do::cert:confirmation_email", to => $email, mailinst => $inst->{mailinst};
 
-  print "Content-Type: text/html; charset=utf-8\n\n"; exit;
+  print $cgi_success; exit;
 }
 
 #------
