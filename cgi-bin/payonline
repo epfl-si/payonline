@@ -1305,7 +1305,7 @@ use overload '""' => 'stringify';
 
 sub stringify {
   my ($self) = @_;
-  $self->{is_readonly} ? $self->as_readonly :
+  $self->{is_readonly} ? $self->as_read_only :
                          $self->as_select;
 }
 
@@ -1381,7 +1381,7 @@ sub as_select {
   return $nat_comptable_txt;
 }
 
-sub as_readonly {
+sub as_read_only {
   my ($self) = @_;
   my $ncref = $nat_comptable{$self->{lang}} || $nat_comptable{'en'};
   return qq{<input type="hidden" name="naturecomptable" value="$self->{naturecomptable}"> $ncref->{$self->{naturecomptable}}};
