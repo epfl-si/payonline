@@ -116,7 +116,7 @@ RUN echo "umask 0002" >> /etc/apache2/envvars && \
 COPY ./cadi-libs/Cadi/. /opt/dinfo/lib/perl/Cadi/
 COPY ./accred-libs/Accred/. /opt/dinfo/lib/perl/Accred/
 COPY ./tequila-perl-client/Tequila/Client.pm /opt/dinfo/lib/perl/Tequila/Client.pm
-COPY ./perllib/*.pm /opt/dinfo/lib/perl/
+ADD ./perllib/ /opt/dinfo/lib/perl/
 COPY ./cgi-bin/messages.txt /opt/dinfo/lib/perl/messages.txt
 
 ################################################################################

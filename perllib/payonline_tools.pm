@@ -24,6 +24,7 @@ use JSON;
 use v5.21;
 
 use Cadi::Accreds;
+use Carp::JSON;
 use Encode;
 
 use CGI qw/ :cgi-lib -utf8 /;
