@@ -574,7 +574,10 @@ sub detinst {
 
   my $codeTVA;
   if ($result->{naturecomptable} eq '740060' || $result->{naturecomptable} eq '741070') {
-    $codeTVA = Widget::CodeTVA->new($result->{codetva})->make_read_only;
+    $codeTVA = Widget::CodeTVA->new($result->{codetva});
+    if (! $user->is_super_user()) {
+      $codeTVA->make_read_only;
+    }
   }
 
   my $nat_comptable = Widget::NatureComptable->new($lang, $result->{naturecomptable});
