@@ -866,7 +866,7 @@ sub doneinst {
   
   my ($msg, $sql);
   if ($id) {
-	if ($args{valid} and $user->is_super_user and $etat_precedent eq 'validation') {
+    if ($user->is_super_user) {
 	# - validation
 		$sql = qq{update instances set
 		  cf=?,
