@@ -170,8 +170,6 @@ sub cert {
 	$args{offline} = 1 if $trans->{etat} eq 'payé';
   if ($args{offline}) {
     log_event("do::cert", status => "offline status change", PAYID => $args{PAYID}, STATUS => $args{STATUS});
-		$msg = qq{OFFLINE STATUS CHANGE}.$msg;
-		payonline_tools::send_mail ('payonline-ops@groupes.epfl.ch', "payonline OFFLINE STATUS CHANGE : status=$args{STATUS}", $msg);
 
 		if ($args{STATUS} eq '93') {
 		#	- TRANSACTION REFUSED
