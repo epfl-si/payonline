@@ -23,29 +23,6 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 ################################################################################
-# Localization
-################################################################################
-RUN echo "Europe/Zurich" > /etc/timezone && \
-    dpkg-reconfigure --frontend=noninteractive tzdata && \
-    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
-    sed -i -e 's/# de_CH.UTF-8 UTF-8/de_CH.UTF-8 UTF-8/' /etc/locale.gen && \
-    echo 'LANG="en_US.UTF-8"' > /etc/default/locale && \
-    dpkg-reconfigure --frontend=noninteractive locales && \
-    update-locale LANG=en_US.UTF-8 && \
-    update-locale LC_CTYPE=en_US.UTF-8 && \
-    update-locale LC_NUMERIC=de_CH.UTF-8 && \
-    update-locale LC_TIME=de_CH.UTF-8 && \
-    update-locale LC_COLLATE=en_US.UTF-8 && \
-    update-locale LC_MONETARY=de_CH.UTF-8 && \
-    update-locale LC_MESSAGES=en_US.UTF-8 && \
-    update-locale LC_PAPER=de_CH.UTF-8 && \
-    update-locale LC_NAME=de_CH.UTF-8 && \
-    update-locale LC_ADDRESS=de_CH.UTF-8 && \
-    update-locale LC_TELEPHONE=de_CH.UTF-8 && \
-    update-locale LC_MEASUREMENT=de_CH.UTF-8 && \
-    update-locale LC_IDENTIFICATION=de_CH.UTF-8
-
-################################################################################
 # Users & groups
 ################################################################################
 RUN groupadd apache && \
