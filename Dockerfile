@@ -1,16 +1,11 @@
-FROM debian:buster-slim
-LABEL maintainer "olivier.delobre@epfl.ch"
+FROM ghcr.io/epfl-si/common-web:1.6.0
+LABEL maintainer "isas-fsd@groupes.epfl.ch"
 
+USER 0
 ################################################################################
 # System packages
 ################################################################################
 RUN apt-get update && apt-get install -y \
-        apache2 \
-        libaio1 \
-        default-libmysqlclient-dev \
-        locales \
-        default-mysql-client \
-        gettext-base \
         openssl \
         cpanminus \
         make \
@@ -21,22 +16,6 @@ RUN apt-get update && apt-get install -y \
         gcc \
         unzip \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
-
-################################################################################
-# Users & groups
-################################################################################
-RUN groupadd apache && \
-    useradd -r --uid 1001 -g apache apache
-
-################################################################################
-# Perl deps (DBD::Oracle, Tequila, ...)
-################################################################################
-RUN mkdir -p /opt/oracle && \
-    mkdir -p /opt/dinfo/lib/perl/Accred && \
-    mkdir -p /opt/dinfo/lib/perl/Cadi && \
-    mkdir -p /opt/dinfo/lib/perl/Tequila && \
-    mkdir -p /opt/dinfo/etc && \
-    mkdir -p /home/dinfo
 
 COPY cpanfile cpanfile
 RUN cpanm --installdeps --notest . || ( cat /root/.cpanm/work/*/build.log; exit 1 )
@@ -68,37 +47,19 @@ RUN mkdir -p /var/www/vhosts/payonline.epfl.ch/private/lib && \
 ################################################################################
 # Apache
 ################################################################################
-RUN mkdir -p /etc/apache2/conf.d && \
-    mkdir /etc/apache2/ssl
-
-COPY ./conf/docker/apache2.conf /etc/apache2/apache2.conf
-COPY ./conf/docker/ports.conf /etc/apache2/ports.conf
 COPY ./conf/docker/25-payonline.epfl.ch.conf /etc/apache2/sites-available/25-payonline.epfl.ch.conf
-COPY ./conf/docker/perl.conf /etc/apache2/conf.d/
 
-RUN echo "umask 0002" >> /etc/apache2/envvars && \
-    a2enmod ssl  && \
-    a2enmod rewrite && \
-    a2enmod headers && \
-    a2enmod cgi && \
-    a2enmod env && \
-    a2enmod remoteip && \
-    a2dissite 000-default.conf && \
-    a2dissite default-ssl.conf && \
+RUN set -e -x; \
+    a2enmod cgi ; \
+    a2dissite 000-default.conf ; \
+    a2dissite default-ssl.conf ; \
     a2ensite 25-payonline.epfl.ch.conf
-
-################################################################################
-# Libraries
-################################################################################
-COPY ./cadi-libs/Cadi/. /opt/dinfo/lib/perl/Cadi/
-COPY ./accred-libs/Accred/. /opt/dinfo/lib/perl/Accred/
-COPY ./tequila-perl-client/Tequila/Client.pm /opt/dinfo/lib/perl/Tequila/Client.pm
-ADD ./perllib/ /opt/dinfo/lib/perl/
-COPY ./cgi-bin/messages.txt /opt/dinfo/lib/perl/messages.txt
 
 ################################################################################
 # App
 ################################################################################
+ADD ./perllib/ /opt/dinfo/lib/perl/
+COPY ./cgi-bin/messages.txt /opt/dinfo/lib/perl/messages.txt
 COPY ./cgi-bin/. /var/www/vhosts/payonline.epfl.ch/cgi-bin/
 COPY ./htdocs/. /var/www/vhosts/payonline.epfl.ch/htdocs/
 COPY ./private/tmpl/. /var/www/vhosts/payonline.epfl.ch/private/tmpl/
@@ -124,12 +85,13 @@ RUN chgrp -R 0 /etc/apache2/sites-available && chmod -R g=u /etc/apache2/sites-a
 RUN chgrp -R 0 /var/www/vhosts/payonline.epfl.ch && chmod -R g=u /var/www/vhosts/payonline.epfl.ch
 RUN chgrp -R 0 /home/dinfo && chmod -R g=u /home/dinfo
 
+USER 1001
+
 ENV TERM=xterm
 ENV TZ=Europe/Zurich
 ENV PERL5LIB=/opt/dinfo/lib/perl
 
 # Use Apache2 graceful stop to terminate
 STOPSIGNAL SIGWINCH
-USER 1001
 EXPOSE 8080
 ENTRYPOINT ["/home/dinfo/docker-entrypoint.sh"]
