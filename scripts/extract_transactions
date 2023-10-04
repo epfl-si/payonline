@@ -45,6 +45,7 @@ payonline_tools::init ();
 
 # ---------- extract and send daily instances to SF
 extrans ($date);
+closeinst ($date);
 
 exit;
 
