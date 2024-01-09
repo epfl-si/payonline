@@ -62,6 +62,10 @@ $messages = {
 			fr => q{Aide},
 			en => q{Help},
 		},
+		menu_help_link => {
+			fr => q{https://www.epfl.ch/campus/services/website/fr/publier-sur-le-web-epfl/wordpress/liste-des-blocs/formulaires/},
+			en => q{https://www.epfl.ch/campus/services/website/web-services/wordpress-help/list-of-blocks-en/forms/},
+		},
 		new_head_label => {
 			fr => q{Nouvelle instance},
 			en => q{New instance},
