@@ -9,114 +9,214 @@
     <link rel="stylesheet" href="https://web2018.epfl.ch/7.0.0/css/elements.min.css">
     <script src="https://web2018.epfl.ch/7.0.0/js/elements.min.js"></script>
 </head>
-    <body>
-        <header role="banner" class="header">
-            <a class="logo" href="#">
-                <img src="https://web2018.epfl.ch/7.0.0/icons/epfl-logo.svg" alt="Logo EPFL, École polytechnique fédérale de Lausanne" class="img-fluid">
+
+<body>
+    <header role="banner" class="header">
+        <a class="logo" href="#">
+            <img src="https://web2018.epfl.ch/7.0.0/icons/epfl-logo.svg"
+                alt="Logo EPFL, École polytechnique fédérale de Lausanne" class="img-fluid">
+        </a>
+        <ul aria-hidden="true" class="nav-header d-none d-xl-flex">
+            <li id="menu-item-1">
+                <a class="nav-item" href="https://www.epfl.ch/about/fr/">À propos</a>
+            </li>
+            <li id="menu-item-2">
+                <a class="nav-item" href="https://www.epfl.ch/education/fr/">Éducation</a>
+            </li>
+            <li id="menu-item-3">
+                <a class="nav-item" href="https://www.epfl.ch/research/fr/">Recherche</a>
+            </li>
+            <li id="menu-item-4">
+                <a class="nav-item" href="https://www.epfl.ch/innovation/fr/">Innovation</a>
+            </li>
+            <li id="menu-item-5">
+                <a class="nav-item" href="https://www.epfl.ch/schools/fr/">Facultés</a>
+            </li>
+            <li id="menu-item-6">
+                <a class="nav-item" href="https://www.epfl.ch/campus/fr/">Campus</a>
+            </li>
+        </ul>
+
+        <div class="dropdown dropright search d-none d-xl-block">
+            <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-search"></use>
+                </svg>
             </a>
-            <ul aria-hidden="true" class="nav-header d-none d-xl-flex">
-                <li id="menu-item-1">
-                    <a class="nav-item" href="https://www.epfl.ch/about/fr/">À propos</a>
-                </li>
-                <li id="menu-item-2">
-                    <a class="nav-item" href="https://www.epfl.ch/education/fr/">Éducation</a>
-                </li>
-                <li id="menu-item-3">
-                    <a class="nav-item" href="https://www.epfl.ch/research/fr/">Recherche</a>
-                </li>
-                <li id="menu-item-4">
-                    <a class="nav-item" href="https://www.epfl.ch/innovation/fr/">Innovation</a>
-                </li>
-                <li id="menu-item-5">
-                    <a class="nav-item" href="https://www.epfl.ch/schools/fr/">Facultés</a>
-                </li>
-                <li id="menu-item-6">
-                    <a class="nav-item" href="https://www.epfl.ch/campus/fr/">Campus</a>
-                </li>
-            </ul>
-
-            <div class="dropdown dropright search d-none d-xl-block">
-                <a class="dropdown-toggle" href="#" data-toggle="dropdown">
-                    <svg class="icon" aria-hidden="true">
-                        <use xlink:href="#icon-search"></use>
-                    </svg>
-                </a>
-                <form action="#" class="dropdown-menu border-0 p-0">
-                    <div class="search-form mt-1 input-group">
-                        <label for="search" class="sr-only">Rechercher sur le site</label>
-                        <input type="text" class="form-control" name="search" placeholder="Rechercher">
-                        <button type="submit" class="d-none d-xl-block btn btn-primary input-group-append">Valider</button>
-                    </div>
-                </form>
-            </div>
-
-            <form action="#" class="d-xl-none">
-                <a id="search-mobile-toggle" class="search-mobile-toggle searchform-controller" href="#">
-                    <svg class="icon" aria-hidden="true">
-                        <use xlink:href="#icon-search"></use>
-                    </svg>
-                    <span class="toggle-label sr-only">Afficher / masquer le formulaire de recherche</span>
-                </a>
-                <div class="input-group search-mobile" role="search">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">
-                            <svg class="icon" aria-hidden="true">
-                                <use xlink:href="#icon-search"></use>
-                            </svg>
-                        </span>
-                    </div>
+            <form action="#" class="dropdown-menu border-0 p-0">
+                <div class="search-form mt-1 input-group">
                     <label for="search" class="sr-only">Rechercher sur le site</label>
                     <input type="text" class="form-control" name="search" placeholder="Rechercher">
-                    <div class="input-group-append">
-                        <a id="search-mobile-close" class="search-mobile-close searchform-controller" href="#">
-                            <svg class="icon" aria-hidden="true">
-                                <use xlink:href="#icon-close"></use>
-                            </svg>
-                            <span class="toggle-label sr-only">Masquer le formulaire de recherche</span>
-                        </a>
-                    </div>
+                    <button type="submit" class="d-none d-xl-block btn btn-primary input-group-append">Valider</button>
                 </div>
             </form>
+        </div>
 
-            <nav class="nav-lang nav-lang-short ml-auto">
-                <ul>
-                    <li>
-                        <span class="active" aria-label="Français">FR</span>
-                    </li>
-                    <li>
-                        <a href="/index.html" aria-label="Français">EN</a>
-                    </li>
-                </ul>
-            </nav>
-            <button class="btn btn-secondary nav-toggle-mobile d-xl-none">
-                <span class="label">Menu</span>
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+        <form action="#" class="d-xl-none">
+            <a id="search-mobile-toggle" class="search-mobile-toggle searchform-controller" href="#">
+                <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-search"></use>
+                </svg>
+                <span class="toggle-label sr-only">Afficher / masquer le formulaire de recherche</span>
+            </a>
+            <div class="input-group search-mobile" role="search">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <svg class="icon" aria-hidden="true">
+                            <use xlink:href="#icon-search"></use>
+                        </svg>
+                    </span>
                 </div>
-            </button>
-        </header>
-        <main class="pl-5 container pr-5">
-            <h1>Hello FR</h1>
-            <div>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Odit corrupti asperiores fugiat dolore blanditiis mollitia excepturi eum repellat earum alias, tenetur, quae similique tempore sunt voluptas optio ullam repellendus delectus officia suscipit ratione vero iure. Ex, qui. Alias, id. Impedit.</p>
-                <div class="faq">
-                    <h2>FAQ</h2>
-                    <button class="collapse-title collapse-title-desktop collapsed" type="button" data-toggle="collapse" data-target="#faq-collapse-1" aria-expanded="false" aria-controls="faq-collapse-1">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus, iusto.
-                    </button>
-                    <div class="collapse collapse-item collapse-item-desktop" id="faq-collapse-1">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam obcaecati quis, nostrum saepe expedita dolorem voluptatem a ducimus nam perferendis quae ipsa ea laboriosam at quidem officiis quas dolor, repellat enim placeat quibusdam iure nobis explicabo! Nostrum eveniet beatae dolorem.</p>
+                <label for="search" class="sr-only">Rechercher sur le site</label>
+                <input type="text" class="form-control" name="search" placeholder="Rechercher">
+                <div class="input-group-append">
+                    <a id="search-mobile-close" class="search-mobile-close searchform-controller" href="#">
+                        <svg class="icon" aria-hidden="true">
+                            <use xlink:href="#icon-close"></use>
+                        </svg>
+                        <span class="toggle-label sr-only">Masquer le formulaire de recherche</span>
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <nav class="nav-lang nav-lang-short ml-auto">
+            <ul>
+                <li>
+                    <span class="active" aria-label="Français">FR</span>
+                </li>
+                <li>
+                    <a href="/index.html" aria-label="Français">EN</a>
+                </li>
+            </ul>
+        </nav>
+        <button class="btn btn-secondary nav-toggle-mobile d-xl-none">
+            <span class="label">Menu</span>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+    </header>
+    <main class="pl-5 container pr-5">
+        <h1>Hello FR</h1>
+        <div>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Odit corrupti asperiores fugiat dolore
+                blanditiis mollitia excepturi eum repellat earum alias, tenetur, quae similique tempore sunt voluptas
+                optio ullam repellendus delectus officia suscipit ratione vero iure. Ex, qui. Alias, id. Impedit.</p>
+            <div class="faq">
+                <h2>FAQ</h2>
+                <button class="collapse-title collapse-title-desktop collapsed" type="button" data-toggle="collapse"
+                    data-target="#faq-collapse-1" aria-expanded="false" aria-controls="faq-collapse-1">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus, iusto.
+                </button>
+                <div class="collapse collapse-item collapse-item-desktop" id="faq-collapse-1">
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam obcaecati quis, nostrum saepe
+                        expedita dolorem voluptatem a ducimus nam perferendis quae ipsa ea laboriosam at quidem officiis
+                        quas dolor, repellat enim placeat quibusdam iure nobis explicabo! Nostrum eveniet beatae
+                        dolorem.</p>
+                </div>
+                <button class="collapse-title collapse-title-desktop collapsed" type="button" data-toggle="collapse"
+                    data-target="#faq-collapse-2" aria-expanded="false" aria-controls="faq-collapse-2">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus, iusto.
+                </button>
+                <div class="collapse collapse-item collapse-item-desktop" id="faq-collapse-2">
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam obcaecati quis, nostrum saepe
+                        expedita dolorem voluptatem a ducimus nam perferendis quae ipsa ea laboriosam at quidem officiis
+                        quas dolor, repellat enim placeat quibusdam iure nobis explicabo! Nostrum eveniet beatae
+                        dolorem.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="footer-light mt-auto w-75 mx-auto" role="contentinfo">
+        <div class="row">
+            <div class="col-6 mx-auto mx-md-0 mb-4 col-md-3 col-lg-2">
+                <a href="#">
+                    <img src="https://web2018.epfl.ch/7.0.0/icons/epfl-logo.svg"
+                        alt="Logo EPFL, École polytechnique fédérale de Lausanne" class="img-fluid">
+                </a>
+            </div>
+            <div class="col-md-9 col-lg-10 mb-4">
+                <div class="ml-md-2 ml-lg-5">
+                    <ul class="list-inline list-unstyled">
+                        <li class="list-inline-item">Contact</li>
+                        <li class="list-inline-item text-muted pl-3"><small>EPFL CH-1015 Lausanne</small></li>
+                        <li class="list-inline-item text-muted pl-3"><small>+41 21 693 11 11</small></li>
+                    </ul>
+                    <div class="footer-light-socials">
+                        <p class="footer-title footer-title-no-underline">Follow EPFL on social media</p>
+
+                        <ul class="social-icon-list list-inline">
+                            <li>
+                                <a href="https://www.facebook.com/epflcampus"
+                                    class="social-icon social-icon-facebook social-icon-negative" target="_blank"
+                                    rel="nofollow noopener">
+                                    <svg class="icon" aria-hidden="true">
+                                        <use xlink:href="#icon-facebook"></use>
+                                    </svg>
+                                    <span class="sr-only">Follow us on Facebook</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://instagram.com/epflcampus"
+                                    class="social-icon social-icon-instagram social-icon-negative" target="_blank"
+                                    rel="nofollow noopener">
+                                    <svg class="icon" aria-hidden="true">
+                                        <use xlink:href="#icon-instagram"></use>
+                                    </svg>
+                                    <span class="sr-only">Follow us on Instagram</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/school/epfl/"
+                                    class="social-icon social-icon-linkedin social-icon-negative" target="_blank"
+                                    rel="nofollow noopener">
+                                    <svg class="icon" aria-hidden="true">
+                                        <use xlink:href="#icon-linkedin"></use>
+                                    </svg>
+                                    <span class="sr-only">Follow us on LinkedIn</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://x.com/epfl_en" class="social-icon social-icon-x social-icon-negative"
+                                    target="_blank" rel="nofollow noopener">
+                                    <svg class="icon" aria-hidden="true">
+                                        <use xlink:href="#icon-x"></use>
+                                    </svg>
+                                    <span class="sr-only">Follow us on X</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.youtube.com/user/epflnews"
+                                    class="social-icon social-icon-youtube social-icon-negative" target="_blank"
+                                    rel="nofollow noopener">
+                                    <svg class="icon" aria-hidden="true">
+                                        <use xlink:href="#icon-youtube"></use>
+                                    </svg>
+                                    <span class="sr-only">Follow us on Youtube</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <button class="collapse-title collapse-title-desktop collapsed" type="button" data-toggle="collapse" data-target="#faq-collapse-2" aria-expanded="false" aria-controls="faq-collapse-2">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus, iusto.
-                    </button>
-                    <div class="collapse collapse-item collapse-item-desktop" id="faq-collapse-2">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam obcaecati quis, nostrum saepe expedita dolorem voluptatem a ducimus nam perferendis quae ipsa ea laboriosam at quidem officiis quas dolor, repellat enim placeat quibusdam iure nobis explicabo! Nostrum eveniet beatae dolorem.</p>
+
+                    <div class="footer-legal">
+                        <div class="footer-legal-links">
+                            <a
+                                href="https://www.epfl.ch/about/overview/regulations-and-guidelines/disclaimer/">Accessibility</a>
+                            <a
+                                href="https://www.epfl.ch/about/overview/regulations-and-guidelines/disclaimer/">Disclaimer</a>
+                            <a href="https://go.epfl.ch/privacy-policy/">Privacy policy</a>
+                        </div>
+                        <div>
+                            <p>&copy; 2024 EPFL, all rights reserved</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </main>
-    </body>
+        </div>
+    </footer>
+</body>
+
 </html>
